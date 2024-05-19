@@ -36,7 +36,7 @@ function NavBar({ isNewTimeCardCreated }) {
               </Link>
             </li>
             <li className={`nav-item ${location.pathname === '/newtimecard' ? 'active' : ''}`}>
-              <Link className="nav-link" to="/newtimecard">
+              <Link className="nav-link" to={isNewTimeCardCreated ? '/CurrentCard' : '/newtimecard'}>
                 {isNewTimeCardCreated ? 'Current Time Card' : 'Create New Time Card'}
               </Link>
             </li>
