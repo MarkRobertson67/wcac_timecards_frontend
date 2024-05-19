@@ -1,0 +1,5 @@
+
+.list-unstyled li:hover {
+    background-color: #6c757d; 
+    transition: background-color 0.3s ease;
+  }
