@@ -4,7 +4,7 @@ import './App.css';
 import Home from './components/pages/Home';
 import About from './components/pages/About/About';
 
-// import NavBar from './components/NavBar/NavBar';
+import NavBar from './components/NavBar/Navbar';
 import Footer from './components/Footer/Footer';
 
 
@@ -13,7 +13,7 @@ function App() {
   return (
     <div className="App">
       <Router>
-        {/* <NavBar /> */}
+        <NavBar />
         <main>
           <div className="content-container">
             <Routes>
