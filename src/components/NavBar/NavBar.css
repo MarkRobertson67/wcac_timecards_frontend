@@ -1,7 +1,26 @@
 
-.navbar-nav .nav-link:hover {
-    color: #fff !important; /* Change text color on hover */
-    background-color: #6c757d !important; /* Change background color on hover */
-    border-radius: 4px; /* Add rounded corners */
-  }
+/* NavBar.css */
+.navbar {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.nav-link {
+  padding: 0.5rem 1rem;
+}
+
+.nav-link:hover {
+  color: #ffcc00; /* Example hover color */
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.navbar-brand {
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+.nav-item.active .nav-link {
+  color: #ffc107; /* Example color for active link */
+}
+
   
