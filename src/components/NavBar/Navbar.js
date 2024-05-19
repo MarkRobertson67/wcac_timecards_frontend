@@ -3,7 +3,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import './NavBar.css';
 
-function NavBar() {
+function NavBar({ isNewTimeCardCreated }) {
   const location = useLocation();
 
   return (
@@ -36,8 +36,8 @@ function NavBar() {
               </Link>
             </li>
             <li className={`nav-item ${location.pathname === '/newtimecard' ? 'active' : ''}`}>
-              <Link className="nav-link" to="/CurrentCard">
-                Create New Time Card
+              <Link className="nav-link" to="/newtimecard">
+                {isNewTimeCardCreated ? 'Current Time Card' : 'Create New Time Card'}
               </Link>
             </li>
             <li className={`nav-item ${location.pathname === '/timecardindex' ? 'active' : ''}`}>

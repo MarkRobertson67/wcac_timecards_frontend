@@ -1,3 +1,5 @@
+
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 
@@ -10,10 +12,13 @@ import Footer from './components/Footer/Footer';
 
 
 function App() {
+
+  const [isNewTimeCardCreated, setIsNewTimeCardCreated] = useState(false);
+
   return (
     <div className="App">
       <Router>
-        <NavBar />
+        <NavBar isNewTimeCardCreated={isNewTimeCardCreated} />
         <main>
           <div className="content-container">
             <Routes>
