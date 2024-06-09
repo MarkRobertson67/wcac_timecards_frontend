@@ -9,7 +9,7 @@ import NavBar from './components/nav-bar/Navbar';
 import Footer from './components/footer/Footer';
 
 import CurrentTimeCard from './components/pages/currentTimeCard/CurrentTimeCard';
-import CreateNewTimeCard from './components/pages/createNewTimecard/CreateNewTimeCard'; 
+import CreateNewTimeCard from './components/pages/createNewTimecard/CreatenewTimecard'; 
 import TimeCardIndex from './components/pages/timeCardsIndex/TimeCardsIndex'; 
 
 function App() {
