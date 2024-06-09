@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import './NavBar.css';
+import './navBar.css';
 import logo from '../../Assets/WCAD_LOGO.png';
 
 function NavBar({ isNewTimeCardCreated }) {
@@ -11,7 +11,7 @@ function NavBar({ isNewTimeCardCreated }) {
     <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
       <div className="container-fluid">
         <Link className="navbar-brand" to="/">
-        <img src={logo} alt="Logo" style={{ height: '100px' }} />
+          <img src={logo} alt="Logo" style={{ height: '40px' }} />
         </Link>
         <button
           className="navbar-toggler"
@@ -36,14 +36,15 @@ function NavBar({ isNewTimeCardCreated }) {
                 About
               </Link>
             </li>
-            <li className={`nav-item ${location.pathname === '/newtimecard' ? 'active' : ''}`}>
-              <Link className="nav-link" to={isNewTimeCardCreated ? '/CurrentCard' : '/newtimecard'}>
+            <li className={`nav-item ${location.pathname === '/CreateNewtimecard' || location.pathname === '/CurrentTimeCard' ? 'active' : ''}`}>
+              <Link className="nav-link" to={isNewTimeCardCreated ? '/CurrentTimeCard' : '/CreateNewtimecard'}>
                 {isNewTimeCardCreated ? 'Current Time Card' : 'Create New Time Card'}
+
               </Link>
             </li>
-            <li className={`nav-item ${location.pathname === '/timecardindex' ? 'active' : ''}`}>
-              <Link className="nav-link" to="/PastCard">
-                Prior Time Cards
+            <li className={`nav-item ${location.pathname === '/TimeCardIndex' ? 'active' : ''}`}>
+              <Link className="nav-link" to="/TimeCardIndex">
+                Time Card Index
               </Link>
             </li>
           </ul>
@@ -54,3 +55,4 @@ function NavBar({ isNewTimeCardCreated }) {
 }
 
 export default NavBar;
+
