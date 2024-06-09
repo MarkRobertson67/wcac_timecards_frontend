@@ -3,14 +3,14 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 
 import Home from './components/pages/Home';
-import About from './components/pages/about/about';
+import About from './components/pages/about/About';
 
-import NavBar from './components/NavBar/navbar';
-import Footer from './components/Footer/Footer';
+import NavBar from './components/nav-bar/Navbar';
+import Footer from './components/footer/Footer';
 
-import CurrentTimeCard from './components/pages/currentTimeCard/currentTimeCard';
-import CreateNewTimeCard from './components/pages/createNewTimecard/createNewTimeCard'; 
-import TimeCardIndex from './components/pages/timeCardsIndex/timeCardsIndex'; 
+import CurrentTimeCard from './components/pages/currentTimeCard/CurrentTimeCard';
+import CreateNewTimeCard from './components/pages/createNewTimecard/CreateNewTimeCard'; 
+import TimeCardIndex from './components/pages/timeCardsIndex/TimeCardsIndex'; 
 
 function App() {
   const [isNewTimeCardCreated, setIsNewTimeCardCreated] = useState(false);
