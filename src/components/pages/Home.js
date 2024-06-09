@@ -5,7 +5,7 @@ function Home() {
     <div>
     <br></br>
     <br></br>
-    <h>Welcome to the timecards home page</h>
+    <h1>Welcome to the timecards home page</h1>
     </div>
     )
     }
