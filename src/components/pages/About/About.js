@@ -5,7 +5,7 @@ function About() {
     <div>
     <br></br>
     <br></br>
-    <h>Welcome to the about page</h>
+    <h1>Welcome to the wcac timecards about page</h1>
     </div>
     )
     }
