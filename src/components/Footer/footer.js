@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import './Footer.css';
-import logo from '../../Assets/WCAD_LOGO_TEXT.png';
+import logo from '../../assets/WCAD_LOGO.png';
 
 function Footer() {
   return (
