@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import './navBar.css';
+import './NavBar.css';
 import logo from '../../Assets/WCAD_LOGO.png';
 
 function NavBar({ isNewTimeCardCreated }) {
