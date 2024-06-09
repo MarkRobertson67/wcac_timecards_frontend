@@ -5,7 +5,7 @@ function timeCardsIndex() {
   return (
     <div>
       <h2>Time Card Index</h2>
-      {/* Add your content for past time cards */}
+      {/* Add the content for past time cards */}
     </div>
   );
 }
