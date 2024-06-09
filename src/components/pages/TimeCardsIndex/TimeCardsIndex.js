@@ -1,7 +1,7 @@
 
 import React from 'react';
 
-function timeCardsIndex() {
+function TimeCardsIndex() {
   return (
     <div>
       <h2>Time Card Index</h2>
@@ -10,5 +10,5 @@ function timeCardsIndex() {
   );
 }
 
-export default timeCardsIndex;
+export default TimeCardsIndex;
 
