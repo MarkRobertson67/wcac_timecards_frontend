@@ -2,6 +2,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import './NavBar.css';
+import logo from '../../Assets/WCAD_LOGO.png';
 
 function NavBar({ isNewTimeCardCreated }) {
   const location = useLocation();
@@ -10,7 +11,7 @@ function NavBar({ isNewTimeCardCreated }) {
     <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
       <div className="container-fluid">
         <Link className="navbar-brand" to="/">
-          AddLogo
+        <img src={logo} alt="Logo" style={{ height: '100px' }} />
         </Link>
         <button
           className="navbar-toggler"
