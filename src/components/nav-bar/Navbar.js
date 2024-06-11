@@ -7,6 +7,8 @@ import logo from '../../assets/WCAD_LOGO.png';
 
 function NavBar({ isNewTimeCardCreated }) {
   const location = useLocation();
+  // localStorage.clear();  
+
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
