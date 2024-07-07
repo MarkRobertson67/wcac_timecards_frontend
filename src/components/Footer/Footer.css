@@ -1,3 +1,22 @@
+/* Proprietary Software License
+   Copyright (c) 2024 Mark Robertson
+   See LICENSE.txt file for details. */
+
+.footer {
+  font-size: 10px; 
+}
+
+.footer-heading {
+  font-size: .7rem; 
+}
+
+.footer-content {
+  display: none;
+}
+
+.footer-heading:hover + .footer-content {
+  display: block;
+}
 
 .list-unstyled li:hover {
     background-color: #6c757d; 
