@@ -1,3 +1,6 @@
+// Proprietary Software License
+// Copyright (c) 2024 Mark Robertson
+// See LICENSE.txt file for details.
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
@@ -7,6 +10,8 @@ import logo from '../../assets/WCAD_LOGO.png';
 
 function NavBar({ isNewTimeCardCreated }) {
   const location = useLocation();
+  // localStorage.clear();  
+
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
