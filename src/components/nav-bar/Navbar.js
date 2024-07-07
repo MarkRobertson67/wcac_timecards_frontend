@@ -1,3 +1,6 @@
+// Proprietary Software License
+// Copyright (c) 2024 Mark Robertson
+// See LICENSE.txt file for details.
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';

@@ -1,3 +1,11 @@
+## License
+
+This project is licensed under the Proprietary Software License. See the [LICENSE.txt](./LICENSE.txt) file for details.
+
+For licensing inquiries, please contact Mark Robertson at [markrobertson67@gmail.com](mailto:markrobertson67@gmail.com).
+
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
