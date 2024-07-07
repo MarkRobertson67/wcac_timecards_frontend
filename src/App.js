@@ -1,3 +1,6 @@
+// Proprietary Software License
+// Copyright (c) 2024 Mark Robertson
+// See LICENSE.txt file for details.
 
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
