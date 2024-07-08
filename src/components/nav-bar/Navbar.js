@@ -4,14 +4,10 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import './NavBar.css';
 import logo from '../../assets/WCAD_LOGO.png';
-
 
 function NavBar({ isNewTimeCardCreated }) {
   const location = useLocation();
-  // localStorage.clear();  
-
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
@@ -42,14 +38,13 @@ function NavBar({ isNewTimeCardCreated }) {
                 About
               </Link>
             </li>
-            <li className={`nav-item ${location.pathname === '/CreateNewtimecard' || location.pathname === '/CurrentTimeCard' ? 'active' : ''}`}>
-              <Link className="nav-link" to={isNewTimeCardCreated ? '/CurrentTimeCard' : '/CreateNewtimecard'}>
+            <li className={`nav-item ${location.pathname === '/createNewTimeCard' || location.pathname === '/currentTimeCard' ? 'active' : ''}`}>
+              <Link className="nav-link" to={isNewTimeCardCreated ? '/currentTimeCard' : '/createNewTimeCard'}>
                 {isNewTimeCardCreated ? 'Current Time Card' : 'Create New Time Card'}
-
               </Link>
             </li>
-            <li className={`nav-item ${location.pathname === '/TimeCardIndex' ? 'active' : ''}`}>
-              <Link className="nav-link" to="/TimeCardIndex">
+            <li className={`nav-item ${location.pathname === '/timeCardIndex' ? 'active' : ''}`}>
+              <Link className="nav-link" to="/timeCardIndex">
                 Time Card Index
               </Link>
             </li>
@@ -61,4 +56,3 @@ function NavBar({ isNewTimeCardCreated }) {
 }
 
 export default NavBar;
-
