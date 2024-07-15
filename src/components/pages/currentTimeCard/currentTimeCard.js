@@ -1,133 +1,118 @@
+// Proprietary Software License
+// Copyright (c) 2024 Mark Robertson
+// See LICENSE.txt file for details.
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Container, Table, Button } from 'react-bootstrap';
 
 function CurrentTimeCard({ setIsNewTimeCardCreated }) {
   const [timeCard, setTimeCard] = useState({ entries: [], isSubmitted: false });
-  const [tempEntries, setTempEntries] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
+    const savedTimeCard = JSON.parse(localStorage.getItem('currentTimeCard'));
     const startDate = localStorage.getItem('startDate');
-    if (startDate) {
+    if (savedTimeCard && startDate) {
+      setTimeCard(savedTimeCard);
+    } else if (startDate) {
+      // Initialize the time card with empty entries for two weeks
       const start = new Date(startDate);
       const endDate = new Date(start);
-      endDate.setDate(endDate.getDate() + 13);
+      endDate.setDate(endDate.getDate() + 13); // Two weeks later
 
       const initialEntries = [];
       let currentDate = new Date(start);
       while (currentDate <= endDate) {
-        const dayOfWeek = currentDate.getDay();
-        // Include only weekdays (Monday to Friday)
-        if (dayOfWeek !== 0 && dayOfWeek !== 6) { // Exclude Sunday (0) and Saturday (6)
-          initialEntries.push({
-            date: currentDate.toISOString().slice(0, 10),
-            startTime: '',
-            lunchStart: '',
-            lunchEnd: '',
-            endTime: ''
-          });
-        }
-        currentDate.setDate(currentDate.getDate() + 1);
+        initialEntries.push({
+          date: currentDate.toISOString().slice(0, 10), // Format as yyyy-mm-dd
+          startTime: '',
+          lunchStart: '',
+          lunchEnd: '',
+          endTime: ''
+        });
+        currentDate.setDate(currentDate.getDate() + 1); // Move to the next day
       }
 
       setTimeCard({ entries: initialEntries, isSubmitted: false });
-      setTempEntries(initialEntries.map(entry => ({ ...entry })));
+      localStorage.setItem('currentTimeCard', JSON.stringify({ entries: initialEntries, isSubmitted: false }));
     }
   }, []);
 
   const handleChange = (index, field, value) => {
-    const updatedTempEntries = [...tempEntries];
-    updatedTempEntries[index][field] = value;
-    setTempEntries(updatedTempEntries);
-  };
-
-  const handleSave = (index) => {
-    const updatedEntries = tempEntries.map((entry, i) =>
-      i === index ? { ...entry } : timeCard.entries[i]
+    const updatedEntries = timeCard.entries.map((entry, i) =>
+      i === index ? { ...entry, [field]: value } : entry
     );
-
     const updatedTimeCard = { ...timeCard, entries: updatedEntries };
-    console.log('Saving updated time card:', updatedTimeCard);
-
     setTimeCard(updatedTimeCard);
+    localStorage.setItem('currentTimeCard', JSON.stringify(updatedTimeCard));
   };
 
   const handleSubmit = () => {
-    setTimeCard({ entries: [], isSubmitted: true });
-    setIsNewTimeCardCreated(false);
-    navigate('/');
+    // Send `timeCard` data to the backend 
+    // After successful submission, clear localStorage and reset timeCard state
+    localStorage.removeItem('currentTimeCard');
+    localStorage.removeItem('startDate');
+    setTimeCard({ entries: [], isSubmitted: false });
+    setIsNewTimeCardCreated(false); // Set to false to show "Create New Time Card" in NavBar
+    navigate('/'); // Navigate to home page
   };
 
   const handleReset = () => {
+    localStorage.removeItem('currentTimeCard');
+    localStorage.removeItem('startDate');
     setTimeCard({ entries: [], isSubmitted: false });
-    setIsNewTimeCardCreated(false);
-    navigate('/createNewTimeCard');
+    setIsNewTimeCardCreated(false); // Set to false to show "Create New Time Card" in NavBar
+    navigate('/createNewTimeCard'); // Navigate back to create new time card
   };
 
   return (
-    <Container className="mt-4">
+    <div className="center-container">
       <div className="current-time-card">
-        <h2 className="mb-4 text-center">Current Time Card</h2>
-        <Table striped bordered hover responsive>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Start Time</th>
-              <th>Lunch Start</th>
-              <th>Lunch End</th>
-              <th>End Time</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {timeCard.entries.map((entry, index) => (
-              <tr key={index}>
-                <td>{new Date(entry.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</td>
-                <td><input type="time" value={tempEntries[index]?.startTime || ''} onChange={(e) => handleChange(index, 'startTime', e.target.value)} disabled={timeCard.isSubmitted} /></td>
-                <td><input type="time" value={tempEntries[index]?.lunchStart || ''} onChange={(e) => handleChange(index, 'lunchStart', e.target.value)} disabled={timeCard.isSubmitted} /></td>
-                <td><input type="time" value={tempEntries[index]?.lunchEnd || ''} onChange={(e) => handleChange(index, 'lunchEnd', e.target.value)} disabled={timeCard.isSubmitted} /></td>
-                <td><input type="time" value={tempEntries[index]?.endTime || ''} onChange={(e) => handleChange(index, 'endTime', e.target.value)} disabled={timeCard.isSubmitted} /></td>
-                <td>
-                  {!timeCard.isSubmitted &&
-                    <Button variant="success" className="mr-2" onClick={() => handleSave(index)}>Save</Button>
-                  }
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
-        <div className="text-center">
-          {!timeCard.isSubmitted &&
-            <>
-              <Button variant="primary" className="mr-2" onClick={handleSubmit}>Submit Time Card</Button>
-              <Button variant="secondary" onClick={handleReset}>Reset Time Card</Button>
-            </>
-          }
-        </div>
+        <h2>Current Time Card</h2>
+        {timeCard.entries.map((entry, index) => (
+          <div key={index}>
+            <label>Date:</label>
+            <input
+              type="date"
+              value={entry.date}
+              onChange={(e) => handleChange(index, 'date', e.target.value)}
+              disabled={timeCard.isSubmitted}
+            />
+            <label>Start Time:</label>
+            <input
+              type="time"
+              value={entry.startTime}
+              onChange={(e) => handleChange(index, 'startTime', e.target.value)}
+              disabled={timeCard.isSubmitted}
+            />
+            <label>Lunch Start:</label>
+            <input
+              type="time"
+              value={entry.lunchStart}
+              onChange={(e) => handleChange(index, 'lunchStart', e.target.value)}
+              disabled={timeCard.isSubmitted}
+            />
+            <label>Lunch End:</label>
+            <input
+              type="time"
+              value={entry.lunchEnd}
+              onChange={(e) => handleChange(index, 'lunchEnd', e.target.value)}
+              disabled={timeCard.isSubmitted}
+            />
+            <label>End Time:</label>
+            <input
+              type="time"
+              value={entry.endTime}
+              onChange={(e) => handleChange(index, 'endTime', e.target.value)}
+              disabled={timeCard.isSubmitted}
+            />
+          </div>
+        ))}
+        {!timeCard.isSubmitted && <button onClick={handleSubmit}>Submit Time Card</button>}
+        <button onClick={handleReset}>Reset Time Card</button>
       </div>
-      <div style={{ marginBottom: '80px' }}></div> {/* Space to prevent content from being hidden under the footer */}
-    </Container>
+    </div>
   );
 }
 
 export default CurrentTimeCard;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
