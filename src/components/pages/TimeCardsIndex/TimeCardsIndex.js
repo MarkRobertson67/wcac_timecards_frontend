@@ -2,13 +2,13 @@
 // Copyright (c) 2024 Mark Robertson
 // See LICENSE.txt file for details.
 
-import React, { useState, useEffect } from 'react';
+//import React, { useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 // import axios from 'axios';
 
 function TimeCardsIndex() {
-  const [timeEntries, setTimeEntries] = useState([]);
+  //const [timeEntries, setTimeEntries] = useState([]);
 
   // useEffect(() => {
   //   // Fetch time cards from the backend
@@ -23,6 +23,8 @@ function TimeCardsIndex() {
 
   //   fetchTimeEntries();
   // }, []);
+
+  const timeEntries = [];
 
   return (
     <div>

@@ -10,7 +10,7 @@ import Home from './components/pages/Home';
 import About from './components/pages/about/About';
 import NavBar from './components/nav-bar/Navbar';
 import Footer from './components/footer/FooterForAll';
-import CurrentTimeCard from './components/pages/currentTimeCard/CurrentTimeCard';
+import CurrentTimeCard from './components/pages/currentTimeCard/ActiveTimeCard';
 import CreateNewTimeCard from './components/pages/createNewTimecard/CreatenewTimecard'; 
 import TimeCardIndex from './components/pages/timeCardsIndex/TimeCardsIndex'; 
 

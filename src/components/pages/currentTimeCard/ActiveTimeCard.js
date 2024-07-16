@@ -5,7 +5,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-function CurrentTimeCard({ setIsNewTimeCardCreated }) {
+function ActiveTimeCard({ setIsNewTimeCardCreated }) {
   const [timeCard, setTimeCard] = useState({ entries: [], isSubmitted: false });
   const navigate = useNavigate();
 
@@ -115,4 +115,4 @@ function CurrentTimeCard({ setIsNewTimeCardCreated }) {
   );
 }
 
-export default CurrentTimeCard;
+export default ActiveTimeCard;
