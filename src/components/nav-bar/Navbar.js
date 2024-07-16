@@ -48,6 +48,11 @@ function NavBar({ isNewTimeCardCreated }) {
                 Time Card Index
               </Link>
             </li>
+            <li className={`nav-item ${location.pathname === '/reports' ? 'active' : ''}`}>
+              <Link className="nav-link" to="/reports">
+                Reports
+              </Link>
+            </li>
           </ul>
         </div>
       </div>

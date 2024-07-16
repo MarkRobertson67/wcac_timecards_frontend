@@ -8,7 +8,7 @@ function Home() {
     <div>
     <br></br>
     <br></br>
-    <h1>Welcome to the timecards home page</h1>
+    <h1 style={{ textAlign: 'center' }}>Welcome to the timecards home page</h1>
     </div>
     )
     }

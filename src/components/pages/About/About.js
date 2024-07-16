@@ -8,7 +8,7 @@ function About() {
     <div>
     <br></br>
     <br></br>
-    <h1>Welcome to the wcac timecards about page</h1>
+    <h1 style={{ textAlign: 'center' }}>Welcome to the wcac timecards about page</h1>
     </div>
     )
     }

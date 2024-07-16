@@ -10,9 +10,10 @@ import Home from './components/pages/Home';
 import About from './components/pages/about/About';
 import NavBar from './components/nav-bar/Navbar';
 import Footer from './components/footer/FooterForAll';
-import CurrentTimeCard from './components/pages/ActiveTimeCard/ActiveTimeCard';
+import CurrentTimeCard from './components/pages/activeTimeCard/ActiveTimeCard';
 import CreateNewTimeCard from './components/pages/createNewTimecard/CreatenewTimecard'; 
 import TimeCardIndex from './components/pages/timeCardsIndex/TimeCardsIndex'; 
+import TimeCardReports from './components/pages/reports/TimeCardReports';
 
 function App() {
   const [isNewTimeCardCreated, setIsNewTimeCardCreated] = useState(false);
@@ -36,6 +37,7 @@ function App() {
         />
         <Route path="/currentTimeCard" element={<CurrentTimeCard setIsNewTimeCardCreated={setIsNewTimeCardCreated} />} />
         <Route path="/timeCardIndex" element={<TimeCardIndex />} />
+        <Route path="/reports" element={<TimeCardReports />} />
       </Routes>
       <Footer />
     </Router>
