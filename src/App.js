@@ -14,6 +14,7 @@ import CurrentTimeCard from './components/pages/activeTimeCard/ActiveTimeCard';
 import CreateNewTimeCard from './components/pages/createNewTimecard/CreatenewTimecard'; 
 import TimeCardIndex from './components/pages/timeCardsIndex/TimeCardsIndex'; 
 import TimeCardReports from './components/pages/reports/TimeCardReports';
+import ReportPage from './components/pages/reports/ReportPage';
 
 function App() {
   const [isNewTimeCardCreated, setIsNewTimeCardCreated] = useState(false);
@@ -38,6 +39,7 @@ function App() {
         <Route path="/currentTimeCard" element={<CurrentTimeCard setIsNewTimeCardCreated={setIsNewTimeCardCreated} />} />
         <Route path="/timeCardIndex" element={<TimeCardIndex />} />
         <Route path="/reports" element={<TimeCardReports />} />
+        <Route path="/report" element={<ReportPage />} />
       </Routes>
       <Footer />
     </Router>
