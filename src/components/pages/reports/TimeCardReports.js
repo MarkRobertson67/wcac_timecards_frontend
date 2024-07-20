@@ -39,10 +39,20 @@ function TimeCardReports() {
 
   const handleChange = (e) => {
     const { id, value, type } = e.target;
-    setFormState(prevState => ({
-      ...prevState,
-      [id]: type === 'checkbox' ? value === 'on' : value
-    }));
+    
+    if (id === 'month') {
+      // Find the selected month option
+      const selectedMonth = monthOptions.find(option => option.value === value);
+      setFormState(prevState => ({
+        ...prevState,
+        [id]: selectedMonth
+      }));
+    } else {
+      setFormState(prevState => ({
+        ...prevState,
+        [id]: type === 'checkbox' ? value === 'on' : value
+      }));
+    }
   };
 
   const resetForm = () => {
@@ -74,55 +84,57 @@ function TimeCardReports() {
   }, []);
 
   const handleGenerateReport = async () => {
-    let url;
-    let queryParams = {};
+  let url;
+  let queryParams = {};
   
-    const { reportType, startDate, endDate, month, year, selectedEmployeeName, employees } = formState;
+  const { reportType, startDate, endDate, month, year, selectedEmployeeName, employees } = formState;
   
-    const selectedEmployee = employees.find(emp => `${emp.first_name} ${emp.last_name}`.trim() === selectedEmployeeName.trim());
-    const empId = selectedEmployee ? selectedEmployee.id : null;
+  const selectedEmployee = employees.find(emp => `${emp.first_name} ${emp.last_name}`.trim() === selectedEmployeeName.trim());
+  const empId = selectedEmployee ? selectedEmployee.id : null;
 
-    if (!empId && ['totalHours', 'detailedTimecards', 'employeeSummary'].includes(reportType)) {
-      console.error('Invalid employee selected or employee ID not found');
+  if (!empId && ['totalHours', 'detailedTimecards', 'employeeSummary'].includes(reportType)) {
+    console.error('Invalid employee selected or employee ID not found');
+    return;
+  }
+
+  switch (reportType) {
+    case 'totalHours':
+      url = `${API}/reports/${empId}`;
+      queryParams = { startDate, endDate };
+      break;
+    case 'detailedTimecards':
+      url = `${API}/reports/detailed/${empId}`;
+      queryParams = { startDate, endDate };
+      break;
+    case 'monthlySummary':
+      url = `${API}/reports/monthly-summary`;
+      queryParams = { month: month ? Number(month.value) : '', year };  // Convert month to a number
+      break;
+    case 'employeeSummary':
+      url = `${API}/reports/employee-summary`;
+      queryParams = { employeeId: empId, startDate, endDate };
+      break;
+    default:
+      console.error('Invalid report type');
       return;
-    }
+  }
 
-    switch (reportType) {
-      case 'totalHours':
-        url = `${API}/reports/${empId}`;
-        queryParams = { startDate, endDate };
-        break;
-      case 'detailedTimecards':
-        url = `${API}/reports/detailed/${empId}`;
-        queryParams = { startDate, endDate };
-        break;
-      case 'monthlySummary':
-        url = `${API}/reports/monthly-summary`;
-        queryParams = { month: month.value, year };
-        break;
-      case 'employeeSummary':
-        url = `${API}/reports/employee-summary`;
-        queryParams = { employeeId: empId, startDate, endDate };
-        break;
-      default:
-        console.error('Invalid report type');
-        return;
-    }
+  const queryString = new URLSearchParams(queryParams).toString();
+  console.log(`Fetching report from: ${url}?${queryString}`);
 
-    const queryString = new URLSearchParams(queryParams).toString();
-
-    try {
-      const response = await fetch(`${url}?${queryString}`);
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Network response was not ok: ${errorText}`);
-      }
-      const reportData = await response.json();
-      navigate('/report', { state: { reportType, reportData } });
-    } catch (error) {
-      console.error('Error fetching report data:', error);
+  try {
+    const response = await fetch(`${url}?${queryString}`);
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Network response was not ok: ${errorText}`);
     }
-  };
+    const reportData = await response.json();
+    navigate('/report', { state: { reportType, reportData } });
+  } catch (error) {
+    console.error('Error fetching report data:', error);
+  }
+};
+
 
   const renderFormFields = () => {
     const { reportType, startDate, endDate, month, year, selectedEmployeeName, employees } = formState;
@@ -227,5 +239,3 @@ function TimeCardReports() {
 }
 
 export default TimeCardReports;
-
-
