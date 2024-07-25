@@ -26,7 +26,7 @@ function Footer() {
             </ul>
           </div>
           <div className="col-sm-6 col-md-4 mb-3 mb-md-0"> 
-            <h6 className="text-uppercase mb-3 footer-heading" onMouseEnter={toggleContentVisibility}>Help center</h6>
+            <h6 className="text-uppercase mb-3 footer-heading" onMouseEnter={toggleContentVisibility}>Help</h6>
             <ul className="list-unstyled mb-0 footer-content">
               <li>
                 <Link to="#" className="text-white">FAQs</Link>

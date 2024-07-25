@@ -11,24 +11,44 @@ import './CreateNewTimeCard.css';
 function CreateNewTimeCard({ setIsNewTimeCardCreated }) {
   const [startDate, setStartDate] = useState(new Date());
   const navigate = useNavigate();
-
+  
   const handleStartDateChange = (date) => {
     setStartDate(date);
   };
 
   const handleStartDateSelection = () => {
     localStorage.setItem('startDate', startDate.toISOString());
-    setIsNewTimeCardCreated(true); // Update the state to indicate a new time card is created
-    navigate('/currentTimeCard', { replace: true }); // Navigate to current time card, replacing the history entry
+    setIsNewTimeCardCreated(true);
+    navigate('/currentTimeCard', { state: { startDate: startDate } });
   };
 
   return (
-    <div className="center-container">
-      <h2>Select Start Date</h2>
-      <Calendar onChange={handleStartDateChange} value={startDate} />
-      <button onClick={handleStartDateSelection}>Start Timecard</button>
+    <div className="container mt-5">
+      <div className="row justify-content-center">
+        <div className="col-md-6">
+          <div className="card">
+            <div className="card-body">
+              <h2 className="card-title">Create New Time Card</h2>
+              <Calendar 
+                onChange={handleStartDateChange} 
+                value={startDate} 
+                locale="en-US" // This sets the calendar to start the week on Sunday
+              />
+              <button onClick={handleStartDateSelection} className="btn btn-primary mt-3">
+                Create Time Card
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
 
 export default CreateNewTimeCard;
+
+
+
+
+
+
