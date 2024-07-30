@@ -1,0 +1,71 @@
+/* Proprietary Software License
+   Copyright (c) 2024 Mark Robertson
+   See LICENSE.txt file for details. */
+
+
+   /* CreatenewTimeCard.css */
+   
+.container {
+  padding: 1rem;
+  margin-top: 5rem; 
+}
+
+.card {
+  margin: auto;
+  width: 100%;
+  max-width: 500px;
+}
+
+.card-body {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.card-title {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+label {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+input, select {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.button {
+  margin-top: 1rem;
+}
+
+
+/* Media Queries */
+@media (max-width: 768px) {
+  .container {
+    padding: 0.5rem;
+  }
+  
+  .card {
+    width: 90%;
+  }
+  
+  .card-body {
+    padding: 0.5rem;
+  }
+  
+  .card-title {
+    font-size: 1.5rem;
+  }
+  
+  .button {
+    width: 100%;
+  }
+}

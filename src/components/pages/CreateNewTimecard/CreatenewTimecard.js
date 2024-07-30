@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
-import './CreateNewTimeCard.css';
+import styles from './CreateNewTimeCard.module.css';
 
 function CreateNewTimeCard({ setIsNewTimeCardCreated }) {
   const [startDate, setStartDate] = useState(new Date());
@@ -23,18 +23,21 @@ function CreateNewTimeCard({ setIsNewTimeCardCreated }) {
   };
 
   return (
-    <div className="container mt-5">
+    <div className={styles.container}>
       <div className="row justify-content-center">
         <div className="col-md-6">
-          <div className="card">
-            <div className="card-body">
-              <h2 className="card-title">Create New Time Card</h2>
+          <div className={styles.card}>
+            <div className={styles.cardBody}>
+              <h2 className={styles.cardTitle}>Create New Time Card</h2>
               <Calendar 
                 onChange={handleStartDateChange} 
                 value={startDate} 
                 locale="en-US" // This sets the calendar to start the week on Sunday
               />
-              <button onClick={handleStartDateSelection} className="btn btn-primary mt-3">
+              <button 
+                onClick={handleStartDateSelection} 
+                className={`btn btn-primary ${styles.button}`}
+              >
                 Create Time Card
               </button>
             </div>
@@ -46,9 +49,3 @@ function CreateNewTimeCard({ setIsNewTimeCardCreated }) {
 }
 
 export default CreateNewTimeCard;
-
-
-
-
-
-

@@ -1,0 +1,111 @@
+/* Proprietary Software License
+Copyright (c) 2024 Mark Robertson
+See LICENSE.txt file for details. */
+
+@import './SharedStyles.module.css';
+
+/* Component-Specific Styles */
+.eventContent {
+  cursor: pointer;
+}
+
+.eventContent span {
+  font-size: 1rem;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  .eventContent span {
+    font-size: 0.875rem;
+  }
+}
+
+
+
+
+
+/* Basic reset */
+body, html {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Container styling */
+.container {
+  width: 100%;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Centering title */
+.container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* FullCalendar styling */
+.fc {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Adjusting the height of the calendar cells */
+.fc-daygrid-day-frame {
+  height: 70px; /* Adjust this value to change the height of the cells */
+}
+
+/* Adjusting the height of the calendar header */
+.fc-header-toolbar {
+  height: 40px; /* Adjust this value to change the height of the header */
+}
+
+/* Event content styling */
+.event-content {
+  display: flex;
+  justify-content: center;
+  align-items: center; /* Ensure vertical centering */
+  height: 100%;
+  width: 100%;
+  color: black; /* Set text color to black */
+  font-weight: bold; /* Make text bold */
+  text-align: center; /* Center text horizontally */
+}
+
+/* Styling for header buttons */
+.fc-button {
+  background-color: transparent; /* No background color by default */
+  border: none; /* Remove default border */
+  color: #000; /* Text color for buttons */
+  font-weight: normal; /* Regular font weight */
+  outline: none; /* Remove the outline */
+}
+
+/* Styling for button in different states */
+.fc-button:hover {
+  background-color: #f0f0f0; /* Background color on hover */
+  color: #000; /* Text color on hover */
+  font-weight: bold; /* Make text bold on hover */
+}
+
+.fc-button:active, .fc-button:focus {
+  background-color: transparent; /* Remove background color when button is clicked or focused */
+  color: #000; /* Text color when button is clicked or focused */
+  border: none; /* Remove border when button is clicked or focused */
+  outline: none; /* Remove outline when button is clicked or focused */
+}
+
+/* Additional styles to override FullCalendar defaults */
+.fc-button:focus-visible {
+  outline: none; /* Remove outline for visible focus */
+}
+
+/* Media query for smaller screens */
+@media (max-width: 600px) {
+  .container {
+    padding: 5px;
+  }
+}

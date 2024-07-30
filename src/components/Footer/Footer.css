@@ -2,7 +2,59 @@
    Copyright (c) 2024 Mark Robertson
    See LICENSE.txt file for details. */
 
+/* Basic reset */
+body, html {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Footer styling */
 .footer {
+  background-color: #007bff; /* Primary background color */
+  color: #fff; /* Text color */
+  font-size: 10px; /* Existing font size */
+}
+
+/* Adjusting font sizes */
+.footer-heading {
+  font-size: .7rem; /* Existing font size */
+  cursor: pointer; /* Indicate that headings are clickable */
+}
+
+/* Hide content by default */
+.footer-content {
+  display: none; /* Hide content by default */
+}
+
+/* Show content on hover */
+.footer-heading:hover + .footer-content {
+  display: block;
+}
+
+/* Styling for footer heading links */
+.list-unstyled li:hover {
+  background-color: #6c757d; /* Background color on hover */
+  transition: background-color 0.3s ease;
+}
+
+/* Responsive design for small screens */
+@media (max-width: 767.98px) {
+  .footer .row {
+    flex-direction: column; /* Stack columns vertically on small screens */
+  }
+
+  .footer .footer-heading {
+    display: flex; /* Show headings on small screens */
+  }
+}
+
+
+
+
+
+
+/* .footer {
   font-size: 10px; 
 }
 
@@ -21,4 +73,4 @@
 .list-unstyled li:hover {
     background-color: #6c757d; 
     transition: background-color 0.3s ease;
-  }
+  } */

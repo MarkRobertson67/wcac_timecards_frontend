@@ -6,7 +6,7 @@ import React, { useState, useEffect } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction'; // Needed for dateClick
-import './TimeCardsIndex.css'; // Import CSS file
+//import './TimeCardsIndex.css'; // Import CSS file
 
 const API = process.env.REACT_APP_API_URL;
 
@@ -51,7 +51,7 @@ function TimeCardsIndex() {
 
   return (
     <div className="container">
-      <h2>Time Card Showing Total Hours / Day</h2>
+      <h2>Total Hours Worked</h2>
       <FullCalendar
         plugins={[dayGridPlugin, interactionPlugin]}
         initialView="dayGridMonth"

@@ -4,8 +4,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import './ActiveTimeCard.css';
+import styles from './ActiveTimeCard.module.css';
 import { startOfWeek } from 'date-fns';
 
 const API = process.env.REACT_APP_API_URL;
@@ -46,14 +45,14 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
   }, []);
 
   const handleChange = async (index, field, value) => {
-    const updatedEntries = timeCard.entries.map((entry, i) =>
-      i === index ? { ...entry, [field]: value, totalTime: calculateTotalTime(
-        field === 'startTime' ? value : entry.startTime,
-        field === 'lunchStart' ? value : entry.lunchStart,
-        field === 'lunchEnd' ? value : entry.lunchEnd,
-        field === 'endTime' ? value : entry.endTime
-      )} : entry
-    );
+    const updatedEntries = [...timeCard.entries];
+  updatedEntries[index][field] = value;
+  updatedEntries[index].totalTime = calculateTotalTime(
+    updatedEntries[index].startTime,
+    updatedEntries[index].lunchStart,
+    updatedEntries[index].lunchEnd,
+    updatedEntries[index].endTime
+  );
     setTimeCard({ ...timeCard, entries: updatedEntries });
 
     const entry = updatedEntries[index];
@@ -157,37 +156,43 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
   const calculateTotalTime = (start, lunchStart, lunchEnd, end) => {
     const parseTime = (time) => time ? new Date(`1970-01-01T${time}:00`) : null;
-
+  
     const startTime = parseTime(start);
     const lunchStartTime = parseTime(lunchStart);
     const lunchEndTime = parseTime(lunchEnd);
     const endTime = parseTime(end);
-
+  
     let totalMinutes = 0;
-
-    if (startTime && endTime) {
-      if (lunchStartTime && lunchEndTime) {
-        const morningWork = (lunchStartTime - startTime) / (1000 * 60);
-        const afternoonWork = (endTime - lunchEndTime) / (1000 * 60);
-        totalMinutes = morningWork + afternoonWork;
-      } else if (lunchStartTime) {
-        totalMinutes = (lunchStartTime - startTime) / (1000 * 60);
-      } else if (lunchEndTime) {
-        totalMinutes = (endTime - startTime) / (1000 * 60);
-      } else {
-        totalMinutes = (endTime - startTime) / (1000 * 60);
-      }
-    } else if (lunchEndTime && endTime) {
-      totalMinutes = (endTime - lunchEndTime) / (1000 * 60);
+  
+    if (startTime && lunchStartTime) {
+      const morningWork = (lunchStartTime - startTime) / (1000 * 60);
+      totalMinutes += morningWork;
     }
-
+  
+    if (lunchEndTime && endTime) {
+      const afternoonWork = (endTime - lunchEndTime) / (1000 * 60);
+      totalMinutes += afternoonWork;
+    }
+  
+    if (startTime && endTime && !lunchStartTime && !lunchEndTime) {
+      const allDayWork = (endTime - startTime) / (1000 * 60);
+      totalMinutes = allDayWork;
+    }
+  
+    if (startTime && lunchStartTime && lunchEndTime && !endTime) {
+      const morningWork = (lunchStartTime - startTime) / (1000 * 60);
+      totalMinutes = morningWork;
+    }
+  
     totalMinutes = Math.max(totalMinutes, 0);
-
+  
     const hours = Math.floor(totalMinutes / 60);
     const minutes = totalMinutes % 60;
-
-    return `${hours} hours ${minutes} minutes`;
+  
+    return `${hours} hrs ${minutes} min`;
   };
+  
+  
 
   const formatDate = (dateString) => {
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -195,41 +200,65 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
   };
 
   return (
-    <div className="container mt-5">
+    <div className={`container mt-5 ${styles.container}`}>
       <div className="text-center">
-        <button className="btn btn-primary mr-3" onClick={handleSubmit}>Submit</button>
+        <button className="btn btn-primary me-3" onClick={handleSubmit}>Submit</button>
         <button className="btn btn-secondary" onClick={handleReset}>Reset</button>
       </div>
       <h2 className="text-center my-4">Active Timecard</h2>
+      <div className="row mb-3">
+        <div className="col-12 col-md-3 label-col">
+          <label>Date</label>
+        </div>
+        <div className="col-12 col-md-2 label-col">
+          <label>Start Time</label>
+        </div>
+        <div className="col-12 col-md-2 label-col">
+          <label>Lunch Start</label>
+        </div>
+        <div className="col-12 col-md-2 label-col">
+          <label>Lunch End</label>
+        </div>
+        <div className="col-12 col-md-2 label-col">
+          <label>End Time</label>
+        </div>
+        <div className="col-12 col-md-1 label-col">
+          <label>Total Time</label>
+        </div>
+      </div>
       {timeCard.entries.map((entry, index) => (
-        <div key={index} className="row mb-3">
+        <div key={index} className="row mb-2">
           <div className="col-12 col-md-3">
-            <label>{formatDate(entry.date)}</label>
+            <span>{formatDate(entry.date)}</span>
           </div>
-          <div className="col-12 col-md-2">
+          <div className="col-12 col-md-2 input-col">
             <input
               type="time"
+              className={`form-control ${styles.input}`}
               value={entry.startTime}
               onChange={(e) => handleChange(index, 'startTime', e.target.value)}
             />
           </div>
-          <div className="col-12 col-md-2">
+          <div className="col-12 col-md-2 input-col">
             <input
               type="time"
+              className={`form-control ${styles.input}`}
               value={entry.lunchStart}
               onChange={(e) => handleChange(index, 'lunchStart', e.target.value)}
             />
           </div>
-          <div className="col-12 col-md-2">
+          <div className="col-12 col-md-2 input-col">
             <input
               type="time"
+              className={`form-control ${styles.input}`}
               value={entry.lunchEnd}
               onChange={(e) => handleChange(index, 'lunchEnd', e.target.value)}
             />
           </div>
-          <div className="col-12 col-md-2">
+          <div className="col-12 col-md-2 input-col">
             <input
               type="time"
+              className={`form-control ${styles.input}`}
               value={entry.endTime}
               onChange={(e) => handleChange(index, 'endTime', e.target.value)}
             />
@@ -244,6 +273,3 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 }
 
 export default ActiveTimeCard;
-
-
-

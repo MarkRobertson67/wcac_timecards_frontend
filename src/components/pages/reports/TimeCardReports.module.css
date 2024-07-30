@@ -1,0 +1,30 @@
+
+/* Proprietary Software License
+Copyright (c) 2024 Mark Robertson
+See LICENSE.txt file for details. */
+
+
+@import './SharedStyles.module.css';
+
+/* Component-Specific Styles */
+.row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.form-select, .form-control {
+  width: 100%;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  .row {
+    flex-direction: column;
+  }
+}

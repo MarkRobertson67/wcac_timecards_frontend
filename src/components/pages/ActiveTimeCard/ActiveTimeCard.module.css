@@ -1,0 +1,55 @@
+/* Proprietary Software License
+Copyright (c) 2024 Mark Robertson
+See LICENSE.txt file for details. */
+
+
+/* ActiveTimeCard.module.css */
+
+.container {
+  max-width: 1200px;
+  margin: auto;
+}
+
+.input {
+  max-width:125px; 
+}
+
+.total-time {
+  text-align: center; 
+}
+
+.input-col {
+  padding-right: 0.25rem; /* Reduce space on the right side */
+  padding-left: 0.25rem; /* Reduce space on the left side */
+}
+
+.label-col {
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 0.5rem; /* Space between label and input */
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  .container {
+    padding: 0.5rem;
+  }
+  
+  .card {
+    width: 90%;
+  }
+  
+  .card-body {
+    padding: 0.5rem;
+  }
+  
+  .card-title {
+    font-size: 1.5rem;
+  }
+  
+  .button {
+    width: 100%;
+  }
+}
+
+  
