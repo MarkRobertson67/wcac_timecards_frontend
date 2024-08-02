@@ -2,11 +2,20 @@
 Copyright (c) 2024 Mark Robertson
 See LICENSE.txt file for details. */
 
-@import './SharedStyles.module.css';
+
+/* TimeCardsIndex.module.css */
 
 /* Component-Specific Styles */
 .eventContent {
-  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center; /* Ensure vertical centering */
+  height: 100%;
+  width: 100%;
+  color: black; /* Set text color to black */
+  font-weight: bold; /* Make text bold */
+  text-align: center; /* Center text horizontally */
+  cursor: pointer; /* Make the whole event box clickable */
 }
 
 .eventContent span {
@@ -19,10 +28,6 @@ See LICENSE.txt file for details. */
     font-size: 0.875rem;
   }
 }
-
-
-
-
 
 /* Basic reset */
 body, html {
@@ -63,18 +68,6 @@ body, html {
   height: 40px; /* Adjust this value to change the height of the header */
 }
 
-/* Event content styling */
-.event-content {
-  display: flex;
-  justify-content: center;
-  align-items: center; /* Ensure vertical centering */
-  height: 100%;
-  width: 100%;
-  color: black; /* Set text color to black */
-  font-weight: bold; /* Make text bold */
-  text-align: center; /* Center text horizontally */
-}
-
 /* Styling for header buttons */
 .fc-button {
   background-color: transparent; /* No background color by default */
@@ -109,3 +102,5 @@ body, html {
     padding: 5px;
   }
 }
+
+

@@ -12,7 +12,8 @@ const API = process.env.REACT_APP_API_URL;
 function ActiveTimeCard({ setIsNewTimeCardCreated }) {
   const [timeCard, setTimeCard] = useState({ entries: [], isSubmitted: false });
   const navigate = useNavigate();
-  const employeeId = 1; // Replace with actual employee ID
+  const employeeId = 1; // Replace with actual employee ID when Firebase added
+  
 
   useEffect(() => {
     const savedTimeCard = JSON.parse(localStorage.getItem('currentTimeCard'));
@@ -20,23 +21,22 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     if (savedTimeCard && startDate) {
       setTimeCard(savedTimeCard);
     } else if (startDate) {
-      // Initialize the time card with empty entries for two weeks
       const start = new Date(startDate);
       const endDate = new Date(start);
-      endDate.setDate(endDate.getDate() + 13); // Two weeks later
+      endDate.setDate(endDate.getDate() + 13);
 
-      // Ensure the week starts on Sunday
       const initialEntries = [];
       let currentDate = startOfWeek(new Date(start), { weekStartsOn: 0 });
       while (currentDate <= endDate) {
         initialEntries.push({
-          date: currentDate.toISOString().slice(0, 10), // Format as yyyy-mm-dd
+          date: currentDate.toISOString().slice(0, 10),
           startTime: '',
           lunchStart: '',
           lunchEnd: '',
-          endTime: ''
+          endTime: '',
+          totalTime: ''
         });
-        currentDate.setDate(currentDate.getDate() + 1); // Move to the next day
+        currentDate.setDate(currentDate.getDate() + 1);
       }
 
       setTimeCard({ entries: initialEntries, isSubmitted: false });
@@ -46,13 +46,13 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
   const handleChange = async (index, field, value) => {
     const updatedEntries = [...timeCard.entries];
-  updatedEntries[index][field] = value;
-  updatedEntries[index].totalTime = calculateTotalTime(
-    updatedEntries[index].startTime,
-    updatedEntries[index].lunchStart,
-    updatedEntries[index].lunchEnd,
-    updatedEntries[index].endTime
-  );
+    updatedEntries[index][field] = value;
+    updatedEntries[index].totalTime = calculateTotalTime(
+      updatedEntries[index].startTime,
+      updatedEntries[index].lunchStart,
+      updatedEntries[index].lunchEnd,
+      updatedEntries[index].endTime
+    );
     setTimeCard({ ...timeCard, entries: updatedEntries });
 
     const entry = updatedEntries[index];
@@ -92,7 +92,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
       }
     }
 
-    if (entry.totalTime !== '0 hours 0 minutes' && entry.id) {
+    if (entry.totalTime !== '0h 0m' && entry.id) {
       console.log('Updating timecard entry...');
       try {
         const response = await fetch(`${API}/timecards/${entry.id}`, {
@@ -150,6 +150,8 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
   const handleReset = () => {
     setTimeCard({ entries: [], isSubmitted: false });
+    localStorage.removeItem('currentTimeCard');
+    localStorage.removeItem('startDate');
     setIsNewTimeCardCreated(false);
     navigate('/createNewTimeCard');
   };
@@ -189,9 +191,12 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     const hours = Math.floor(totalMinutes / 60);
     const minutes = totalMinutes % 60;
   
-    return `${hours} hrs ${minutes} min`;
-  };
+    // Format hours and minutes to always show two digits
+    const formattedHours = String(hours).padStart(2, '0');
+    const formattedMinutes = String(minutes).padStart(2, '0');
   
+    return `${formattedHours}h ${formattedMinutes}m`;
+  };
   
 
   const formatDate = (dateString) => {
@@ -206,70 +211,67 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
         <button className="btn btn-secondary" onClick={handleReset}>Reset</button>
       </div>
       <h2 className="text-center my-4">Active Timecard</h2>
-      <div className="row mb-3">
-        <div className="col-12 col-md-3 label-col">
-          <label>Date</label>
-        </div>
-        <div className="col-12 col-md-2 label-col">
-          <label>Start Time</label>
-        </div>
-        <div className="col-12 col-md-2 label-col">
-          <label>Lunch Start</label>
-        </div>
-        <div className="col-12 col-md-2 label-col">
-          <label>Lunch End</label>
-        </div>
-        <div className="col-12 col-md-2 label-col">
-          <label>End Time</label>
-        </div>
-        <div className="col-12 col-md-1 label-col">
-          <label>Total Time</label>
-        </div>
+      <div className="table-responsive">
+        <table className="table table-bordered">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Start Time</th>
+              <th>Lunch Start</th>
+              <th>Lunch End</th>
+              <th>End Time</th>
+              <th>Total Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            {timeCard.entries.map((entry, index) => (
+              <tr key={index}>
+                <td>{formatDate(entry.date)}</td>
+                <td>
+                  <input
+                    type="time"
+                    className={`form-control ${styles.input}`}
+                    value={entry.startTime}
+                    onChange={(e) => handleChange(index, 'startTime', e.target.value)}
+                  />
+                </td>
+                <td>
+                  <input
+                    type="time"
+                    className={`form-control ${styles.input}`}
+                    value={entry.lunchStart}
+                    onChange={(e) => handleChange(index, 'lunchStart', e.target.value)}
+                  />
+                </td>
+                <td>
+                  <input
+                    type="time"
+                    className={`form-control ${styles.input}`}
+                    value={entry.lunchEnd}
+                    onChange={(e) => handleChange(index, 'lunchEnd', e.target.value)}
+                  />
+                </td>
+                <td>
+                  <input
+                    type="time"
+                    className={`form-control ${styles.input}`}
+                    value={entry.endTime}
+                    onChange={(e) => handleChange(index, 'endTime', e.target.value)}
+                  />
+                </td>
+                <td>
+                  <div className={`form-control ${styles.input} ${styles.totalTime}`}>
+                    {entry.totalTime}
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
-      {timeCard.entries.map((entry, index) => (
-        <div key={index} className="row mb-2">
-          <div className="col-12 col-md-3">
-            <span>{formatDate(entry.date)}</span>
-          </div>
-          <div className="col-12 col-md-2 input-col">
-            <input
-              type="time"
-              className={`form-control ${styles.input}`}
-              value={entry.startTime}
-              onChange={(e) => handleChange(index, 'startTime', e.target.value)}
-            />
-          </div>
-          <div className="col-12 col-md-2 input-col">
-            <input
-              type="time"
-              className={`form-control ${styles.input}`}
-              value={entry.lunchStart}
-              onChange={(e) => handleChange(index, 'lunchStart', e.target.value)}
-            />
-          </div>
-          <div className="col-12 col-md-2 input-col">
-            <input
-              type="time"
-              className={`form-control ${styles.input}`}
-              value={entry.lunchEnd}
-              onChange={(e) => handleChange(index, 'lunchEnd', e.target.value)}
-            />
-          </div>
-          <div className="col-12 col-md-2 input-col">
-            <input
-              type="time"
-              className={`form-control ${styles.input}`}
-              value={entry.endTime}
-              onChange={(e) => handleChange(index, 'endTime', e.target.value)}
-            />
-          </div>
-          <div className="col-12 col-md-1">
-            <span>{entry.totalTime}</span>
-          </div>
-        </div>
-      ))}
     </div>
   );
 }
 
 export default ActiveTimeCard;
+

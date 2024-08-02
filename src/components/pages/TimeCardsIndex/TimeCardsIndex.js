@@ -2,11 +2,12 @@
 // Copyright (c) 2024 Mark Robertson
 // See LICENSE.txt file for details.
 
+
 import React, { useState, useEffect } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction'; // Needed for dateClick
-//import './TimeCardsIndex.css'; // Import CSS file
+import styles from './TimeCardsIndex.module.css';
 
 const API = process.env.REACT_APP_API_URL;
 
@@ -14,13 +15,12 @@ function TimeCardsIndex() {
   const [timeEntries, setTimeEntries] = useState([]);
 
   useEffect(() => {
-    // Fetch time cards from the backend
     const fetchTimeEntries = async () => {
       try {
         const response = await fetch(`${API}/timecards/employee/1`);
         const data = await response.json();
         console.log('Fetched data:', data); // Debug: log the fetched data
-        setTimeEntries(data.data); // Assuming the response structure has a 'data' field
+        setTimeEntries(data.data); 
       } catch (error) {
         console.error('Error fetching time entries:', error);
       }
@@ -29,8 +29,13 @@ function TimeCardsIndex() {
     fetchTimeEntries();
   }, []);
 
-  const formatTotalTime = ({ hours, minutes }) => {
-    return `${hours}h ${minutes}m`;
+  const formatTotalTime = (totalTime) => {
+    if (!totalTime) {
+      return;
+    }
+
+    const { hours, minutes } = totalTime;
+    return `${hours || 0}h ${minutes || 0}m`;
   };
 
   const handleDateClick = (info) => {
@@ -41,7 +46,7 @@ function TimeCardsIndex() {
   const renderEventContent = (eventInfo) => {
     return (
       <div
-        className="event-content"
+        className={styles.eventContent}
         onClick={() => handleDateClick({ view: eventInfo.view, dateStr: eventInfo.event.startStr })}
       >
         <span>{eventInfo.event.extendedProps.time}</span>
@@ -50,7 +55,7 @@ function TimeCardsIndex() {
   };
 
   return (
-    <div className="container">
+    <div className={styles.container}>
       <h2>Total Hours Worked</h2>
       <FullCalendar
         plugins={[dayGridPlugin, interactionPlugin]}
@@ -62,20 +67,19 @@ function TimeCardsIndex() {
           right: 'dayGridMonth,dayGridDay'
         }}
         events={timeEntries.map((entry) => ({
-          title: '', // No title
+          title: '', 
           start: entry.work_date,
           end: entry.work_date,
           extendedProps: {
             time: formatTotalTime(entry.total_time),
           },
         }))}
-        eventContent={renderEventContent} // Custom event rendering
-        dateClick={handleDateClick} // Handle date clicks
-        height="auto" // Adjust the height of the calendar
+        eventContent={renderEventContent} 
+        dateClick={handleDateClick} 
+        height="auto" // height of calendar
       />
     </div>
   );
 }
 
 export default TimeCardsIndex;
-
