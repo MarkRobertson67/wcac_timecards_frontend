@@ -11,15 +11,18 @@ import styles from './CreateNewTimeCard.module.css';
 function CreateNewTimeCard({ setIsNewTimeCardCreated }) {
   const [startDate, setStartDate] = useState(new Date());
   const navigate = useNavigate();
-  
+
   const handleStartDateChange = (date) => {
     setStartDate(date);
   };
 
   const handleStartDateSelection = () => {
-    localStorage.setItem('startDate', startDate.toISOString());
+    // Store the date as an ISO string
+    const isoDate = startDate.toISOString();
+    localStorage.setItem('startDate', isoDate);
+
     setIsNewTimeCardCreated(true);
-    navigate('/currentTimeCard', { state: { startDate: startDate } });
+    navigate('/currentTimeCard', { state: { startDate: isoDate } });
   };
 
   return (
@@ -32,7 +35,7 @@ function CreateNewTimeCard({ setIsNewTimeCardCreated }) {
               <Calendar 
                 onChange={handleStartDateChange} 
                 value={startDate} 
-                locale="en-US" // This sets the calendar to start the week on Sunday
+                locale="en-US" 
               />
               <button 
                 onClick={handleStartDateSelection} 
@@ -49,3 +52,7 @@ function CreateNewTimeCard({ setIsNewTimeCardCreated }) {
 }
 
 export default CreateNewTimeCard;
+
+
+
+

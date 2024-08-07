@@ -4,45 +4,73 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
 import styles from './ActiveTimeCard.module.css';
-import { startOfWeek } from 'date-fns';
+// import { format } from 'date-fns';
 
 const API = process.env.REACT_APP_API_URL;
 
 function ActiveTimeCard({ setIsNewTimeCardCreated }) {
   const [timeCard, setTimeCard] = useState({ entries: [], isSubmitted: false });
+  const [startDate, setStartDate] = useState(new Date());
+  const [showCalendar, setShowCalendar] = useState(false);
   const navigate = useNavigate();
+
   const employeeId = 1; // Replace with actual employee ID when Firebase added
-  
 
   useEffect(() => {
     const savedTimeCard = JSON.parse(localStorage.getItem('currentTimeCard'));
-    const startDate = localStorage.getItem('startDate');
-    if (savedTimeCard && startDate) {
+    const storedStartDate = localStorage.getItem('startDate');
+
+    if (savedTimeCard && storedStartDate) {
       setTimeCard(savedTimeCard);
-    } else if (startDate) {
-      const start = new Date(startDate);
-      const endDate = new Date(start);
-      endDate.setDate(endDate.getDate() + 13);
-
-      const initialEntries = [];
-      let currentDate = startOfWeek(new Date(start), { weekStartsOn: 0 });
-      while (currentDate <= endDate) {
-        initialEntries.push({
-          date: currentDate.toISOString().slice(0, 10),
-          startTime: '',
-          lunchStart: '',
-          lunchEnd: '',
-          endTime: '',
-          totalTime: ''
-        });
-        currentDate.setDate(currentDate.getDate() + 1);
-      }
-
+      setStartDate(new Date(storedStartDate));
+    } else if (storedStartDate) {
+      const initialEntries = generateInitialEntries(new Date(storedStartDate));
       setTimeCard({ entries: initialEntries, isSubmitted: false });
       localStorage.setItem('currentTimeCard', JSON.stringify({ entries: initialEntries, isSubmitted: false }));
     }
   }, []);
+
+  // Function to get the previous Monday from a given date
+  const getPreviousMonday = (date) => {
+    const day = date.getDay();
+    console.log('Current date:', date.toDateString()); // Log the current date
+    console.log('Current day (0 = Sunday, 6 = Saturday):', day); // Log the current day of the week
+
+    // Calculate how many days to subtract to get to the previous Monday
+    const daysToSubtract = (day === 0 ? 6 : day - 1);
+    console.log('Days to subtract:', daysToSubtract); // Log the number of days to subtract
+
+    const monday = new Date(date);
+    monday.setDate(date.getDate() - daysToSubtract);
+    console.log('Calculated Monday:', monday.toDateString()); // Log the resulting Monday date
+
+    return monday;
+  };
+  console.log('hello')
+
+  const generateInitialEntries = (startDate) => {
+    const entries = [];
+    let currentDate = new Date(startDate);
+    const endDate = new Date(currentDate);
+    endDate.setDate(endDate.getDate() + 13); // Two weeks from the start date
+
+    while (currentDate <= endDate) {
+      entries.push({
+        date: currentDate.toISOString().split('T')[0], // Format date as ISO string
+        startTime: '',
+        lunchStart: '',
+        lunchEnd: '',
+        endTime: '',
+        totalTime: ''
+      });
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return entries;
+  };
 
   const handleChange = async (index, field, value) => {
     const updatedEntries = [...timeCard.entries];
@@ -156,61 +184,84 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     navigate('/createNewTimeCard');
   };
 
+  const handleDateChange = (date) => {
+    console.log('Date selected from calendar:', date.toDateString()); // Log the date selected from calendar
+    const previousMonday = getPreviousMonday(date);
+    console.log('Previous Monday calculated:', previousMonday.toDateString()); // Log the calculated previous Monday
+    setStartDate(previousMonday);
+    setShowCalendar(false);
+    const initialEntries = generateInitialEntries(previousMonday);
+    setTimeCard({ entries: initialEntries, isSubmitted: false });
+    localStorage.setItem('currentTimeCard', JSON.stringify({ entries: initialEntries, isSubmitted: false }));
+    localStorage.setItem('startDate', previousMonday.toISOString());
+  };
+
   const calculateTotalTime = (start, lunchStart, lunchEnd, end) => {
     const parseTime = (time) => time ? new Date(`1970-01-01T${time}:00`) : null;
-  
+
     const startTime = parseTime(start);
     const lunchStartTime = parseTime(lunchStart);
     const lunchEndTime = parseTime(lunchEnd);
     const endTime = parseTime(end);
-  
+
     let totalMinutes = 0;
-  
+
     if (startTime && lunchStartTime) {
       const morningWork = (lunchStartTime - startTime) / (1000 * 60);
       totalMinutes += morningWork;
     }
-  
+
     if (lunchEndTime && endTime) {
       const afternoonWork = (endTime - lunchEndTime) / (1000 * 60);
       totalMinutes += afternoonWork;
     }
-  
+
     if (startTime && endTime && !lunchStartTime && !lunchEndTime) {
       const allDayWork = (endTime - startTime) / (1000 * 60);
       totalMinutes = allDayWork;
     }
-  
+
     if (startTime && lunchStartTime && lunchEndTime && !endTime) {
       const morningWork = (lunchStartTime - startTime) / (1000 * 60);
       totalMinutes = morningWork;
     }
-  
+
     totalMinutes = Math.max(totalMinutes, 0);
-  
+
     const hours = Math.floor(totalMinutes / 60);
     const minutes = totalMinutes % 60;
-  
-    // Format hours and minutes to always show two digits
-    const formattedHours = String(hours).padStart(2, '0');
-    const formattedMinutes = String(minutes).padStart(2, '0');
-  
-    return `${formattedHours}h ${formattedMinutes}m`;
+
+    return `${hours}h ${minutes}m`;
   };
-  
 
   const formatDate = (dateString) => {
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
+  const isWeekday = (dateString) => {
+    const date = new Date(dateString);
+    const day = date.getDay();
+    return day !== 0 && day !== 6; // 0 is Sunday, 6 is Saturday
+  };
+
+  const filteredEntries = timeCard.entries.filter(entry => isWeekday(entry.date));
+
   return (
     <div className={`container mt-5 ${styles.container}`}>
-      <div className="text-center">
+      <div className="text-center mb-3">
         <button className="btn btn-primary me-3" onClick={handleSubmit}>Submit</button>
         <button className="btn btn-secondary" onClick={handleReset}>Reset</button>
       </div>
-      <h2 className="text-center my-4">Active Timecard</h2>
+      <h2 className="text-center mb-4">Active Timecard</h2>
+      <div className="text-center mb-4">
+        {showCalendar && (
+          <Calendar
+            onChange={handleDateChange}
+            value={startDate}
+          />
+        )}
+      </div>
       <div className="table-responsive">
         <table className="table table-bordered">
           <thead>
@@ -224,46 +275,14 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
             </tr>
           </thead>
           <tbody>
-            {timeCard.entries.map((entry, index) => (
-              <tr key={index}>
+            {filteredEntries.map((entry, index) => (
+              <tr key={entry.date}>
                 <td>{formatDate(entry.date)}</td>
-                <td>
-                  <input
-                    type="time"
-                    className={`form-control ${styles.input}`}
-                    value={entry.startTime}
-                    onChange={(e) => handleChange(index, 'startTime', e.target.value)}
-                  />
-                </td>
-                <td>
-                  <input
-                    type="time"
-                    className={`form-control ${styles.input}`}
-                    value={entry.lunchStart}
-                    onChange={(e) => handleChange(index, 'lunchStart', e.target.value)}
-                  />
-                </td>
-                <td>
-                  <input
-                    type="time"
-                    className={`form-control ${styles.input}`}
-                    value={entry.lunchEnd}
-                    onChange={(e) => handleChange(index, 'lunchEnd', e.target.value)}
-                  />
-                </td>
-                <td>
-                  <input
-                    type="time"
-                    className={`form-control ${styles.input}`}
-                    value={entry.endTime}
-                    onChange={(e) => handleChange(index, 'endTime', e.target.value)}
-                  />
-                </td>
-                <td>
-                  <div className={`form-control ${styles.input} ${styles.totalTime}`}>
-                    {entry.totalTime}
-                  </div>
-                </td>
+                <td><input type="time" value={entry.startTime} onChange={(e) => handleChange(index, 'startTime', e.target.value)} /></td>
+                <td><input type="time" value={entry.lunchStart} onChange={(e) => handleChange(index, 'lunchStart', e.target.value)} /></td>
+                <td><input type="time" value={entry.lunchEnd} onChange={(e) => handleChange(index, 'lunchEnd', e.target.value)} /></td>
+                <td><input type="time" value={entry.endTime} onChange={(e) => handleChange(index, 'endTime', e.target.value)} /></td>
+                <td>{entry.totalTime}</td>
               </tr>
             ))}
           </tbody>
@@ -274,4 +293,3 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 }
 
 export default ActiveTimeCard;
-
