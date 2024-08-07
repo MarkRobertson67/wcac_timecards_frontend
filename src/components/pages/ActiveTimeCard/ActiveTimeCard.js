@@ -2,22 +2,46 @@
 // Copyright (c) 2024 Mark Robertson
 // See LICENSE.txt file for details.
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Calendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css';
+import 'bootstrap/dist/css/bootstrap.min.css'; // Ensure Bootstrap is included
 import styles from './ActiveTimeCard.module.css';
-// import { format } from 'date-fns';
+import { startOfWeek, addDays, format } from 'date-fns';
 
 const API = process.env.REACT_APP_API_URL;
 
 function ActiveTimeCard({ setIsNewTimeCardCreated }) {
   const [timeCard, setTimeCard] = useState({ entries: [], isSubmitted: false });
-  const [startDate, setStartDate] = useState(new Date());
-  const [showCalendar, setShowCalendar] = useState(false);
   const navigate = useNavigate();
-
   const employeeId = 1; // Replace with actual employee ID when Firebase added
+
+  // Utility Functions
+  const getPreviousMonday = (date) => {
+    if (date.getDay() === 0) { // If Sunday
+      return addDays(date, 1); // Next Monday
+    }
+    return startOfWeek(date, { weekStartsOn: 1 }); // Current week's Monday
+  };
+
+  const generateInitialEntries = useCallback((startDate) => {
+    const entries = [];
+    let currentDate = getPreviousMonday(startDate);
+    const endDate = addDays(currentDate, 13); // Two weeks from the start date
+
+    while (currentDate <= endDate) {
+      entries.push({
+        date: format(currentDate, 'yyyy-MM-dd'),
+        startTime: '',
+        lunchStart: '',
+        lunchEnd: '',
+        endTime: '',
+        totalTime: ''
+      });
+      currentDate = addDays(currentDate, 1);
+    }
+
+    return entries;
+  }, []);
 
   useEffect(() => {
     const savedTimeCard = JSON.parse(localStorage.getItem('currentTimeCard'));
@@ -25,51 +49,53 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
     if (savedTimeCard && storedStartDate) {
       setTimeCard(savedTimeCard);
-      setStartDate(new Date(storedStartDate));
+      // The startDate state is no longer used, so this is removed
     } else if (storedStartDate) {
       const initialEntries = generateInitialEntries(new Date(storedStartDate));
       setTimeCard({ entries: initialEntries, isSubmitted: false });
       localStorage.setItem('currentTimeCard', JSON.stringify({ entries: initialEntries, isSubmitted: false }));
     }
-  }, []);
+  }, [generateInitialEntries]);
 
-  // Function to get the previous Monday from a given date
-  const getPreviousMonday = (date) => {
-    const day = date.getDay();
-    console.log('Current date:', date.toDateString()); // Log the current date
-    console.log('Current day (0 = Sunday, 6 = Saturday):', day); // Log the current day of the week
+  const calculateTotalTime = (start, lunchStart, lunchEnd, end) => {
+    const parseTime = (time) => time ? new Date(`1970-01-01T${time}:00`) : null;
+    const startTime = parseTime(start);
+    const lunchStartTime = parseTime(lunchStart);
+    const lunchEndTime = parseTime(lunchEnd);
+    const endTime = parseTime(end);
 
-    // Calculate how many days to subtract to get to the previous Monday
-    const daysToSubtract = (day === 0 ? 6 : day - 1);
-    console.log('Days to subtract:', daysToSubtract); // Log the number of days to subtract
+    let totalMinutes = 0;
 
-    const monday = new Date(date);
-    monday.setDate(date.getDate() - daysToSubtract);
-    console.log('Calculated Monday:', monday.toDateString()); // Log the resulting Monday date
-
-    return monday;
-  };
-  console.log('hello')
-
-  const generateInitialEntries = (startDate) => {
-    const entries = [];
-    let currentDate = new Date(startDate);
-    const endDate = new Date(currentDate);
-    endDate.setDate(endDate.getDate() + 13); // Two weeks from the start date
-
-    while (currentDate <= endDate) {
-      entries.push({
-        date: currentDate.toISOString().split('T')[0], // Format date as ISO string
-        startTime: '',
-        lunchStart: '',
-        lunchEnd: '',
-        endTime: '',
-        totalTime: ''
-      });
-      currentDate.setDate(currentDate.getDate() + 1);
+    if (startTime && lunchStartTime) {
+      totalMinutes += (lunchStartTime - startTime) / (1000 * 60);
     }
 
-    return entries;
+    if (lunchEndTime && endTime) {
+      totalMinutes += (endTime - lunchEndTime) / (1000 * 60);
+    }
+
+    if (startTime && endTime && !lunchStartTime && !lunchEndTime) {
+      totalMinutes = (endTime - startTime) / (1000 * 60);
+    }
+
+    if (startTime && lunchStartTime && lunchEndTime && !endTime) {
+      totalMinutes = (lunchStartTime - startTime) / (1000 * 60);
+    }
+
+    totalMinutes = Math.max(totalMinutes, 0);
+
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+
+    return `${hours}h ${minutes}m`;
+  };
+
+  const formatDate = (dateString) => format(new Date(dateString), 'eeee, MMM d, yyyy');
+
+  const isWeekday = (dateString) => {
+    const date = new Date(dateString);
+    const day = date.getDay();
+    return day !== 0 && day !== 6; // 0 is Sunday, 6 is Saturday
   };
 
   const handleChange = async (index, field, value) => {
@@ -99,46 +125,22 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
       return;
     }
 
-    if (entry.startTime && !entry.id) {
-      console.log('Posting timecard entry...');
-      try {
-        const response = await fetch(`${API}/timecards`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(requestPayload),
-        });
+    try {
+      const response = await fetch(`${API}/timecards${entry.id ? `/${entry.id}` : ''}`, {
+        method: entry.id ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestPayload),
+      });
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(`Failed to save timecard entry: ${errorData.error}`);
-        }
-
-        const result = await response.json();
-        console.log('Timecard entry saved successfully:', result);
-      } catch (error) {
-        console.error('Error saving timecard entry:', error.message);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Failed to ${entry.id ? 'update' : 'save'} timecard entry: ${errorData.error}`);
       }
-    }
 
-    if (entry.totalTime !== '0h 0m' && entry.id) {
-      console.log('Updating timecard entry...');
-      try {
-        const response = await fetch(`${API}/timecards/${entry.id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(requestPayload),
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(`Failed to update timecard entry: ${errorData.error}`);
-        }
-
-        const result = await response.json();
-        console.log('Timecard entry updated successfully:', result);
-      } catch (error) {
-        console.error('Error updating timecard entry:', error.message);
-      }
+      const result = await response.json();
+      console.log(`Timecard entry ${entry.id ? 'updated' : 'saved'} successfully:`, result);
+    } catch (error) {
+      console.error(`Error ${entry.id ? 'updating' : 'saving'} timecard entry:`, error.message);
     }
   };
 
@@ -148,9 +150,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
         timeCard.entries.map(async (entry) => {
           const response = await fetch(`${API}/timecards${entry.id ? `/${entry.id}` : ''}`, {
             method: entry.id ? 'PUT' : 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               employee_id: employeeId,
               work_date: entry.date,
@@ -184,67 +184,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     navigate('/createNewTimeCard');
   };
 
-  const handleDateChange = (date) => {
-    console.log('Date selected from calendar:', date.toDateString()); // Log the date selected from calendar
-    const previousMonday = getPreviousMonday(date);
-    console.log('Previous Monday calculated:', previousMonday.toDateString()); // Log the calculated previous Monday
-    setStartDate(previousMonday);
-    setShowCalendar(false);
-    const initialEntries = generateInitialEntries(previousMonday);
-    setTimeCard({ entries: initialEntries, isSubmitted: false });
-    localStorage.setItem('currentTimeCard', JSON.stringify({ entries: initialEntries, isSubmitted: false }));
-    localStorage.setItem('startDate', previousMonday.toISOString());
-  };
-
-  const calculateTotalTime = (start, lunchStart, lunchEnd, end) => {
-    const parseTime = (time) => time ? new Date(`1970-01-01T${time}:00`) : null;
-
-    const startTime = parseTime(start);
-    const lunchStartTime = parseTime(lunchStart);
-    const lunchEndTime = parseTime(lunchEnd);
-    const endTime = parseTime(end);
-
-    let totalMinutes = 0;
-
-    if (startTime && lunchStartTime) {
-      const morningWork = (lunchStartTime - startTime) / (1000 * 60);
-      totalMinutes += morningWork;
-    }
-
-    if (lunchEndTime && endTime) {
-      const afternoonWork = (endTime - lunchEndTime) / (1000 * 60);
-      totalMinutes += afternoonWork;
-    }
-
-    if (startTime && endTime && !lunchStartTime && !lunchEndTime) {
-      const allDayWork = (endTime - startTime) / (1000 * 60);
-      totalMinutes = allDayWork;
-    }
-
-    if (startTime && lunchStartTime && lunchEndTime && !endTime) {
-      const morningWork = (lunchStartTime - startTime) / (1000 * 60);
-      totalMinutes = morningWork;
-    }
-
-    totalMinutes = Math.max(totalMinutes, 0);
-
-    const hours = Math.floor(totalMinutes / 60);
-    const minutes = totalMinutes % 60;
-
-    return `${hours}h ${minutes}m`;
-  };
-
-  const formatDate = (dateString) => {
-    const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString(undefined, options);
-  };
-
-  const isWeekday = (dateString) => {
-    const date = new Date(dateString);
-    const day = date.getDay();
-    return day !== 0 && day !== 6; // 0 is Sunday, 6 is Saturday
-  };
-
+  // Filtered Entries
   const filteredEntries = timeCard.entries.filter(entry => isWeekday(entry.date));
 
   return (
@@ -254,14 +194,6 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
         <button className="btn btn-secondary" onClick={handleReset}>Reset</button>
       </div>
       <h2 className="text-center mb-4">Active Timecard</h2>
-      <div className="text-center mb-4">
-        {showCalendar && (
-          <Calendar
-            onChange={handleDateChange}
-            value={startDate}
-          />
-        )}
-      </div>
       <div className="table-responsive">
         <table className="table table-bordered">
           <thead>
@@ -286,6 +218,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
               </tr>
             ))}
           </tbody>
+
         </table>
       </div>
     </div>
