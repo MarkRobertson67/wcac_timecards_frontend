@@ -106,6 +106,7 @@ function TimeCardReports() {
     case 'detailedTimecards':
       url = `${API}/reports/detailed/${empId}`;
       queryParams = { startDate, endDate };
+      console.log({ startDate, endDate })
       break;
     case 'monthlySummary':
       url = `${API}/reports/monthly-summary`;

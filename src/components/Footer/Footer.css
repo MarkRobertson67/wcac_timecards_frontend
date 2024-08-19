@@ -2,75 +2,74 @@
    Copyright (c) 2024 Mark Robertson
    See LICENSE.txt file for details. */
 
-/* Basic reset */
-body, html {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-/* Footer styling */
-.footer {
-  background-color: #007bff; /* Primary background color */
-  color: #fff; /* Text color */
-  font-size: 10px; /* Existing font size */
-}
-
-/* Adjusting font sizes */
-.footer-heading {
-  font-size: .7rem; /* Existing font size */
-  cursor: pointer; /* Indicate that headings are clickable */
-}
-
-/* Hide content by default */
-.footer-content {
-  display: none; /* Hide content by default */
-}
-
-/* Show content on hover */
-.footer-heading:hover + .footer-content {
-  display: block;
-}
-
-/* Styling for footer heading links */
-.list-unstyled li:hover {
-  background-color: #6c757d; /* Background color on hover */
-  transition: background-color 0.3s ease;
-}
-
-/* Responsive design for small screens */
-@media (max-width: 767.98px) {
-  .footer .row {
-    flex-direction: column; /* Stack columns vertically on small screens */
+   .footer {
+    font-size: 10px;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    background: #007bff;
+  }
+  
+  .footer-toggler {
+    display: none;  
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  }
+  
+  .footer-menu {
+    display: block;  
+    text-align: center;  
+  }
+  
+  .footer-heading {
+    cursor: pointer;  
+    text-align: center;
+    padding: 10px 0;
+  }
+  
+  .footer-content {
+    display: none;
+    text-align: center;
+  }
+  
+  .footer-heading:hover + .footer-content,
+  .footer-content:hover {
+    display: block;  
   }
 
-  .footer .footer-heading {
-    display: flex; /* Show headings on small screens */
-  }
-}
-
-
-
-
-
-
-/* .footer {
-  font-size: 10px; 
-}
-
-.footer-heading {
-  font-size: .7rem; 
-}
-
-.footer-content {
-  display: none;
-}
-
-.footer-heading:hover + .footer-content {
+  /* Use parent container for hover to keep submenu open */
+  .col-md-4:hover .footer-content {
   display: block;
 }
-
-.list-unstyled li:hover {
-    background-color: #6c757d; 
-    transition: background-color 0.3s ease;
-  } */
+  
+  @media (max-width: 767px) {
+    .footer-toggler {
+      display: block;  
+    }
+    .footer-menu {
+      display: none;  
+    }
+    .footer-menu.open {
+      display: block;  
+    }
+    .row {
+      text-align: center;  
+    }
+    .col-sm-6, .col-md-4 {
+      float: none;  
+      display: inline-block;  
+      width: 100%;  
+    }
+  }
+  
+  
+  
+  
+  
+  

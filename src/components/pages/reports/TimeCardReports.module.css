@@ -4,9 +4,14 @@ Copyright (c) 2024 Mark Robertson
 See LICENSE.txt file for details. */
 
 
-@import './SharedStyles.module.css';
-
 /* Component-Specific Styles */
+
+.container {
+  padding: 1rem;
+  margin-top: 5rem;
+  padding-bottom: 100px;
+}
+
 .row {
   display: flex;
   justify-content: space-between;
@@ -21,6 +26,14 @@ See LICENSE.txt file for details. */
 .form-select, .form-control {
   width: 100%;
 }
+
+@media print {
+  button {
+    display: none !important;
+  }
+}
+
+
 
 /* Media Queries */
 @media (max-width: 768px) {

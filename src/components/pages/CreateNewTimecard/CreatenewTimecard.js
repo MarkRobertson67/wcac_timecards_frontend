@@ -55,4 +55,4 @@ export default CreateNewTimeCard;
 
 
 
-
+// startOfWeek: () => startOfWeek( new Date(), {weekStartsOn: 0}),

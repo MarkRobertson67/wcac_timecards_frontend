@@ -13,11 +13,12 @@ const API = process.env.REACT_APP_API_URL;
 
 function TimeCardsIndex() {
   const [timeEntries, setTimeEntries] = useState([]);
+  const employeeId = 1  //currentUser?.employeeId;  Replace with actual employee ID from FireBase authentication
 
   useEffect(() => {
     const fetchTimeEntries = async () => {
       try {
-        const response = await fetch(`${API}/timecards/employee/1`);
+        const response = await fetch(`${API}/timecards/employee/${employeeId}`);
         const data = await response.json();
         console.log('Fetched data:', data); // Debug: log the fetched data
         setTimeEntries(data.data); 

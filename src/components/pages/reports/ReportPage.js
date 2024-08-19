@@ -6,6 +6,7 @@ import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { formatDate, formatTime } from '../utils/TimeAndDateUtils'; 
+import styles from "./TimeCardReports.module.css"
 
 
 const ReportPage = () => {
@@ -21,23 +22,35 @@ const ReportPage = () => {
     window.print();
   };
 
+
   const handleSaveCSV = () => {
-    const rows = [
-      ['Work Date', 'Start Time', 'Lunch Start', 'Lunch End', 'End Time', 'Total Hours'], // Header
-      ...reportData.map(record => [
-        formatDate(record.work_date) || '',
-        formatTime(record.start_time) || '',
-        formatTime(record.lunch_start) || '',
-        formatTime(record.lunch_end) || '',
-        formatTime(record.end_time) || '',
-        record.total_time || ''
-      ])
-    ];
+    let rows;
+    // Check the report type and format the rows accordingly
+    if (reportType === 'totalHours' || reportType === 'employeeSummary' || reportType === 'monthlySummary') {
+      rows = [
+        ['Employee ID', 'First Name', 'Last Name', 'Total Hours'], // Adjust headers as per report type
+        ...reportData.map(record => [
+          record.employee_id || '',
+          record.first_name || '',
+          record.last_name || '',
+          record.total_hours || ''
+        ])
+      ];
+    } else if (reportType === 'detailedTimecards') {
+      rows = [
+        ['Work Date', 'Start Time', 'Lunch Start', 'Lunch End', 'End Time', 'Total Hours'], // Header for detailed timecards
+        ...reportData.map(record => [
+          formatDate(record.work_date) || '',
+          formatTime(record.start_time) || '',
+          formatTime(record.lunch_start) || '',
+          formatTime(record.lunch_end) || '',
+          formatTime(record.end_time) || '',
+          record.total_time || ''
+        ])
+      ];
+    }
     
-
-    const csvContent = "data:text/csv;charset=utf-8,"
-      + rows.map(e => e.join(",")).join("\n");
-
+    const csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
@@ -46,15 +59,18 @@ const ReportPage = () => {
     link.click();
     document.body.removeChild(link);
   };
+  
 
   const renderDetailedTimecards = () => {
     return (
-      <div className="container mt-4">
+      <div className={`${styles.container} mt-4`}>
         <h2 className="text-center mb-4">Detailed Timecards Report</h2>
-        <div className="text-center mb-4">
-          <button className="btn btn-primary mx-2" onClick={handlePrint}>Print Report</button>
-          <button className="btn btn-secondary mx-2" onClick={handleSaveCSV}>Save as CSV</button>
-          <button className="btn btn-dark mx-2" onClick={() => navigate(-1)}>Back</button>
+        <div className="text-center mb-4 print-hide">
+        <div className="print-hide">
+          <button className="btn btn-primary mx-2 print-hide" onClick={handlePrint}>Print Report</button>
+          <button className="btn btn-secondary mx-2 print-hide" onClick={handleSaveCSV}>Save as CSV</button>
+          <button className="btn btn-dark mx-2 print-hide" onClick={() => navigate(-1)}>Back</button>
+          </div>
         </div>
         <table className="table table-striped table-bordered text-center">
           <thead>
@@ -69,8 +85,6 @@ const ReportPage = () => {
           </thead>
           <tbody>
             {reportData.map((record) => {
-              // Log the work_date to check its format
-              // console.log('Work Date:', record.work_date);
 
               return (
                 <tr key={record.timecard_id}>
@@ -91,7 +105,7 @@ const ReportPage = () => {
 
   const renderTotalHours = () => {
     return (
-      <div className="container mt-4">
+      <div className={`${styles.container} mt-4`}>
         <h2 className="text-center mb-4">Total Hours Report</h2>
         <div className="text-center mb-4">
           <button className="btn btn-primary mx-2" onClick={handlePrint}>Print Report</button>
@@ -123,9 +137,9 @@ const ReportPage = () => {
   };
 
   const renderMonthlySummary = () => {
-    // Example rendering for Monthly Summary Report
+    
     return (
-      <div className="container mt-4">
+      <div className={`${styles.container} mt-4`}>
         <h2 className="text-center mb-4">Monthly Summary Report</h2>
         <div className="text-center mb-4">
           <button className="btn btn-primary mx-2" onClick={handlePrint}>Print Report</button>
@@ -157,7 +171,7 @@ const ReportPage = () => {
   const renderEmployeeSummary = () => {
     // Example rendering for Employee Summary Report
     return (
-      <div className="container mt-4">
+      <div className={`${styles.container} mt-4`}>
         <h2 className="text-center mb-4">Detailed Timecards Report</h2>
         <div className="text-center mb-4">
           <button className="btn btn-primary mx-2" onClick={handlePrint}>Print Report</button>
@@ -192,10 +206,10 @@ const ReportPage = () => {
     );
   };
 
-  // Define the other render functions similarly, applying the date formatting as needed
+  
 
   return (
-    <div className="container mt-4">
+    <div className={`${styles.container} mt-4`}>
       {reportType === 'detailedTimecards' && renderDetailedTimecards()}
       {reportType === 'totalHours' && renderTotalHours()}
       {reportType === 'monthlySummary' && renderMonthlySummary()}

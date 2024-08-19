@@ -9,6 +9,7 @@ See LICENSE.txt file for details. */
 .container {
     padding: 1rem;
     margin-top: 5rem;
+    padding-bottom: 150px;
   }
   
   .card {
@@ -53,6 +54,14 @@ See LICENSE.txt file for details. */
     border-color: #6c757d;
     color: white;
   }
+
+
+  @media print {
+    .print-hide {
+    display: none;
+    }
+  }
+
   
   /* Media Queries */
   @media (max-width: 768px) {
