@@ -21,11 +21,68 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     return result;
   };
 
+  
+  const getEndDate = (startDate) => {
+    // Adding 13 days to start from Monday and include the next next Friday (two weeks)
+    return addDays(startDate, 13);
+  };
 
-// Generates initial timecard entries for the specified start date.
-// This function calculates a two-week period starting from the previous Monday,
-// excluding weekends. It iterates through 14 days, adding an entry only for weekdays,
-// ensuring that timecard entries align with business days.
+
+  const fetchTimeCardData = async (startDate) => {
+    try {
+      const endDate = getEndDate(startDate);
+      const formattedStart = format(startDate, 'yyyy-MM-dd');
+      const formattedEnd = format(endDate, 'yyyy-MM-dd');
+      const response = await fetch(`${API}/timecards/employee/${employeeId}/range/${formattedStart}/${formattedEnd}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const fetchedData = await response.json();
+      console.log("Fetched data:", fetchedData);  // Log the raw data for debugging
+      
+      let initialEntries = generateInitialEntries(startDate);
+  
+      // Merge fetched data with initial entries based on the work_date
+      if (fetchedData && Array.isArray(fetchedData.data) && fetchedData.data.length > 0) {
+        initialEntries = initialEntries.map(entry => {
+          const foundData = fetchedData.data.find(data => {
+            const entryDate = format(new Date(entry.date), 'yyyy-MM-dd');
+            const workDate = format(new Date(data.work_date), 'yyyy-MM-dd');
+            return entryDate === workDate;
+          });
+          return foundData
+            ? {
+                ...entry,
+                startTime: foundData.start_time || '',
+                lunchStart: foundData.lunch_start || '',
+                lunchEnd: foundData.lunch_end || '',
+                endTime: foundData.end_time || '',
+                totalTime: `${foundData.total_time.hours}h ${foundData.total_time.minutes}m` || '',
+              }
+            : entry;
+        });
+      }
+  
+      // Update the state to trigger re-render
+      setTimeCard({ entries: initialEntries, isSubmitted: false });
+      console.log("Updated TimeCard entries:", initialEntries);
+      
+    } catch (error) {
+      console.error('Error fetching timecard data:', error);
+      setTimeCard({ entries: generateInitialEntries(startDate), isSubmitted: false });
+    }
+  };
+  
+  
+  
+  
+  
+
+
+// Generates initial timecard entries for the specified start date. This function calculates a two-week period starting from the previous Monday, excluding weekends.
+//  It iterates through 14 days, adding an entry only for weekdays, ensuring that timecard entries align with business days.
+
 
   const generateInitialEntries = useCallback((startDate) => {
     let currentDate = getPreviousMonday(startDate);
@@ -43,27 +100,36 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
         }
         currentDate = addDays(currentDate, 1);
     }
+    console.log(`Here are the entries from the generateinitialentries function: ${entries}`)
     return entries;
+    
 }, []);
 
 
+  // useEffect(() => {
+  //   const savedTimeCard = JSON.parse(localStorage.getItem('currentTimeCard'));
+  //   const storedStartDate = localStorage.getItem('startDate');
+  //   // console.log('Stored Start Date:', storedStartDate);
+  //   if (savedTimeCard && storedStartDate) {
+  //     // console.log('Using Saved Time Card:', savedTimeCard);
+  //     setTimeCard(savedTimeCard);
+  //   } else if (storedStartDate) {
+  //     setTimeCard({
+  //       entries: generateInitialEntries(new Date(storedStartDate)),
+  //       isSubmitted: false
+  //     });
+  //   }
+  // }, [generateInitialEntries]);
+
   useEffect(() => {
-    const savedTimeCard = JSON.parse(localStorage.getItem('currentTimeCard'));
-    const storedStartDate = localStorage.getItem('startDate');
-    // console.log('Stored Start Date:', storedStartDate);
-    if (savedTimeCard && storedStartDate) {
-      // console.log('Using Saved Time Card:', savedTimeCard);
-      setTimeCard(savedTimeCard);
-    } else if (storedStartDate) {
-      setTimeCard({
-        entries: generateInitialEntries(new Date(storedStartDate)),
-        isSubmitted: false
-      });
-    }
-  }, [generateInitialEntries]);
+    const storedStartDateStr = localStorage.getItem('startDate');
+    const storedStartDate = storedStartDateStr ? new Date(storedStartDateStr) : new Date();
+    fetchTimeCardData(storedStartDate);
+  }, []);
 
 
   const calculateTotalTime = (start, lunchStart, lunchEnd, end) => {
+    
     const parseTime = (time) => time ? new Date(`1970-01-01T${time}:00`) : null;
     const startTime = parseTime(start);
     const lunchStartTime = parseTime(lunchStart);
@@ -234,7 +300,6 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
             </tr>
           </thead>
           <tbody>
-            {/* timeCard.entries.filter(isWeekday) */}
             {filteredEntries.map((entry, index) => (
               <tr key={entry.date}>
                 <td>{formatDate(entry.date)}</td>
