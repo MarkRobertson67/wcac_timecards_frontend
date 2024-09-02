@@ -74,11 +74,6 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     }
   };
   
-  
-  
-  
-  
-
 
 // Generates initial timecard entries for the specified start date. This function calculates a two-week period starting from the previous Monday, excluding weekends.
 //  It iterates through 14 days, adding an entry only for weekdays, ensuring that timecard entries align with business days.
@@ -106,20 +101,6 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 }, []);
 
 
-  // useEffect(() => {
-  //   const savedTimeCard = JSON.parse(localStorage.getItem('currentTimeCard'));
-  //   const storedStartDate = localStorage.getItem('startDate');
-  //   // console.log('Stored Start Date:', storedStartDate);
-  //   if (savedTimeCard && storedStartDate) {
-  //     // console.log('Using Saved Time Card:', savedTimeCard);
-  //     setTimeCard(savedTimeCard);
-  //   } else if (storedStartDate) {
-  //     setTimeCard({
-  //       entries: generateInitialEntries(new Date(storedStartDate)),
-  //       isSubmitted: false
-  //     });
-  //   }
-  // }, [generateInitialEntries]);
 
   useEffect(() => {
     const storedStartDateStr = localStorage.getItem('startDate');

@@ -40,15 +40,20 @@ function TimeCardReports() {
 
   const handleChange = (e) => {
     const { id, value, type } = e.target;
+
+    console.log(`Handling change for ${id} with value ${value}`);
+
     
     if (id === 'month') {
       // Find the selected month option
       const selectedMonth = monthOptions.find(option => option.value === value);
+      console.log(`Updating month to ${selectedMonth.label}`);
       setFormState(prevState => ({
         ...prevState,
         [id]: selectedMonth
       }));
     } else {
+      console.log(`Updating ${id} to ${value}`);
       setFormState(prevState => ({
         ...prevState,
         [id]: type === 'checkbox' ? value === 'on' : value
@@ -72,17 +77,29 @@ function TimeCardReports() {
 
   const fetchEmployees = async () => {
     try {
-      const response = await fetch(`${API}/employees`);
-      const data = await response.json();
-      setFormState(prevState => ({ ...prevState, employees: data.data }));
+        const response = await fetch(`${API}/employees`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch employees');
+        }
+        const data = await response.json();
+        if (data && data.data) {
+            setFormState(prevState => ({ ...prevState, employees: data.data }));
+        } else {
+            console.error('Unexpected response data:', data);
+        }
     } catch (error) {
-      console.error('Error fetching employees:', error);
+        console.error('Error fetching employees:', error);
     }
-  };
+};
 
-  useEffect(() => {
+useEffect(() => {
     fetchEmployees();
-  }, []);
+}, []); // Empty dependency array to run only once on component mount
+
+
+ 
+  
+
 
   const handleGenerateReport = async () => {
   let url;
@@ -102,6 +119,9 @@ function TimeCardReports() {
     case 'totalHours':
       url = `${API}/reports/${empId}`;
       queryParams = { startDate, endDate };
+      console.log(`Start Date: ${formState.startDate}`);
+console.log(`End Date: ${formState.endDate}`);
+
       break;
     case 'detailedTimecards':
       url = `${API}/reports/detailed/${empId}`;

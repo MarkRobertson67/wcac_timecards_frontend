@@ -2,9 +2,9 @@
 // Copyright (c) 2024 Mark Robertson
 // See LICENSE.txt file for details.
 
+
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import { formatDate, formatTime } from '../utils/TimeAndDateUtils'; 
 import styles from "./TimeCardReports.module.css"
 
@@ -15,50 +15,53 @@ const ReportPage = () => {
   const { reportType, reportData } = location.state || {};
 
   if (!reportType || !reportData) {
+    console.log("No report data or type provided");
     return <div className="text-center">No report data available</div>;
   }
-
+  console.log("Received Report Data:", reportData);
   const handlePrint = () => {
     window.print();
   };
 
 
   const handleSaveCSV = () => {
-    let rows;
-    // Check the report type and format the rows accordingly
-    if (reportType === 'totalHours' || reportType === 'employeeSummary' || reportType === 'monthlySummary') {
-      rows = [
-        ['Employee ID', 'First Name', 'Last Name', 'Total Hours'], // Adjust headers as per report type
-        ...reportData.map(record => [
-          record.employee_id || '',
-          record.first_name || '',
-          record.last_name || '',
-          record.total_hours || ''
-        ])
-      ];
-    } else if (reportType === 'detailedTimecards') {
-      rows = [
-        ['Work Date', 'Start Time', 'Lunch Start', 'Lunch End', 'End Time', 'Total Hours'], // Header for detailed timecards
-        ...reportData.map(record => [
-          formatDate(record.work_date) || '',
-          formatTime(record.start_time) || '',
-          formatTime(record.lunch_start) || '',
-          formatTime(record.lunch_end) || '',
-          formatTime(record.end_time) || '',
-          record.total_time || ''
-        ])
-      ];
+    let headers = [];
+    let dataRows = [];
+
+    if (reportType === 'detailedTimecards') {
+        headers = ['Work Date', 'Start Time', 'Lunch Start', 'Lunch End', 'End Time', 'Total Hours'];
+        dataRows = reportData.map(record => [
+          `"${formatDate(record.work_date,)}"`,
+            formatTime(record.start_time),
+            formatTime(record.lunch_start),
+            formatTime(record.lunch_end),
+            formatTime(record.end_time),
+            record.total_hours
+        ]);
+    } else if (reportType === 'totalHours') {
+        headers = ['Employee ID', 'First Name', 'Last Name', 'Total Hours'];
+        dataRows = reportData.map(record => [
+            record.employee_id,
+            record.first_name,
+            record.last_name,
+            record.total_hours
+        ]);
     }
-    
-    const csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
+
+    // Combine headers and data rows
+    let rows = [headers, ...dataRows];
+
+    // Convert rows to CSV format
+    const csvContent = "data:text/csv;charset=utf-8," + rows.map(row => row.join(",")).join("\n");
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
     link.setAttribute("download", "report.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+    document.body.appendChild(link); // Append the link to the document
+    link.click(); // Simulate a click to download
+    document.body.removeChild(link); // Clean up by removing the link
+};
+  
   
 
   const renderDetailedTimecards = () => {
