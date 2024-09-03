@@ -16,7 +16,16 @@ function CreateNewTimeCard({ setIsNewTimeCardCreated }) {
     setStartDate(date);
   };
 
+  const clearLocalStorage = () => {
+    localStorage.removeItem('currentTimeCard');
+    localStorage.removeItem('startDate');
+  };
+  
+  // Call this method on logout or when you need to ensure fresh data is loaded
+  
+
   const handleStartDateSelection = () => {
+    clearLocalStorage()
     // Store the date as an ISO string
     const isoDate = startDate.toISOString();
     localStorage.setItem('startDate', isoDate);
