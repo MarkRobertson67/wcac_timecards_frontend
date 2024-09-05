@@ -16,22 +16,28 @@ function CreateNewTimeCard({ setIsNewTimeCardCreated }) {
     setStartDate(date);
   };
 
+   // Call this method on logout or when you need to ensure fresh data is loaded
   const clearLocalStorage = () => {
     localStorage.removeItem('currentTimeCard');
     localStorage.removeItem('startDate');
   };
-  
-  // Call this method on logout or when you need to ensure fresh data is loaded
-  
+
+  const formatDate = (date) => {
+    // Format the date as YYYY-MM-DD
+    const year = date.getFullYear();
+    const month = (`0${date.getMonth() + 1}`).slice(-2); // Adding 1 since getMonth() returns 0-11
+    const day = (`0${date.getDate()}`).slice(-2);
+    return `${year}-${month}-${day}`;
+  };
 
   const handleStartDateSelection = () => {
-    clearLocalStorage()
-    // Store the date as an ISO string
-    const isoDate = startDate.toISOString();
-    localStorage.setItem('startDate', isoDate);
+    clearLocalStorage();
+    // Format the date and store it in localStorage
+    const formattedDate = formatDate(startDate);
+    localStorage.setItem('startDate', formattedDate);
 
     setIsNewTimeCardCreated(true);
-    navigate('/currentTimeCard', { state: { startDate: isoDate } });
+    navigate('/currentTimeCard', { state: { startDate: formattedDate } });
   };
 
   return (
@@ -62,6 +68,3 @@ function CreateNewTimeCard({ setIsNewTimeCardCreated }) {
 
 export default CreateNewTimeCard;
 
-
-
-// startOfWeek: () => startOfWeek( new Date(), {weekStartsOn: 0}),
