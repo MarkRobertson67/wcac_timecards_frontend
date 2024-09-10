@@ -133,7 +133,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
   }, []);
 
   const calculateTotalTime = (start, lunchStart, lunchEnd, end) => {
-    const parseTime = (time) => (time ? moment(`1970-01-01T${time}:00Z`) : null);
+    const parseTime = (time) => (time ? moment(`1970-01-01T${time}`).isValid() ? moment(`1970-01-01T${time}:00Z`) : null : null);
     const startTime = parseTime(start);
     const lunchStartTime = parseTime(lunchStart);
     const lunchEndTime = parseTime(lunchEnd);
@@ -142,11 +142,19 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     let totalMinutes = 0;
 
     if (startTime && lunchStartTime) {
-      totalMinutes += lunchStartTime.diff(startTime, 'minutes');
+      totalMinutes += (lunchStartTime - startTime) / (1000 * 60);
     }
 
     if (lunchEndTime && endTime) {
-      totalMinutes += endTime.diff(lunchEndTime, 'minutes');
+      totalMinutes += (endTime - lunchEndTime) / (1000 * 60);
+    }
+
+    if (startTime && endTime && !lunchStartTime && !lunchEndTime) {
+      totalMinutes = (endTime - startTime) / (1000 * 60);
+    }
+
+    if (startTime && lunchStartTime && lunchEndTime && !endTime) {
+      totalMinutes = (lunchStartTime - startTime) / (1000 * 60);
     }
 
     totalMinutes = Math.max(totalMinutes, 0);
@@ -223,7 +231,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
       lunch_start: entry.lunchStart || null,
       lunch_end: entry.lunchEnd || null,
       end_time: entry.endTime || null,
-      total_time: entry.totalTime || null,
+      total_time: entry.totalTime === 'NaNh NaNm' ? '' : entry.totalTime,
       status: entry.status,
     };
 
