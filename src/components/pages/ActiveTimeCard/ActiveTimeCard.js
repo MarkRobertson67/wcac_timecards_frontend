@@ -17,8 +17,13 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
   const getPreviousMonday = (date) => {
     const day = moment(date).day();
-    const previousMonday = day === 0 ? moment(date).add(1, 'days') : moment(date).startOf('week').add(1, 'days');
-    return previousMonday;
+    if (day === 0) {
+      // If the selected day is Sunday (0), start from the next day (Monday)
+      return moment(date).add(1, 'days');
+    } else {
+      // Otherwise, get the previous Monday
+      return moment(date).startOf('week').add(1, 'days');
+    }
   };
 
   const getEndDate = (startDate) => {
@@ -29,8 +34,10 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
   const fetchTimeCardData = async (startDate) => {
     try {
-      const endDate = getEndDate(startDate);
-      const formattedStart = moment.utc(startDate).format('YYYY-MM-DD');
+      // Get the Monday prior or following based on the selected date
+    const adjustedStartDate = getPreviousMonday(startDate);
+      const endDate = getEndDate(adjustedStartDate);
+      const formattedStart = moment.utc(adjustedStartDate).format('YYYY-MM-DD');
       const formattedEnd = moment.utc(endDate).format('YYYY-MM-DD');
       console.log("Fetching data from", formattedStart, "to", formattedEnd); // Log range
   
@@ -43,7 +50,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
       const fetchedData = await response.json();
       console.log("Fetched data:", fetchedData);  // Log the raw data for debugging
       
-      let initialEntries = generateInitialEntries(startDate);
+      let initialEntries = generateInitialEntries(adjustedStartDate);
   
       // Merge fetched data with initial entries based on the work_date
       if (fetchedData && Array.isArray(fetchedData.data) && fetchedData.data.length > 0) {
@@ -149,7 +156,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
     const totalTime = `${hours}h ${minutes}m`;
     console.log('Calculated Total Time:', totalTime);
-    return totalTime;
+    return totalTime || '';
   };
 
   const isWeekday = (date) => {
