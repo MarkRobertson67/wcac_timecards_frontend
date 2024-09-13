@@ -34,72 +34,90 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
   const fetchTimeCardData = async (startDate) => {
     try {
-      // Get the Monday prior or following based on the selected date
-    const adjustedStartDate = getPreviousMonday(startDate);
+      const adjustedStartDate = getPreviousMonday(startDate);
       const endDate = getEndDate(adjustedStartDate);
       const formattedStart = moment.utc(adjustedStartDate).format('YYYY-MM-DD');
       const formattedEnd = moment.utc(endDate).format('YYYY-MM-DD');
-      console.log("Fetching data from", formattedStart, "to", formattedEnd); // Log range
-  
+      console.log("Fetching data from", formattedStart, "to", formattedEnd);
+
       const response = await fetch(`${API}/timecards/employee/${employeeId}/range/${formattedStart}/${formattedEnd}`);
-  
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-  
+
       const fetchedData = await response.json();
-      console.log("Fetched data:", fetchedData);  // Log the raw data for debugging
-      
+      console.log("Fetched data:", fetchedData);
+
       let initialEntries = generateInitialEntries(adjustedStartDate);
-  
+
       // Merge fetched data with initial entries based on the work_date
       if (fetchedData && Array.isArray(fetchedData.data) && fetchedData.data.length > 0) {
         initialEntries = initialEntries.map((entry) => {
           const foundData = fetchedData.data.find((data) => {
-            // Log the raw work_date value before formatting
-            console.log("Raw work_date from fetched data:", data.work_date);
-  
-            // Convert both dates to UTC for comparison
             const entryDate = moment.utc(entry.date).format('YYYY-MM-DD');
             const workDate = moment.utc(data.work_date).format('YYYY-MM-DD');
-  
-            // Log both the entryDate and workDate after formatting
-            console.log("Formatted entryDate in UTC:", entryDate);
-            console.log("Formatted workDate in UTC:", workDate);
-  
             return entryDate === workDate;
           });
-  
-          // Log foundData to see if the match was successful
-          console.log("Matched data for entry:", foundData);
-  
+
+          const totalTime = foundData && foundData.total_time
+            ? `${foundData.total_time.hours}h ${foundData.total_time.minutes}m`
+            : '0h 0m';
+
           return foundData
             ? {
-                ...entry,
-                startTime: foundData.start_time || '',
-                lunchStart: foundData.lunch_start || '',
-                lunchEnd: foundData.lunch_end || '',
-                endTime: foundData.end_time || '',
-                totalTime: `${foundData.total_time.hours}h ${foundData.total_time.minutes}m` || '',
-                status: foundData.status, // Ensure the status is also updated from fetched data
-              }
+              ...entry,
+              id: foundData.id, // Ensure the entry has an ID from the backend
+              startTime: foundData.start_time || '',
+              lunchStart: foundData.lunch_start || '',
+              lunchEnd: foundData.lunch_end || '',
+              endTime: foundData.end_time || '',
+              totalTime,
+              status: foundData.status,
+            }
             : entry;
         });
       }
-  
-      // Update the state to trigger re-render
-      setTimeCard({ entries: initialEntries, isSubmitted: false });
-      console.log("Updated TimeCard entries:", initialEntries); // Log updated entries
+
+      // Insert missing blank entries after loading existing entries
+      const completeEntries = insertMissingEntries(adjustedStartDate, initialEntries);
+      setTimeCard({ entries: completeEntries, isSubmitted: false });
+      console.log("Updated TimeCard entries with missing blanks filled:", completeEntries);
     } catch (error) {
       console.error('Error fetching timecard data:', error);
       setTimeCard({ entries: generateInitialEntries(startDate), isSubmitted: false });
     }
   };
-  
-  
-  
-  
-  
+
+  // Helper function to insert missing entries for each day in the 2-week period
+  const insertMissingEntries = (startDate, entries) => {
+    const allEntries = [];
+    let currentDate = new Date(startDate);
+
+    for (let i = 0; i < 14; i++) {
+      const formattedDate = moment.utc(currentDate).format('YYYY-MM-DD');
+      const foundEntry = entries.find(entry => entry.date === formattedDate);
+
+      if (foundEntry) {
+        allEntries.push(foundEntry);  // Use existing entry if available
+      } else if (isWeekday(currentDate)) {
+        allEntries.push({
+          date: formattedDate,
+          startTime: '',
+          lunchStart: '',
+          lunchEnd: '',
+          endTime: '',
+          totalTime: '',
+          status: 'active',
+        });
+      }
+
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return allEntries;
+  };
+
 
 
   const generateInitialEntries = useCallback((startDate) => {
@@ -128,12 +146,13 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
       const startDate = storedStartDateStr ? moment(storedStartDateStr) : moment();
       await fetchTimeCardData(startDate);
     };
-
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     fetchData();
   }, []);
 
   const calculateTotalTime = (start, lunchStart, lunchEnd, end) => {
-    const parseTime = (time) => (time ? moment(`1970-01-01T${time}`).isValid() ? moment(`1970-01-01T${time}:00Z`) : null : null);
+
+    const parseTime = (time) => (time ? moment(time, 'HH:mm:ss') : null);
     const startTime = parseTime(start);
     const lunchStartTime = parseTime(lunchStart);
     const lunchEndTime = parseTime(lunchEnd);
@@ -164,7 +183,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
     const totalTime = `${hours}h ${minutes}m`;
     console.log('Calculated Total Time:', totalTime);
-    return totalTime || '';
+    return totalTime || '00:00';
   };
 
   const isWeekday = (date) => {
@@ -195,121 +214,136 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
       );
 
       // Log which method will be used for the update
-    console.log(`Updating entry: ${entryToUpdate.id ? 'PUT' : 'POST'} method`);
-    console.log('Updated entry before saving:', entryToUpdate);
+      console.log(`Updating entry: ${entryToUpdate.id ? 'PUT' : 'POST'} method`);
+      console.log('Updated entry before saving:', entryToUpdate);
 
       // Set the status to 'active' if not already submitted
       if (entryToUpdate.status !== 'submitted') {
-      entryToUpdate.status = 'active';
-    }
+        entryToUpdate.status = 'active';
+      }
 
-    // Check if this entry has an ID, and use PUT to update instead of POST
-    if (entryToUpdate.id) {
       updateEntryInDatabase(index, entryToUpdate);
-    } else {
-      updateEntryInDatabase(index, entryToUpdate);
-    }
-
-    return { ...prevState, entries };
-  });
-};
-
+      return { ...prevState, entries };
+    });
+  };
 
   const updateEntryInDatabase = async (index, entry) => {
-     // Clear any previous timeout to prevent multiple updates being sent in quick succession
-  clearTimeout(entry.updateTimeout);
+    clearTimeout(entry.updateTimeout);
 
-  entry.updateTimeout = setTimeout(async () => {
-    const method = entry.id ? 'PUT' : 'POST';
-    console.log(`updateEntryInDatabase called for index: ${index}, using ${method} method`);
-    const url = `${API}/timecards${entry.id ? `/${entry.id}` : ''}`;
+    entry.updateTimeout = setTimeout(async () => {
+      const method = entry.id ? 'PUT' : 'POST';
+      console.log(`updateEntryInDatabase called for index: ${index}, using ${method} method`);
+      const url = `${API}/timecards${entry.id ? `/${entry.id}` : ''}`;
 
-    const requestPayload = {
-      employee_id: employeeId,
-      work_date: entry.date,
-      start_time: entry.startTime || null,
-      lunch_start: entry.lunchStart || null,
-      lunch_end: entry.lunchEnd || null,
-      end_time: entry.endTime || null,
-      total_time: entry.totalTime === 'NaNh NaNm' ? '' : entry.totalTime,
-      status: entry.status,
-    };
+      const requestPayload = {
+        employee_id: employeeId,
+        work_date: entry.date,
+        start_time: entry.startTime || null,
+        lunch_start: entry.lunchStart || null,
+        lunch_end: entry.lunchEnd || null,
+        end_time: entry.endTime || null,
+        total_time: entry.totalTime ? entry.totalTime : '0h 0m',
+        status: entry.status || 'active',
+      };
 
-    console.log('Request payload:', requestPayload);
+      console.log('Request payload:', requestPayload);
 
-
-    try {
-      const response = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestPayload),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to save entry');
-      }
-
-      const result = await response.json();
-      console.log('Response from server:', result);
-      if (method === 'POST' && !entry.id) {
-        setTimeCard((prevState) => {
-          const updatedEntries = [...prevState.entries];
-          updatedEntries[index].id = result.data.id;
-          console.log(`New entry created with ID: ${result.data.id}`);
-          return { ...prevState, entries: updatedEntries };
+      try {
+        const response = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(requestPayload),
         });
+
+        if (!response.ok) {
+          throw new Error('Failed to save entry');
+        }
+
+        const result = await response.json();
+        console.log('Response from server:', result);
+        if (method === 'POST' && !entry.id) {
+          setTimeCard((prevState) => {
+            const updatedEntries = [...prevState.entries];
+            updatedEntries[index].id = result.data.id;
+            console.log(`New entry created with ID: ${result.data.id}`);
+            return { ...prevState, entries: updatedEntries };
+          });
+        }
+        console.log(`Successfully ${method === 'POST' ? 'created' : 'updated'} timecard with ID ${result.data.id}`);
+      } catch (error) {
+        console.error(`Error during ${method} operation:`, error);
       }
-      console.log(`Successfully ${method === 'POST' ? 'created' : 'updated'} timecard with ID ${result.data.id}`);
-    } catch (error) {
-      console.error(`Error during ${method} operation:`, error);
-    }
-  }, 1000); // Delay by 1 second (1000 ms)
+    }, 5000);
   };
+
+  
 
   const handleSubmit = async () => {
-    const allSubmitted = timeCard.entries.every((entry) => entry.status === 'submitted');
-
-    if (allSubmitted) {
-      alert('This timecard has already been submitted.');
-      return;
+    const twoWeekPeriod = timeCard.entries;
+  
+    // Check if there are any missing entries (no ID) and handle them
+    const missingEntries = twoWeekPeriod.filter(entry => !entry.id);
+  
+    if (missingEntries.length > 0) {
+      console.error(`Some entries are missing IDs:`, missingEntries);
+      const confirmation = window.confirm(
+        `There are ${missingEntries.length} missing days. Click 'Cancel' to create them first, or 'OK' to ignore blank entries and proceed with the submission.`
+      );
+      if (!confirmation) return;  // If the user cancels, stop the submission
     }
-
-    if (window.confirm("Are you sure you want to submit? Once submitted, the timecard is locked and cannot be changed.")) {
-      try {
-        await Promise.all(
-          timeCard.entries.map(async (entry) => {
-            if (entry.status !== 'submitted') {
-              const response = await fetch(`${API}/timecards${entry.id ? `/${entry.id}` : ''}`, {
-                method: entry.id ? 'PUT' : 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  employee_id: employeeId,
-                  work_date: entry.date,
-                  start_time: entry.startTime,
-                  lunch_start: entry.lunchStart,
-                  lunch_end: entry.lunchEnd,
-                  end_time: entry.endTime,
-                  total_time: entry.totalTime,
-                  status: 'submitted',
-                }),
-              });
-
-              if (!response.ok) {
-                throw new Error('Failed to submit timecard');
-              }
-            }
-          })
-        );
-        console.log('Time Card Submitted Successfully');
-        setTimeCard({ entries: [], isSubmitted: true });
-        setIsNewTimeCardCreated(false);
-        navigate('/');
-      } catch (error) {
-        console.error('Error submitting timecard:', error);
-      }
+  
+    try {
+      await submitTimeCardEntries(twoWeekPeriod);
+      console.log('Timecard submitted successfully');
+      setIsNewTimeCardCreated(false);
+      afterSubmitReset();  // Reset the timecard after successful submission
+      navigate('/');
+    } catch (error) {
+      console.error('Error submitting timecard:', error);
     }
   };
+  
 
+
+  // Function to submit all entries
+  const submitTimeCardEntries = async (entries) => {
+    await Promise.all(
+      entries.map(async (entry) => {
+        // Always use PUT as we're updating existing entries
+        const url = `${API}/timecards/${entry.id}`;
+  
+        // Only include the status field in the payload
+        const requestPayload = {
+          status: 'submitted',  // Always set status to 'submitted'
+        };
+  
+        console.log(`Submitting PUT request for date ${entry.date}`);
+  
+        try {
+          const response = await fetch(url, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requestPayload),
+          });
+  
+          if (!response.ok) {
+            const errorMessage = await response.text();
+            console.error(`Failed to submit entry: ${errorMessage}`);
+            throw new Error(errorMessage);
+          } else {
+            // const result = await response.json();
+            console.log(`Successfully updated entry with ID: ${entry.id}`);
+          }
+        } catch (error) {
+          console.error(`Error during PUT operation for date ${entry.date}:`, error);
+        }
+      })
+    );
+  };
+  
+
+  
+  
   const handleReset = () => {
     const isConfirmed = window.confirm("Are you sure you want to reset? All data entered will be lost.");
     if (!isConfirmed) return;
@@ -321,9 +355,19 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     navigate('/createNewTimeCard');
   };
 
+
+  const afterSubmitReset = () => {
+    setTimeCard({ entries: generateInitialEntries(moment()), isSubmitted: false });
+    localStorage.removeItem('currentTimeCard');
+    localStorage.removeItem('startDate');
+    setIsNewTimeCardCreated(false);
+  }
+
+
   const handleBack = () => {
     navigate('/createNewTimecard');
   };
+
 
   const filteredEntries = timeCard.entries.filter((entry) => isWeekday(entry.date));
 
