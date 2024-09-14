@@ -276,14 +276,20 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     }, 5000);
   };
 
-  
-
   const handleSubmit = async () => {
     const twoWeekPeriod = timeCard.entries;
-  
+
+    // Check if all entries are already submitted
+    const alreadySubmittedEntries = twoWeekPeriod.every(entry => entry.status === 'submitted');
+
+    if (alreadySubmittedEntries) {
+      alert("All entries are already submitted.");
+      return;  // Prevent resubmission if everything is already submitted
+    }
+
     // Check if there are any missing entries (no ID) and handle them
     const missingEntries = twoWeekPeriod.filter(entry => !entry.id);
-  
+
     if (missingEntries.length > 0) {
       console.error(`Some entries are missing IDs:`, missingEntries);
       const confirmation = window.confirm(
@@ -291,59 +297,52 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
       );
       if (!confirmation) return;  // If the user cancels, stop the submission
     }
-  
-    try {
-      await submitTimeCardEntries(twoWeekPeriod);
-      console.log('Timecard submitted successfully');
-      setIsNewTimeCardCreated(false);
-      afterSubmitReset();  // Reset the timecard after successful submission
-      navigate('/');
-    } catch (error) {
-      console.error('Error submitting timecard:', error);
-    }
-  };
-  
 
-
-  // Function to submit all entries
-  const submitTimeCardEntries = async (entries) => {
+    // Iterate through all entries and submit them
     await Promise.all(
-      entries.map(async (entry) => {
-        // Always use PUT as we're updating existing entries
-        const url = `${API}/timecards/${entry.id}`;
-  
-        // Only include the status field in the payload
-        const requestPayload = {
-          status: 'submitted',  // Always set status to 'submitted'
-        };
-  
-        console.log(`Submitting PUT request for date ${entry.date}`);
-  
-        try {
-          const response = await fetch(url, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(requestPayload),
-          });
-  
-          if (!response.ok) {
-            const errorMessage = await response.text();
-            console.error(`Failed to submit entry: ${errorMessage}`);
-            throw new Error(errorMessage);
-          } else {
-            // const result = await response.json();
-            console.log(`Successfully updated entry with ID: ${entry.id}`);
+      twoWeekPeriod.map(async (entry) => {
+        // Log the date and ID for each entry in the two-week period
+        console.log(`Date: ${entry.date}, ID: ${entry.id ? entry.id : 'No ID assigned yet'}`);
+
+        if (entry.id) {
+          // Only submit if the entry has an ID
+          const url = `${API}/timecards/${entry.id}`;
+          const requestPayload = {
+            status: 'submitted',  // Always set status to 'submitted'
+          };
+
+          console.log(`Submitting PUT request for date ${entry.date}`);
+
+          try {
+            const response = await fetch(url, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(requestPayload),
+            });
+
+            if (!response.ok) {
+              const errorMessage = await response.text();
+              console.error(`Failed to submit entry: ${errorMessage}`);
+              throw new Error(errorMessage);
+            } else {
+              console.log(`Successfully updated entry with ID: ${entry.id}`);
+            }
+          } catch (error) {
+            console.error(`Error during PUT operation for date ${entry.date}:`, error);
           }
-        } catch (error) {
-          console.error(`Error during PUT operation for date ${entry.date}:`, error);
         }
       })
     );
-  };
-  
 
-  
-  
+    // After submitting, reset the timecard
+    console.log('Timecard submitted successfully');
+    setIsNewTimeCardCreated(false);
+    afterSubmitReset();
+    navigate('/');
+  };
+
+
+
   const handleReset = () => {
     const isConfirmed = window.confirm("Are you sure you want to reset? All data entered will be lost.");
     if (!isConfirmed) return;
