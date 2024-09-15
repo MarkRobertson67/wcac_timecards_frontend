@@ -12,13 +12,19 @@ import styles from "./TimeCardReports.module.css"
 const ReportPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { reportType, reportData } = location.state || {};
+  const { reportType, reportData = [], defaultReportData = [] } = location.state || {};
 
-  if (!reportType || !reportData) {
+  // Use reportData if available, otherwise fallback to defaultReportData
+  const activeReportData = (reportData.length > 0) ? reportData : (defaultReportData.length > 0 ? defaultReportData : []);
+
+
+  if (!reportType || activeReportData.length === 0) {
+    console.log(`This is the default Data: ${defaultReportData}`)
     console.log("No report data or type provided");
     return <div className="text-center">No report data available</div>;
   }
-  console.log("Received Report Data:", reportData);
+  console.log("Received Report Data:", activeReportData);
+
   const handlePrint = () => {
     window.print();
   };
@@ -30,21 +36,21 @@ const ReportPage = () => {
 
     if (reportType === 'detailedTimecards') {
         headers = ['Work Date', 'Start Time', 'Lunch Start', 'Lunch End', 'End Time', 'Total Hours'];
-        dataRows = reportData.map(record => [
+        dataRows = activeReportData.map(record => [
           `"${formatDate(record.work_date,)}"`,
             formatTime(record.start_time),
             formatTime(record.lunch_start),
             formatTime(record.lunch_end),
             formatTime(record.end_time),
-            record.total_hours
+            (record.total_hours && record.total_hours !== 'Invalid data') ? record.total_hours : "0 Hours 0 Minutes"
         ]);
     } else if (reportType === 'totalHours') {
         headers = ['Employee ID', 'First Name', 'Last Name', 'Total Hours'];
-        dataRows = reportData.map(record => [
+        dataRows = activeReportData.map(record => [
             record.employee_id,
             record.first_name,
             record.last_name,
-            record.total_hours
+            (record.total_hours && record.total_hours !== 'Invalid data') ? record.total_hours : "0 Hours 0 Minutes"
         ]);
     }
 
@@ -87,7 +93,7 @@ const ReportPage = () => {
             </tr>
           </thead>
           <tbody>
-            {reportData.map((record) => {
+            {activeReportData.map((record) => {
 
               return (
                 <tr key={record.timecard_id}>
@@ -96,7 +102,7 @@ const ReportPage = () => {
                   <td>{formatTime(record.lunch_start)}</td>
                   <td>{formatTime(record.lunch_end)}</td>
                   <td>{formatTime(record.end_time)}</td>
-                  <td>{record.total_hours}</td>
+                  <td>{(record.total_hours && record.total_hours !== 'Invalid data') ? record.total_hours : "0 Hours 0 Minutes"}</td>
                 </tr>
               );
             })}
@@ -125,12 +131,12 @@ const ReportPage = () => {
             </tr>
           </thead>
           <tbody>
-            {reportData.map((record) => (
+            {activeReportData.map((record) => (
               <tr key={record.employee_id}>
                 <td>{record.employee_id}</td>
                 <td>{record.first_name}</td>
                 <td>{record.last_name}</td>
-                <td>{record.total_hours}</td>
+                <td>{(record.total_hours && record.total_hours !== 'Invalid data') ? record.total_hours : "0 Hours 0 Minutes"}</td>
               </tr>
             ))}
           </tbody>
@@ -158,7 +164,7 @@ const ReportPage = () => {
             </tr>
           </thead>
           <tbody>
-            {reportData.map((record) => (
+            {activeReportData.map((record) => (
               <tr key={record.employee_id}>
                 <td>{record.employee_id}</td>
                 <td>{record.month}</td>
@@ -193,7 +199,7 @@ const ReportPage = () => {
             </tr>
           </thead>
           <tbody>
-            {reportData.map((record) => (
+            {activeReportData.map((record) => (
               <tr key={record.id}>
                 <td>{formatDate(record.work_date)}</td>
                 <td>{formatTime(record.start_time)}</td>
@@ -210,7 +216,6 @@ const ReportPage = () => {
   };
 
   
-
   return (
     <div className={`${styles.container} mt-4`}>
       {reportType === 'detailedTimecards' && renderDetailedTimecards()}
