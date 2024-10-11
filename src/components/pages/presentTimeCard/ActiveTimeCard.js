@@ -42,13 +42,6 @@ console.log('Window Size:', width, height);
     return moment(startDate).add(13, 'days'); // Two-week period
   };
 
-  // useEffect(() => {
-  //   // Trigger confetti on component mount for testing
-  //   setShowConfetti(true);
-  //   setTimeout(() => {
-  //     setShowConfetti(false);
-  //   }, 5000);
-  // }, []);
   
   const fetchTimeCardData = useCallback(async (startDate) => {
     try {

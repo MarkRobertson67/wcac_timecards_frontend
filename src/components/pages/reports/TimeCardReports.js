@@ -33,19 +33,31 @@ function TimeCardReports() {
     employeeId: '',
     selectedEmployeeName: '',
     month: monthOptions[0],
-    year: '2024',
+    year: new Date().getFullYear().toString(), // Use the current year
     period: 'weekly',
     employees: []
   });
+  
+  useEffect(() => {
+    if (formState.employees.length > 0) {
+      console.log("Employees updated after fetch:", formState.employees);  // This log after the state updates
+    }
+  }, [formState.employees]);
+  
 
   const handleChange = (e) => {
     const { id, value, type } = e.target;
-
     console.log(`Handling change for ${id} with value ${value}`);
 
-
-    if (id === 'month') {
-      // Find the selected month option
+    // Handle employee selection
+    if (id === 'selectedEmployeeName') {
+      console.log(`Updating selectedEmployeeName to ${value}`);  // Add a log for debugging
+      setFormState(prevState => ({
+        ...prevState,
+        selectedEmployeeName: value  // Update the form state
+      }));
+    } else if (id === 'month') {
+      // Handle month selection
       const selectedMonth = monthOptions.find(option => option.value === value);
       console.log(`Updating month to ${selectedMonth.label}`);
       setFormState(prevState => ({
@@ -53,15 +65,17 @@ function TimeCardReports() {
         [id]: selectedMonth
       }));
     } else {
+      // Handle other fields
       console.log(`Updating ${id} to ${value}`);
       setFormState(prevState => ({
         ...prevState,
         [id]: type === 'checkbox' ? value === 'on' : value
       }));
     }
-  };
+};
 
   const resetForm = () => {
+    
     setFormState({
       reportType: 'totalHours',
       startDate: '',
@@ -69,7 +83,7 @@ function TimeCardReports() {
       employeeId: '',
       selectedEmployeeName: '',
       month: monthOptions[0],
-      year: '2024',
+      year: new Date().getFullYear().toString(), // Reset to the current year,
       period: 'weekly',
       employees: []
     });
@@ -77,13 +91,16 @@ function TimeCardReports() {
 
   const fetchEmployees = async () => {
     try {
-      const response = await fetch(`${API}/employees`);
+      const response = await fetch(`${API}/employees?ts=${new Date().getTime()}`);
+
       if (!response.ok) {
         throw new Error('Failed to fetch employees');
       }
       const data = await response.json();
       if (data && data.data) {
+
         setFormState(prevState => ({ ...prevState, employees: data.data }));
+        console.log("Fetched employees:", data.data);  // Log the fetched employees
       } else {
         console.error('Unexpected response data:', data);
       }
@@ -97,78 +114,161 @@ function TimeCardReports() {
   }, []); // Empty dependency array to run only once on component mount
 
 
+
   const handleGenerateReport = async () => {
     let url;
     let queryParams = {};
 
-    const { reportType, startDate, endDate, month, year, selectedEmployeeName, employees } = formState;
+    const { reportType, startDate, endDate, selectedEmployeeName, employees, period } = formState;
 
-    const selectedEmployee = employees.find(emp => `${emp.first_name} ${emp.last_name}`.trim() === selectedEmployeeName.trim());
-    const empId = selectedEmployee ? selectedEmployee.id : null;
 
-    if (!empId && ['totalHours', 'detailedTimecards', 'employeeSummary'].includes(reportType)) {
-      console.error('Invalid employee selected or employee ID not found');
-      return;
+    // Check if 'ALL' employees is selected
+    if (selectedEmployeeName === "ALL") {
+        // Route for ALL employees
+        if (reportType === 'employeeSummary') {
+            url = `${API}/reports/all/employee-summary?startDate=${startDate}&endDate=${endDate}&period=${period}`;
+            console.log(`Fetching employee summary for ALL employees from: ${url}`);
+        } else if (reportType === 'totalHours') {
+            url = `${API}/reports/all/range/${startDate}/${endDate}`;
+            console.log(`Fetching total hours for ALL employees from: ${url}`);
+        } else {
+            console.error('Invalid report type for ALL employees');
+            return;
+        }
+
+        // Fetching report for ALL employees
+        try {
+            const response = await fetch(`${url}`);
+            const reportData = await response.json();
+
+            // Ensure reportData.data is an array
+            const reportArray = Array.isArray(reportData.data) ? reportData.data : [];
+
+            if (reportArray.length === 0) {
+                console.log("No timecards found for ALL employees. Generating default data.");
+                const defaultReportData = [{
+                    start_date: startDate,
+                    end_date: endDate,
+                    employee_id: 'ALL',
+                    total_hours: { hours: 0, minutes: 0 }
+                }];
+
+                navigate('/report', {
+                    state: {
+                        reportType,
+                        reportData: defaultReportData,
+                        startDate,
+                        endDate,
+                        employeeId: 'ALL',
+                    }
+                });
+            } else {
+                navigate('/report', {
+                    state: {
+                        reportType,
+                        reportData: reportArray,
+                        startDate,
+                        endDate,
+                        employeeId: 'ALL',
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Error fetching report data for ALL employees:', error);
+        }
+
+    } else {
+        // Logic for an individual employee
+        const selectedEmployee = employees.find(emp => `${emp.first_name} ${emp.last_name}`.trim() === selectedEmployeeName.trim());
+        const empId = selectedEmployee ? selectedEmployee.id : null;
+
+        if (!empId) {
+            console.error('Invalid employee selected or employee ID not found');
+            return;
+        }
+
+        // Set employeeId in the formState
+        setFormState(prevState => ({
+            ...prevState,
+            employeeId: empId
+        }));
+
+        switch (reportType) {
+            case 'totalHours':
+                url = `${API}/reports/${empId}`;
+                queryParams = { startDate, endDate };
+                console.log(`Fetching total hours for employee ID ${empId} from: ${url}?startDate=${startDate}&endDate=${endDate}`);
+                break;
+
+            case 'detailedTimecards':
+                url = `${API}/reports/detailed/${empId}`;
+                queryParams = { startDate, endDate };
+                console.log(`Fetching detailed timecards for employee ID ${empId} from: ${url}?startDate=${startDate}&endDate=${endDate}`);
+                break;
+
+            case 'employeeSummary':
+                url = `${API}/reports/employee-summary/${empId}`;
+                queryParams = { startDate, endDate, period };
+                console.log(`Fetching employee summary for employee ID ${empId} from: ${url}?startDate=${startDate}&endDate=${endDate}&period=${period}`);
+                break;
+
+            default:
+                console.error('Invalid report type for individual employee');
+                return;
+        }
+
+        const queryString = new URLSearchParams(queryParams).toString();
+        console.log(`Fetching report from: ${url}?${queryString}`);
+
+        try {
+            const response = await fetch(`${url}?${queryString}`);
+            const reportData = await response.json();
+
+            // Ensure reportData is an array
+            const reportArray = Array.isArray(reportData) ? reportData : [];
+
+            if (reportArray.length === 0) {
+                console.log("No timecards found. Generating default data.");
+                const defaultReportData = [{
+                    start_date: startDate,
+                    end_date: endDate,
+                    employee_id: empId,
+                    first_name: selectedEmployee.first_name,
+                    last_name: selectedEmployee.last_name,
+                    total_hours: { hours: 0, minutes: 0 }
+                }];
+
+                navigate('/report', {
+                    state: {
+                        reportType,
+                        reportData: defaultReportData,
+                        startDate,
+                        endDate,
+                        employeeId: empId,
+                        firstName: selectedEmployee.first_name,
+                        lastName: selectedEmployee.last_name
+                    }
+                });
+            } else {
+                navigate('/report', {
+                    state: {
+                        reportType,
+                        reportData: reportArray,
+                        startDate,
+                        endDate,
+                        employeeId: empId,
+                        firstName: selectedEmployee.first_name,
+                        lastName: selectedEmployee.last_name,
+                        period
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Error fetching report data for individual employee:', error);
+        }
     }
 
-    switch (reportType) {
-      case 'totalHours':
-        url = `${API}/reports/${empId}`;
-        queryParams = { startDate, endDate };
-        console.log(`Start Date: ${formState.startDate}`);
-        console.log(`End Date: ${formState.endDate}`);
-
-        break;
-      case 'detailedTimecards':
-        url = `${API}/reports/detailed/${empId}`;
-        queryParams = { startDate, endDate };
-        console.log({ startDate, endDate })
-        break;
-      case 'monthlySummary':
-        url = `${API}/reports/monthly-summary`;
-        queryParams = { month: month ? Number(month.value) : '', year };  // Convert month to a number
-        break;
-      case 'employeeSummary':
-        url = `${API}/reports/employee-summary`;
-        queryParams = { employeeId: empId, startDate, endDate };
-        break;
-      default:
-        console.error('Invalid report type');
-        return;
-    }
-
-    const queryString = new URLSearchParams(queryParams).toString();
-    console.log(`Fetching report from: ${url}?${queryString}`);
-
-    try {
-      const response = await fetch(`${url}?${queryString}`);
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Network response was not ok: ${errorText}`);
-      }
-      const reportData = await response.json();
-
-      //Check if the reportData is empty and set default values if no timecards are found
-      if (reportData.length === 0) {
-        console.log("No timecards found.  Generating default data.")
-        const defaultReportData = [{
-          employee_id: empId,
-          first_name: selectedEmployee.first_name,
-          last_name: selectedEmployee.last_name,
-          total_hours: '0 Hours 0 Minutes'
-        }]
-
-        navigate('/report', { state: { reportType, defaultReportData}})
-        console.log(defaultReportData)
-      } else {
-        //If data exists, proceed normally
-        navigate('/report', { state: { reportType, reportData } });
-      }
-
-    } catch (error) {
-      console.error('Error fetching report data:', error);
-    }
-  };
+};
 
 
   const renderFormFields = () => {
@@ -190,6 +290,13 @@ function TimeCardReports() {
                   onChange={handleChange}
                 >
                   <option value="">Select Employee</option>
+
+                  {/* Only show "ALL" option if the report type is not detailedTimecards */}
+                  {reportType !== 'detailedTimecards' && (
+                    <option value="ALL">ALL</option>
+                  )}
+
+                  {/* Map individual employee names */}
                   {employees.map(emp => (
                     <option key={emp.id} value={`${emp.first_name} ${emp.last_name}`}>
                       {emp.first_name} {emp.last_name}
@@ -258,7 +365,6 @@ function TimeCardReports() {
         <select id="reportType" className="form-select" value={formState.reportType} onChange={handleChange}>
           <option value="totalHours">Total Hours Worked by Employee</option>
           <option value="detailedTimecards">Detailed Timecards by Employee</option>
-          <option value="monthlySummary">Monthly Summary Report</option>
           <option value="employeeSummary">Employee Summary Report</option>
         </select>
       </div>

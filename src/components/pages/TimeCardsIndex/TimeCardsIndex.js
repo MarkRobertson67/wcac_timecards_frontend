@@ -20,7 +20,7 @@ function TimeCardsIndex() {
       try {
         const response = await fetch(`${API}/timecards/employee/${employeeId}`);
         const data = await response.json();
-        console.log('Fetched data:', data); // Debug: log the fetched data
+        console.log('Fetched data:', data);
         setTimeEntries(data.data); 
       } catch (error) {
         console.error('Error fetching time entries:', error);
