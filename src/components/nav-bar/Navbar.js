@@ -5,6 +5,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import logo from '../../assets/WCAD_LOGO.png';
+import "../nav-bar/NavBar.css"
 
 function NavBar({ isNewTimeCardCreated }) {
   const location = useLocation();
@@ -46,6 +47,11 @@ function NavBar({ isNewTimeCardCreated }) {
             <li className={`nav-item ${location.pathname === '/timeCardIndex' ? 'active' : ''}`}>
               <Link className="nav-link" to="/timeCardIndex">
                 Time Card Index
+              </Link>
+            </li>
+            <li className={`nav-item ${location.pathname === '/reports' ? 'active' : ''}`}>
+              <Link className="nav-link" to="/reports">
+                Reports
               </Link>
             </li>
           </ul>
