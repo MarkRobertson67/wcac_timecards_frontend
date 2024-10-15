@@ -7,7 +7,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './ActiveTimeCard.module.css';
 import moment from 'moment-timezone';
-import Confetti from 'react-confetti'; // Import Confetti
+import Confetti from 'react-confetti';
 import { useWindowSize } from 'react-use';
 
 const API = process.env.REACT_APP_API_URL;
