@@ -2,7 +2,7 @@
 // Copyright (c) 2024 Mark Robertson
 // See LICENSE.txt file for details.
 
-function About() {
+function AboutComponemt() {
 
     return(
     <div>
@@ -14,4 +14,4 @@ function About() {
     }
     
     
-    export default About;
+    export default AboutComponemt;
