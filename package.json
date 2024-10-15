@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    
     "@fullcalendar/daygrid": "^6.1.14",
     "@fullcalendar/interaction": "^6.1.15",
     "@fullcalendar/react": "^6.1.14",
@@ -53,5 +52,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
   }
 }
