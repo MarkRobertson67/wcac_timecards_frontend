@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './Footer.css';
 
-function Footer() {
+function FooterComponent() {
   const [isMenuOpen, setMenuOpen] = useState(false); 
 
   // Toggle menu visibility
@@ -54,4 +54,4 @@ function Footer() {
   );
 }
 
-export default Footer;
+export default FooterComponent;
