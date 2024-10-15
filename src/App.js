@@ -9,10 +9,10 @@ import './App.css';
 import Home from './components/pages/Home';
 import About from './components/pages/about/AboutComponent';
 import NavBar from './components/nav-bar/Navbar';
-import Footer from './components/footer/FooterComponent';
+import Footer from './components/Footer/FooterComponent';
 import CurrentTimeCard from './components/pages/presentTimeCard/ActiveTimeCard';
-import CreateNewTimeCard from './components/pages/createNewTimecard/CreatenewTimecard'; 
-import TimeCardIndex from './components/pages/timeCardsIndex/TimeCardsIndex'; 
+import CreateNewTimeCard from './components/pages/CreateNewTimecard/CreatenewTimecard'; 
+import TimeCardIndex from './components/pages/TimeCardsIndex/TimeCardsIndex'; 
 import TimeCardReports from './components/pages/reports/TimeCardReports';
 import ReportPage from './components/pages/reports/ReportPage';
 
