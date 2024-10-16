@@ -28,16 +28,17 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 console.log('Window Size:', width, height);
 
 
-  const getPreviousMonday = (date) => {
-    const day = moment(date).day();
-    if (day === 0) {
-      // If the selected day is Sunday (0), start from the next day (Monday)
-      return moment(date).add(1, 'days');
-    } else {
-      // Otherwise, get the previous Monday
-      return moment(date).startOf('week').add(1, 'days');
-    }
-  };
+const getPreviousMonday = (date) => {
+  const day = moment(date).day();
+  if (day === 1) { // If the day is Monday (1)
+    return moment(date); // Return the same date
+  } else if (day === 0) { // If the day is Sunday (0)
+    return moment(date).add(1, 'days'); // Move to Monday
+  } else {
+    return moment(date).startOf('week').add(1, 'days'); // Start of the week is Sunday, get Monday
+  }
+};
+
 
   const getEndDate = (startDate) => {
     return moment(startDate).add(13, 'days'); // Two-week period
