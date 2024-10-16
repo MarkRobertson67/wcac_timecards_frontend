@@ -21,7 +21,7 @@ function TimeCardsIndex() {
         const response = await fetch(`${API}/timecards/employee/${employeeId}`);
         const data = await response.json();
         console.log('Fetched data:', data);
-        setTimeEntries(data.data); 
+        setTimeEntries(data.data);
       } catch (error) {
         console.error('Error fetching time entries:', error);
       }
@@ -64,7 +64,7 @@ function TimeCardsIndex() {
     console.log('Event Start:', eventStart); // Log the event start time
 
     return {
-      title: '', 
+      title: '',
       start: eventStart,   // Same for start
       end: eventStart,     // Same for end
       extendedProps: {
@@ -79,6 +79,7 @@ function TimeCardsIndex() {
     <div className={styles.container}>
       <h2>Total Hours Worked</h2>
       <FullCalendar
+        timeZone="UTC"
         plugins={[dayGridPlugin, interactionPlugin]}
         initialView="dayGridMonth"
         initialDate={new Date()}
@@ -88,8 +89,8 @@ function TimeCardsIndex() {
           right: 'dayGridMonth,dayGridDay'
         }}
         events={events} // Pass the logged events to FullCalendar
-        eventContent={renderEventContent} 
-        dateClick={handleDateClick} 
+        eventContent={renderEventContent}
+        dateClick={handleDateClick}
         height="auto" // height of calendar
       />
     </div>
