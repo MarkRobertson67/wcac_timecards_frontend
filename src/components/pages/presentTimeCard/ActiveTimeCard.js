@@ -16,7 +16,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
   const [timeCard, setTimeCard] = useState({ entries: [], isSubmitted: false });
   const [isLoading, setIsLoading] = useState(true);
   const hasFetched = useRef(false); // Initialize the flag
-  const [isSubmitting, setIsSubmitting] = useState(false); 
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const navigate = useNavigate();
@@ -25,30 +25,35 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
   // Get window size for Confetti
   const { width, height } = useWindowSize();
-console.log('Window Size:', width, height);
+  console.log('Window Size:', width, height);
 
 
-const getPreviousMonday = (date) => {
-  const day = moment.utc(date).day();
-  if (day === 1) { // If the day is Monday (1)
-    return moment.utc(date); // Return the same date
-  } else if (day === 0) { // If the day is Sunday (0)
-    return moment.utc(date).add(1, 'days'); // Move to Monday
-  } else {
-    return moment.utc(date).startOf('week').add(1, 'days'); // Start of the week is Sunday, get Monday
-  }
-};
+  const getPreviousMonday = (date) => {
+    const utcDate = moment.utc(date); // Convert the input date to UTC
+    const day = utcDate.day();
 
+    if (day === 1) { // If the day is Monday (1)
+      return utcDate; // Return the same date in UTC
+    } else if (day === 0) { // If the day is Sunday (0)
+      return utcDate.add(1, 'days'); // Move to Monday
+    } else {
+      return utcDate.startOf('week').add(1, 'days'); // Start of the week is Sunday, get Monday
+    }
+  };
 
   const getEndDate = (startDate) => {
     return moment(startDate).add(13, 'days'); // Two-week period
   };
 
-  
+
   const fetchTimeCardData = useCallback(async (startDate) => {
     try {
       const adjustedStartDate = getPreviousMonday(startDate);
       const endDate = getEndDate(adjustedStartDate);
+
+      console.log("Adjusted Start Date:", adjustedStartDate.format());
+      console.log("End Date for fetching:", endDate.format());
+
       const formattedStart = moment.utc(adjustedStartDate).format('YYYY-MM-DD');
       const formattedEnd = moment.utc(endDate).format('YYYY-MM-DD');
       console.log("Fetching data from", formattedStart, "to", formattedEnd);
@@ -175,18 +180,27 @@ const getPreviousMonday = (date) => {
 
       console.log("All Entries to be set in state:", allEntries);
 
-      // Update state with all entries
-      setTimeCard({ entries: allEntries, isSubmitted: false });
-      console.log("Updated TimeCard entries:", allEntries);
+      //     // Update state with all entries
+      //     setTimeCard({ entries: allEntries, isSubmitted: false });
+      //     console.log("Updated TimeCard entries:", allEntries);
+      //   } catch (error) {
+      //     console.error('Error fetching timecard data:', error);
+      //     // Maybe retry fetching or handle the error differently
+      //     setTimeCard({ entries: [], isSubmitted: false });
+      //   } finally {
+      //     setIsLoading(false);
+      //   }
+      // }, [employeeId]);
+
+      // Update state with all entries...
+      setTimeCard({ entries: [...Array.from(fetchedEntriesMap.values()), ...successfulCreatedEntries], isSubmitted: false });
     } catch (error) {
       console.error('Error fetching timecard data:', error);
-      // Maybe retry fetching or handle the error differently
       setTimeCard({ entries: [], isSubmitted: false });
     } finally {
       setIsLoading(false);
     }
   }, [employeeId]);
-
 
 
   useEffect(() => {
@@ -196,6 +210,7 @@ const getPreviousMonday = (date) => {
       hasFetched.current = true; // Set the flag after fetching
       const storedStartDateStr = localStorage.getItem('startDate');
       const startDate = storedStartDateStr ? moment.utc(storedStartDateStr) : moment.utc();
+      console.log("Start Date for fetching:", startDate.format());
       await fetchTimeCardData(startDate);
     };
     fetchData();
@@ -457,8 +472,8 @@ const getPreviousMonday = (date) => {
       console.error('Unexpected error submitting timecard:', error);
       alert(`An unexpected error occurred: ${error.message}`);
     } finally {
-    setIsSubmitting(false); // **Set submitting state to false**
-  }
+      setIsSubmitting(false); // **Set submitting state to false**
+    }
   };
 
   const handleReset = () => { //Add here code to delete the entries made.
@@ -486,114 +501,114 @@ const getPreviousMonday = (date) => {
   const filteredEntries = timeCard.entries.filter((entry) => isWeekday(entry.date));
 
 
-    return (
-      <div className={`container mt-5 ${styles.container}`}>
-        {showConfetti && (
-          <Confetti
-            width={width}
-            height={height}
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              zIndex: 9999, // Ensure it's on top of other elements
-            }}
-          />
-        )}
-    
-        <div className="text-center mb-3">
-          {/* Submit Button with Conditional Label */}
-          <button 
-            className="btn btn-primary me-3" 
-            onClick={handleSubmit}
-            disabled={isSubmitting || isSubmitted} // Disable when submitting or after submission
-          >
-            {isSubmitting ? (
-              <>
-                <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                Submitting...
-              </>
-            ) : isSubmitted ? (
-              'Submitted'
-            ) : (
-              'Submit'
-            )}
-          </button>
-    
-          {/* Reset Button - Optionally disable during submission */}
-          <button 
-            className="btn btn-danger me-3" 
-            onClick={handleReset}
-            disabled={isSubmitting} // disable during submission
-          >
-            Reset
-          </button>
-    
-          {/* Back to Calendar Button */}
-          <button className="btn btn-secondary" onClick={handleBack}>Back to Calendar</button>
-        </div>
-    
-        <h2 className="text-center mb-4">Active Timecard</h2>
-        
-        {isLoading ? (
-          <p>Loading timecard data...</p>
-        ) : (
-          <div className="table-responsive">
-            <table className="table table-bordered">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Start Time</th>
-                  <th>Lunch Start</th>
-                  <th>Lunch End</th>
-                  <th>End Time</th>
-                  <th>Total Time</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredEntries.map((entry, index) => (
-                  <tr key={entry.date}>
-                    <td>{moment.utc(entry.date).format('dddd, MMM D, YYYY')}</td>
-                    <td>
-                      <input 
-                        type="time" 
-                        value={entry.startTime} 
-                        onChange={(e) => handleChange(index, 'startTime', e.target.value)} 
-                        required
-                      />
-                    </td>
-                    <td>
-                      <input 
-                        type="time" 
-                        value={entry.lunchStart} 
-                        onChange={(e) => handleChange(index, 'lunchStart', e.target.value)} 
-                      />
-                    </td>
-                    <td>
-                      <input 
-                        type="time" 
-                        value={entry.lunchEnd} 
-                        onChange={(e) => handleChange(index, 'lunchEnd', e.target.value)} 
-                      />
-                    </td>
-                    <td>
-                      <input 
-                        type="time" 
-                        value={entry.endTime} 
-                        onChange={(e) => handleChange(index, 'endTime', e.target.value)} 
-                        required
-                      />
-                    </td>
-                    <td>{entry.totalTime}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+  return (
+    <div className={`container mt-5 ${styles.container}`}>
+      {showConfetti && (
+        <Confetti
+          width={width}
+          height={height}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            zIndex: 9999, // Ensure it's on top of other elements
+          }}
+        />
+      )}
+
+      <div className="text-center mb-3">
+        {/* Submit Button with Conditional Label */}
+        <button
+          className="btn btn-primary me-3"
+          onClick={handleSubmit}
+          disabled={isSubmitting || isSubmitted} // Disable when submitting or after submission
+        >
+          {isSubmitting ? (
+            <>
+              <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              Submitting...
+            </>
+          ) : isSubmitted ? (
+            'Submitted'
+          ) : (
+            'Submit'
+          )}
+        </button>
+
+        {/* Reset Button - Optionally disable during submission */}
+        <button
+          className="btn btn-danger me-3"
+          onClick={handleReset}
+          disabled={isSubmitting} // disable during submission
+        >
+          Reset
+        </button>
+
+        {/* Back to Calendar Button */}
+        <button className="btn btn-secondary" onClick={handleBack}>Back to Calendar</button>
       </div>
-    );
-    
+
+      <h2 className="text-center mb-4">Active Timecard</h2>
+
+      {isLoading ? (
+        <p>Loading timecard data...</p>
+      ) : (
+        <div className="table-responsive">
+          <table className="table table-bordered">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Start Time</th>
+                <th>Lunch Start</th>
+                <th>Lunch End</th>
+                <th>End Time</th>
+                <th>Total Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredEntries.map((entry, index) => (
+                <tr key={entry.date}>
+                  <td>{moment.utc(entry.date).format('dddd, MMM D, YYYY')}</td>
+                  <td>
+                    <input
+                      type="time"
+                      value={entry.startTime}
+                      onChange={(e) => handleChange(index, 'startTime', e.target.value)}
+                      required
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="time"
+                      value={entry.lunchStart}
+                      onChange={(e) => handleChange(index, 'lunchStart', e.target.value)}
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="time"
+                      value={entry.lunchEnd}
+                      onChange={(e) => handleChange(index, 'lunchEnd', e.target.value)}
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="time"
+                      value={entry.endTime}
+                      onChange={(e) => handleChange(index, 'endTime', e.target.value)}
+                      required
+                    />
+                  </td>
+                  <td>{entry.totalTime}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+
 }
 
 export default ActiveTimeCard;
