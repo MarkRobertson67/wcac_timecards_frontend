@@ -29,13 +29,13 @@ console.log('Window Size:', width, height);
 
 
 const getPreviousMonday = (date) => {
-  const day = moment(date).day();
+  const day = moment.utc(date).day();
   if (day === 1) { // If the day is Monday (1)
-    return moment(date); // Return the same date
+    return moment.utc(date); // Return the same date
   } else if (day === 0) { // If the day is Sunday (0)
-    return moment(date).add(1, 'days'); // Move to Monday
+    return moment.utc(date).add(1, 'days'); // Move to Monday
   } else {
-    return moment(date).startOf('week').add(1, 'days'); // Start of the week is Sunday, get Monday
+    return moment.utc(date).startOf('week').add(1, 'days'); // Start of the week is Sunday, get Monday
   }
 };
 
