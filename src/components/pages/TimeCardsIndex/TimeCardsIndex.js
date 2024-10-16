@@ -67,14 +67,19 @@ function TimeCardsIndex() {
           center: 'title',
           right: 'dayGridMonth,dayGridDay'
         }}
-        events={timeEntries.map((entry) => ({
-          title: '', 
-          start: entry.work_date,
-          end: entry.work_date,
-          extendedProps: {
-            time: formatTotalTime(entry.total_time),
-          },
-        }))}
+        events={timeEntries.map((entry) => {
+          // Create a Date object from work_date
+          const workDate = new Date(entry.work_date); // This should already be in UTC
+
+          return {
+            title: '', 
+            start: workDate.toISOString(), // Convert to ISO string for UTC
+            end: workDate.toISOString(),   // Same for end
+            extendedProps: {
+              time: formatTotalTime(entry.total_time),
+            },
+          };
+        })}
         eventContent={renderEventContent} 
         dateClick={handleDateClick} 
         height="auto" // height of calendar
