@@ -22,6 +22,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
   const navigate = useNavigate();
   const employeeId = 1;
 
+
   // Get window size for Confetti
   const { width, height } = useWindowSize();
 console.log('Window Size:', width, height);
@@ -75,7 +76,7 @@ console.log('Window Size:', width, height);
       // Map fetched entries by date for quick lookup
       const fetchedEntriesMap = new Map();
       fetchedData.data.forEach(entry => {
-        const date = moment(entry.work_date).format('YYYY-MM-DD');
+        const date = moment.utc(entry.work_date).format('YYYY-MM-DD');
 
         // Convert total_time from object to string
         const totalTime = entry.total_time
@@ -193,7 +194,7 @@ console.log('Window Size:', width, height);
     const fetchData = async () => {
       hasFetched.current = true; // Set the flag after fetching
       const storedStartDateStr = localStorage.getItem('startDate');
-      const startDate = storedStartDateStr ? moment(storedStartDateStr) : moment();
+      const startDate = storedStartDateStr ? moment.utc(storedStartDateStr) : moment.utc();
       await fetchTimeCardData(startDate);
     };
     fetchData();
@@ -203,7 +204,7 @@ console.log('Window Size:', width, height);
 
   const calculateTotalTime = (start, lunchStart, lunchEnd, end) => {
 
-    const parseTime = (time) => (time ? moment(time, 'HH:mm:ss') : null);
+    const parseTime = (time) => (time ? moment.utc(time, 'HH:mm:ss') : null);
     const startTime = parseTime(start);
     const lunchStartTime = parseTime(lunchStart);
     const lunchEndTime = parseTime(lunchEnd);
@@ -445,7 +446,7 @@ console.log('Window Size:', width, height);
         console.log('All submissions failed.');
       } else {
         // Partial failures
-        const failedDatesFormatted = failedSubmissions.map(date => moment(date).format('MMMM Do YYYY')).join(', ');
+        const failedDatesFormatted = failedSubmissions.map(date => moment.utc(date).format('MMMM Do YYYY')).join(', ');
         alert(`Timecard submitted with errors. Failed to submit entries for the following dates:\n${failedDatesFormatted}`);
         console.log(`Partial failures for dates: ${failedDatesFormatted}`);
       }
@@ -551,7 +552,7 @@ console.log('Window Size:', width, height);
               <tbody>
                 {filteredEntries.map((entry, index) => (
                   <tr key={entry.date}>
-                    <td>{moment(entry.date).format('dddd, MMM D, YYYY')}</td>
+                    <td>{moment.utc(entry.date).format('dddd, MMM D, YYYY')}</td>
                     <td>
                       <input 
                         type="time" 
