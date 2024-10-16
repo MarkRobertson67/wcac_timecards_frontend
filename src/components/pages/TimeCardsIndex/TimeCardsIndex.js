@@ -21,7 +21,7 @@ function TimeCardsIndex() {
         const response = await fetch(`${API}/timecards/employee/${employeeId}`);
         const data = await response.json();
         console.log('Fetched data:', data);
-        setTimeEntries(data.data); 
+        setTimeEntries(data.data);
       } catch (error) {
         console.error('Error fetching time entries:', error);
       }
@@ -67,21 +67,25 @@ function TimeCardsIndex() {
           center: 'title',
           right: 'dayGridMonth,dayGridDay'
         }}
+
         events={timeEntries.map((entry) => {
-          // Create a Date object from work_date
-          const workDate = new Date(entry.work_date); // This should already be in UTC
+          const workDate = new Date(entry.work_date); // Create a Date object from the work date
+
+          // Convert to UTC by explicitly using the UTC year, month, and day
+          const utcDateString = new Date(Date.UTC(workDate.getUTCFullYear(), workDate.getUTCMonth(), workDate.getUTCDate())).toISOString();
 
           return {
-            title: '', 
-            start: workDate.toISOString(), // Convert to ISO string for UTC
-            end: workDate.toISOString(),   // Same for end
+            title: '',
+            start: utcDateString, // Use UTC formatted date
+            end: utcDateString,   // Same for end if it represents a single day
             extendedProps: {
               time: formatTotalTime(entry.total_time),
             },
           };
         })}
-        eventContent={renderEventContent} 
-        dateClick={handleDateClick} 
+
+        eventContent={renderEventContent}
+        dateClick={handleDateClick}
         height="auto" // height of calendar
       />
     </div>
