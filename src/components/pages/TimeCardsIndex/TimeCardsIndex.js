@@ -13,7 +13,7 @@ const API = process.env.REACT_APP_API_URL;
 
 function TimeCardsIndex() {
   const [timeEntries, setTimeEntries] = useState([]);
-  const employeeId = 1  //currentUser?.employeeId;  Replace with actual employee ID from FireBase authentication
+  const employeeId = 1;  // currentUser?.employeeId; Replace with actual employee ID from FireBase authentication
 
   useEffect(() => {
     const fetchTimeEntries = async () => {
@@ -21,7 +21,7 @@ function TimeCardsIndex() {
         const response = await fetch(`${API}/timecards/employee/${employeeId}`);
         const data = await response.json();
         console.log('Fetched data:', data);
-        setTimeEntries(data.data);
+        setTimeEntries(data.data); 
       } catch (error) {
         console.error('Error fetching time entries:', error);
       }
@@ -55,6 +55,26 @@ function TimeCardsIndex() {
     );
   };
 
+  const events = timeEntries.map((entry) => {
+    // Create a Date object from work_date
+    const workDate = new Date(entry.work_date); // This should already be in UTC
+    console.log('Processing workDate:', workDate); // Log the processed workDate
+
+    const eventStart = workDate.toISOString(); // Convert to ISO string for UTC
+    console.log('Event Start:', eventStart); // Log the event start time
+
+    return {
+      title: '', 
+      start: eventStart,   // Same for start
+      end: eventStart,     // Same for end
+      extendedProps: {
+        time: formatTotalTime(entry.total_time),
+      },
+    };
+  });
+
+  console.log('Generated events:', events); // Log the generated events
+
   return (
     <div className={styles.container}>
       <h2>Total Hours Worked</h2>
@@ -67,25 +87,9 @@ function TimeCardsIndex() {
           center: 'title',
           right: 'dayGridMonth,dayGridDay'
         }}
-
-        events={timeEntries.map((entry) => {
-          const workDate = new Date(entry.work_date); // Create a Date object from the work date
-
-          // Convert to UTC by explicitly using the UTC year, month, and day
-          const utcDateString = new Date(Date.UTC(workDate.getUTCFullYear(), workDate.getUTCMonth(), workDate.getUTCDate())).toISOString();
-
-          return {
-            title: '',
-            start: utcDateString, // Use UTC formatted date
-            end: utcDateString,   // Same for end if it represents a single day
-            extendedProps: {
-              time: formatTotalTime(entry.total_time),
-            },
-          };
-        })}
-
-        eventContent={renderEventContent}
-        dateClick={handleDateClick}
+        events={events} // Pass the logged events to FullCalendar
+        eventContent={renderEventContent} 
+        dateClick={handleDateClick} 
         height="auto" // height of calendar
       />
     </div>
@@ -93,3 +97,4 @@ function TimeCardsIndex() {
 }
 
 export default TimeCardsIndex;
+

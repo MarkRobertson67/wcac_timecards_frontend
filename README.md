@@ -4,7 +4,7 @@ This project is licensed under the Proprietary Software License. See the [LICENS
 
 For licensing inquiries, please contact Mark Robertson at [markrobertson67@gmail.com](mailto:markrobertson67@gmail.com).
 
-
+[![Netlify Status](https://api.netlify.com/api/v1/badges/d9b982a6-78ec-40a3-9e2e-f9857b4a1706/deploy-status)](https://app.netlify.com/sites/wcac-timecards/deploys)
 
 # Getting Started with Create React App
 
