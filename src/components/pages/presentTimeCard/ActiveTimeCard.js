@@ -25,8 +25,9 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
   // Get window size for Confetti
   const { width, height } = useWindowSize();
-  console.log('Window Size:', width, height);
+  //console.log('Window Size:', width, height);
 
+  const [entryToUpdate, setEntryToUpdate] = useState(null);
 
   const getPreviousMonday = (date) => {
     const utcDate = moment.utc(date); // Convert the input date to UTC
@@ -180,17 +181,6 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
       console.log("All Entries to be set in state:", allEntries);
 
-      //     // Update state with all entries
-      //     setTimeCard({ entries: allEntries, isSubmitted: false });
-      //     console.log("Updated TimeCard entries:", allEntries);
-      //   } catch (error) {
-      //     console.error('Error fetching timecard data:', error);
-      //     // Maybe retry fetching or handle the error differently
-      //     setTimeCard({ entries: [], isSubmitted: false });
-      //   } finally {
-      //     setIsLoading(false);
-      //   }
-      // }, [employeeId]);
 
       // Update state with all entries...
       setTimeCard({ entries: [...Array.from(fetchedEntriesMap.values()), ...successfulCreatedEntries], isSubmitted: false });
@@ -220,7 +210,8 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
   const calculateTotalTime = (start, lunchStart, lunchEnd, end) => {
 
-    const parseTime = (time) => (time ? moment.utc(time, 'HH:mm:ss') : null);
+
+    const parseTime = (time) => (time ? moment(time, 'HH:mm') : null);
     const startTime = parseTime(start);
     const lunchStartTime = parseTime(lunchStart);
     const lunchEndTime = parseTime(lunchEnd);
@@ -259,171 +250,129 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     return day !== 0 && day !== 6; // Not Sunday (0) or Saturday (6)
   };
 
-  const handleChange = async (index, field, value) => {
-    console.log(`handleChange called for index: ${index}, field: ${field}, value: ${value}`);
+  
 
-    // Store the previous value for potential rollback in case of an error
-    let previousValue;
-
-    // Update the local state first
+  const handleChange = (index, field, value) => {
     setTimeCard((prevState) => {
-      const entries = [...prevState.entries];
-      const entryToUpdate = entries.find((e, idx) => isWeekday(e.date) && idx === index);
+        const updatedEntries = [...prevState.entries];
+        const entry = updatedEntries[index];
 
-      if (!entryToUpdate || entryToUpdate.status === 'submitted') {
-        alert('Cannot update a submitted timecard');
-        return prevState;
-      }
+        // Update the specified field with the new value
+        entry[field] = value;
 
-      // Store the previous value before updating
-      previousValue = entryToUpdate[field];
+        // Calculate total time after the update
+        entry.totalTime = calculateTotalTime(
+            entry.startTime,
+            entry.lunchStart,
+            entry.lunchEnd,
+            entry.endTime
+        );
 
-      // Update the specified field with the new value
-      entryToUpdate[field] = value;
+        entry.status = 'active'; // Ensure status is active
 
-      // Recalculate total time based on updated fields
-      entryToUpdate.totalTime = calculateTotalTime(
-        entryToUpdate.startTime,
-        entryToUpdate.lunchStart,
-        entryToUpdate.lunchEnd,
-        entryToUpdate.endTime
-      );
+        // Set the entry to update for the API call
+        setEntryToUpdate(entry);
 
-      // Ensure the status is set to 'active' if not already 'submitted'
-      if (entryToUpdate.status !== 'submitted') {
-        entryToUpdate.status = 'active';
-      }
-
-      console.log(`Updating entry: PUT method`);
-      console.log('Updated entry before saving:', entryToUpdate);
-
-      return { ...prevState, entries };
+        return { ...prevState, entries: updatedEntries };
     });
+};
 
-    // Retrieve the updated entry from the new state
-    const updatedEntry = timeCard.entries.find((e, idx) => isWeekday(e.date) && idx === index);
+useEffect(() => {
+    if (!entryToUpdate) return; // Exit if there's no entry to update
 
-    if (!updatedEntry) {
-      console.error('Entry not found after state update');
-      return;
-    }
-
-    // Perform the database update using PUT
-    try {
-      const method = 'PUT'; // Always using PUT
-      const url = `${API}/timecards/${updatedEntry.id}`;
-
-      const requestPayload = {
+    // Construct the payload based on the updated entry
+    const requestPayload = {
         employee_id: employeeId,
-        work_date: updatedEntry.date,
-        start_time: updatedEntry.startTime || null,
-        lunch_start: updatedEntry.lunchStart || null,
-        lunch_end: updatedEntry.lunchEnd || null,
-        end_time: updatedEntry.endTime || null,
-        total_time: updatedEntry.totalTime || '',
-        status: updatedEntry.status || 'active',
-      };
+        work_date: entryToUpdate.date,
+        start_time: entryToUpdate.startTime || null,
+        lunch_start: entryToUpdate.lunchStart || null,
+        lunch_end: entryToUpdate.lunchEnd || null,
+        end_time: entryToUpdate.endTime || null,
+        total_time: entryToUpdate.totalTime || '0h 0m',
+        status: entryToUpdate.status || 'active',
+    };
 
-      console.log(`Updating entry in database for index: ${index}, using ${method} method`);
-      console.log('Request payload:', requestPayload);
+    console.log('Request payload for update:', requestPayload);
 
-      const response = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestPayload),
-      });
+    const updateEntry = async () => {
+        try {
+            const response = await fetch(`${API}/timecards/${entryToUpdate.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestPayload),
+            });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to save entry: ${errorText}`);
-      }
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Failed to save entry: ${errorText}`);
+            }
 
-      const result = await response.json();
-      console.log('Response from server:', result);
+            const result = await response.json();
+            console.log('Response from server:', result);
 
-      console.log(`Successfully updated timecard with ID ${result.data.id}`);
-    } catch (error) {
-      console.error(`Error during PUT operation:`, error);
-      alert(`Error saving timecard entry: ${error.message}`);
+            // Update local state with the server response
+            setTimeCard((prevState) => {
+                return {
+                    ...prevState,
+                    entries: prevState.entries.map((entry) => {
+                        if (entry.id === result.data.id) {
+                            return {
+                                ...entry,
+                                // Update values with server response
+                            };
+                        }
+                        return entry;
+                    }),
+                };
+            });
 
-      // Revert the local state change if the API call fails
-      setTimeCard((prevState) => {
-        const entries = [...prevState.entries];
-        const entryToRevert = entries.find((e, idx) => isWeekday(e.date) && idx === index);
-        if (entryToRevert) {
-          entryToRevert[field] = previousValue;
-          entryToRevert.totalTime = calculateTotalTime(
-            entryToRevert.startTime,
-            entryToRevert.lunchStart,
-            entryToRevert.lunchEnd,
-            entryToRevert.endTime
-          );
+            console.log(`Successfully updated timecard with ID ${result.data.id}`);
+        } catch (error) {
+            console.error(`Error during PUT operation:`, error);
+            alert(`Error saving timecard entry: ${error.message}`);
         }
-        return { ...prevState, entries };
-      });
-    }
-  };
+    };
+
+    updateEntry(); // Call the function to perform the API update
+
+    setEntryToUpdate(null); // Reset after update
+}, [entryToUpdate]); // Run this effect whenever entryToUpdate changes
+
 
 
   const handleSubmit = async () => {
     const twoWeekPeriod = timeCard.entries;
-
+  
     // Check if all entries are already submitted
     const alreadySubmittedEntries = twoWeekPeriod.every(entry => entry.status === 'submitted');
-
+  
     if (alreadySubmittedEntries) {
       alert("All entries are already submitted.");
-      return;  // Prevent resubmission if everything is already submitted
+      return; // Prevent resubmission if everything is already submitted
     }
-
-    // Define required fields
-    const requiredFields = ['startTime', 'lunchStart', 'lunchEnd', 'endTime'];
-
-    // Check for entries with missing required fields
-    const incompleteEntries = twoWeekPeriod.filter(entry =>
-      requiredFields.some(field => !entry[field] || entry[field].trim() === '')
-    );
-
-    if (incompleteEntries.length > 0) {
-      const confirmation = window.confirm(
-        `There are ${incompleteEntries.length} missing days. Click 'Cancel' to create them first, or 'OK' to ignore blank entries and proceed with the submission.`
-      );
-
-      if (!confirmation) {
-        // User chose to cancel the submission
-        return;  // Halt the submission process
-      }
-      // If user confirms, proceed with submission
-    }
-
+  
     try {
-      setIsSubmitting(true); // **Set submitting state to true**
-
+      setIsSubmitting(true); // Set submitting state to true
+  
       // Array to keep track of failed submissions
       const failedSubmissions = [];
-
+  
       // Iterate through all entries and submit them
       await Promise.all(
         twoWeekPeriod.map(async (entry) => {
-          // Log the date and ID for each entry in the two-week period
-          console.log(`Date: ${entry.work_date}, ID: ${entry.id ? entry.id : 'No ID assigned yet'}`);
-
-          if (entry.id) {
-            // Only submit if the entry has an ID
+          if (entry.status === 'active') {
             const url = `${API}/timecards/${entry.id}`;
             const requestPayload = {
-              status: 'submitted',  // Always set status to 'submitted'
+              status: 'submitted', // Update status to 'submitted'
             };
-
-            console.log(`Submitting PUT request for date ${entry.work_date}`);
-
+  
             try {
               const response = await fetch(url, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(requestPayload),
               });
-
+  
               if (!response.ok) {
                 const errorMessage = await response.text();
                 console.error(`Failed to submit entry for ${entry.work_date}: ${errorMessage}`);
@@ -433,11 +382,12 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
               }
             } catch (error) {
               console.error(`Error during PUT operation for date ${entry.work_date}:`, error);
-              failedSubmissions.push(entry.work_date);  // Add the date to failed submissions
+              failedSubmissions.push(entry.work_date); // Add the date to failed submissions
             }
           }
         })
       );
+  
 
       // Determine the outcome based on failed submissions
       if (failedSubmissions.length === 0) {
@@ -445,15 +395,15 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
         console.log('All submissions succeeded. Triggering confetti.');
         setShowConfetti(true); // Trigger confetti
         setIsSubmitted(true);   // Update button label to "Submitted"
-
+  
         // Hide confetti after 5 seconds and navigate
         setTimeout(() => {
           setShowConfetti(false);
           console.log('Hiding confetti after 5 seconds');
-
+  
           // Proceed with state reset and navigation
           setIsNewTimeCardCreated(false);
-          afterSubmitReset();  // Reset the timecard after submission
+          afterSubmitReset(); // Reset the timecard after submission
           navigate('/');
         }, 5000); // 5000 milliseconds = 5 seconds
       } else if (failedSubmissions.length === twoWeekPeriod.length) {
@@ -462,19 +412,21 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
         console.log('All submissions failed.');
       } else {
         // Partial failures
-        const failedDatesFormatted = failedSubmissions.map(date => moment.utc(date).format('MMMM Do YYYY')).join(', ');
+        const failedDatesFormatted = failedSubmissions.map(date => moment(date).format('MMMM Do YYYY')).join(', ');
         alert(`Timecard submitted with errors. Failed to submit entries for the following dates:\n${failedDatesFormatted}`);
         console.log(`Partial failures for dates: ${failedDatesFormatted}`);
       }
-
+  
       console.log('Timecard submission process completed.');
     } catch (error) {
       console.error('Unexpected error submitting timecard:', error);
       alert(`An unexpected error occurred: ${error.message}`);
     } finally {
-      setIsSubmitting(false); // **Set submitting state to false**
+      setIsSubmitting(false); // Set submitting state to false
     }
   };
+  
+
 
   const handleReset = () => { //Add here code to delete the entries made.
     const isConfirmed = window.confirm("Are you sure you want to reset? All data entered will be lost.");
