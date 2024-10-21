@@ -7,8 +7,17 @@
    
 .container {
   padding: 1rem;
-  margin-top: 5rem; 
+  margin-top: 2rem;
+  padding-bottom: 3rem;
 }
+
+.flex-container {
+  display: flex;
+  flex-direction: column; /* Stack items vertically */
+  justify-content: flex-start; /* Align items at the top */
+  align-items: center; /* Center items horizontally */
+}
+
 
 .card {
   margin: auto;

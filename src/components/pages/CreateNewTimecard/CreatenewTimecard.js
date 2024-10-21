@@ -42,6 +42,7 @@ function CreateNewTimeCard({ setIsNewTimeCardCreated }) {
 
   return (
     <div className={styles.container}>
+      <div className="flex-container">
       <div className="row justify-content-center">
         <div className="col-md-6">
           <div className={styles.card}>
@@ -61,6 +62,7 @@ function CreateNewTimeCard({ setIsNewTimeCardCreated }) {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );
