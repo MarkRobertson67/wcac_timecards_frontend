@@ -115,160 +115,358 @@ function TimeCardReports() {
 
 
 
-  const handleGenerateReport = async () => {
-    let url;
-    let queryParams = {};
+//   const handleGenerateReport = async () => {
+//     let url;
+//     let queryParams = {};
 
-    const { reportType, startDate, endDate, selectedEmployeeName, employees, period } = formState;
+//     const { reportType, startDate, endDate, selectedEmployeeName, employees, period } = formState;
 
 
-    // Check if 'ALL' employees is selected
-    if (selectedEmployeeName === "ALL") {
-        // Route for ALL employees
-        if (reportType === 'employeeSummary') {
-            url = `${API}/reports/all/employee-summary?startDate=${startDate}&endDate=${endDate}&period=${period}`;
-            console.log(`Fetching employee summary for ALL employees from: ${url}`);
-        } else if (reportType === 'totalHours') {
-            url = `${API}/reports/all/range/${startDate}/${endDate}`;
-            console.log(`Fetching total hours for ALL employees from: ${url}`);
-        } else {
-            console.error('Invalid report type for ALL employees');
-            return;
-        }
+//     // Check if 'ALL' employees is selected
+//     if (selectedEmployeeName === "ALL") {
+//         // Route for ALL employees
+//         if (reportType === 'employeeSummary') {
+//             url = `${API}/reports/all/employee-summary?startDate=${startDate}&endDate=${endDate}&period=${period}`;
+//             console.log(`Fetching employee summary for ALL employees from: ${url}`);
+//         } else if (reportType === 'totalHours') {
+//             url = `${API}/reports/all/range/${startDate}/${endDate}`;
+//             console.log(`Fetching total hours for ALL employees from: ${url}`);
+//         } else {
+//             console.error('Invalid report type for ALL employees');
+//             return;
+//         }
 
-        // Fetching report for ALL employees
-        try {
-            const response = await fetch(`${url}`);
-            const reportData = await response.json();
+//         // Fetching report for ALL employees
+//         try {
+//             const response = await fetch(`${url}`);
+//             const reportData = await response.json();
 
-            // Ensure reportData.data is an array
-            const reportArray = Array.isArray(reportData.data) ? reportData.data : [];
+//             // Ensure reportData.data is an array
+//             const reportArray = Array.isArray(reportData.data) ? reportData.data : [];
 
-            if (reportArray.length === 0) {
-                console.log("No timecards found for ALL employees. Generating default data.");
-                const defaultReportData = [{
-                    start_date: startDate,
-                    end_date: endDate,
-                    employee_id: 'ALL',
-                    total_hours: { hours: 0, minutes: 0 }
-                }];
+//             if (reportArray.length === 0) {
+//                 console.log("No timecards found for ALL employees. Generating default data.");
+//                 const defaultReportData = [{
+//                     start_date: startDate,
+//                     end_date: endDate,
+//                     employee_id: 'ALL',
+//                     total_hours: { hours: 0, minutes: 0 }
+//                 }];
 
-                navigate('/report', {
-                    state: {
-                        reportType,
-                        reportData: defaultReportData,
-                        startDate,
-                        endDate,
-                        employeeId: 'ALL',
-                    }
-                });
-            } else {
-                navigate('/report', {
-                    state: {
-                        reportType,
-                        reportData: reportArray,
-                        startDate,
-                        endDate,
-                        employeeId: 'ALL',
-                    }
-                });
-            }
-        } catch (error) {
-            console.error('Error fetching report data for ALL employees:', error);
-        }
+//                 navigate('/report', {
+//                     state: {
+//                         reportType,
+//                         reportData: defaultReportData,
+//                         startDate,
+//                         endDate,
+//                         employeeId: 'ALL',
+//                     }
+//                 });
+//             } else {
+//                 navigate('/report', {
+//                     state: {
+//                         reportType,
+//                         reportData: reportArray,
+//                         startDate,
+//                         endDate,
+//                         employeeId: 'ALL',
+//                     }
+//                 });
+//             }
+//         } catch (error) {
+//             console.error('Error fetching report data for ALL employees:', error);
+//         }
 
-    } else {
-        // Logic for an individual employee
-        const selectedEmployee = employees.find(emp => `${emp.first_name} ${emp.last_name}`.trim() === selectedEmployeeName.trim());
-        const empId = selectedEmployee ? selectedEmployee.id : null;
+//     } else {
+//         // Logic for an individual employee
+//         const selectedEmployee = employees.find(emp => `${emp.first_name} ${emp.last_name}`.trim() === selectedEmployeeName.trim());
+//         const empId = selectedEmployee ? selectedEmployee.id : null;
 
-        if (!empId) {
-            console.error('Invalid employee selected or employee ID not found');
-            return;
-        }
+//         if (!empId) {
+//             console.error('Invalid employee selected or employee ID not found');
+//             return;
+//         }
 
-        // Set employeeId in the formState
-        setFormState(prevState => ({
-            ...prevState,
-            employeeId: empId
-        }));
+//         // Set employeeId in the formState
+//         setFormState(prevState => ({
+//             ...prevState,
+//             employeeId: empId
+//         }));
 
-        switch (reportType) {
-            case 'totalHours':
-                url = `${API}/reports/${empId}`;
-                queryParams = { startDate, endDate };
-                console.log(`Fetching total hours for employee ID ${empId} from: ${url}?startDate=${startDate}&endDate=${endDate}`);
-                break;
+//         switch (reportType) {
+//             case 'totalHours':
+//                 url = `${API}/reports/${empId}`;
+//                 queryParams = { startDate, endDate };
+//                 console.log(`Fetching total hours for employee ID ${empId} from: ${url}?startDate=${startDate}&endDate=${endDate}`);
+//                 break;
 
-            case 'detailedTimecards':
-                url = `${API}/reports/detailed/${empId}`;
-                queryParams = { startDate, endDate };
-                console.log(`Fetching detailed timecards for employee ID ${empId} from: ${url}?startDate=${startDate}&endDate=${endDate}`);
-                break;
+//             case 'detailedTimecards':
+//                 url = `${API}/reports/detailed/${empId}`;
+//                 queryParams = { startDate, endDate };
+//                 console.log(`Fetching detailed timecards for employee ID ${empId} from: ${url}?startDate=${startDate}&endDate=${endDate}`);
+//                 break;
 
-            case 'employeeSummary':
-                url = `${API}/reports/employee-summary/${empId}`;
-                queryParams = { startDate, endDate, period };
-                console.log(`Fetching employee summary for employee ID ${empId} from: ${url}?startDate=${startDate}&endDate=${endDate}&period=${period}`);
-                break;
+//             case 'employeeSummary':
+//                 url = `${API}/reports/employee-summary/${empId}`;
+//                 queryParams = { startDate, endDate, period };
+//                 console.log(`Fetching employee summary for employee ID ${empId} from: ${url}?startDate=${startDate}&endDate=${endDate}&period=${period}`);
+//                 break;
 
-            default:
-                console.error('Invalid report type for individual employee');
-                return;
-        }
+//             default:
+//                 console.error('Invalid report type for individual employee');
+//                 return;
+//         }
 
-        const queryString = new URLSearchParams(queryParams).toString();
-        console.log(`Fetching report from: ${url}?${queryString}`);
+//         const queryString = new URLSearchParams(queryParams).toString();
+//         console.log(`Fetching report from: ${url}?${queryString}`);
 
-        try {
-            const response = await fetch(`${url}?${queryString}`);
-            const reportData = await response.json();
+//         try {
+//             const response = await fetch(`${url}?${queryString}`);
+//             const reportData = await response.json();
 
-            // Ensure reportData is an array
-            const reportArray = Array.isArray(reportData) ? reportData : [];
+//             // Ensure reportData is an array
+//             const reportArray = Array.isArray(reportData) ? reportData : [];
 
-            if (reportArray.length === 0) {
-                console.log("No timecards found. Generating default data.");
-                const defaultReportData = [{
-                    start_date: startDate,
-                    end_date: endDate,
-                    employee_id: empId,
-                    first_name: selectedEmployee.first_name,
-                    last_name: selectedEmployee.last_name,
-                    total_hours: { hours: 0, minutes: 0 }
-                }];
+//             if (reportArray.length === 0) {
+//                 console.log("No timecards found. Generating default data.");
+//                 const defaultReportData = [{
+//                     start_date: startDate,
+//                     end_date: endDate,
+//                     employee_id: empId,
+//                     first_name: selectedEmployee.first_name,
+//                     last_name: selectedEmployee.last_name,
+//                     total_hours: { hours: 0, minutes: 0 }
+//                 }];
 
-                navigate('/report', {
-                    state: {
-                        reportType,
-                        reportData: defaultReportData,
-                        startDate,
-                        endDate,
-                        employeeId: empId,
-                        firstName: selectedEmployee.first_name,
-                        lastName: selectedEmployee.last_name
-                    }
-                });
-            } else {
-                navigate('/report', {
-                    state: {
-                        reportType,
-                        reportData: reportArray,
-                        startDate,
-                        endDate,
-                        employeeId: empId,
-                        firstName: selectedEmployee.first_name,
-                        lastName: selectedEmployee.last_name,
-                        period
-                    }
-                });
-            }
-        } catch (error) {
-            console.error('Error fetching report data for individual employee:', error);
-        }
-    }
+//                 navigate('/report', {
+//                     state: {
+//                         reportType,
+//                         reportData: defaultReportData,
+//                         startDate,
+//                         endDate,
+//                         employeeId: empId,
+//                         firstName: selectedEmployee.first_name,
+//                         lastName: selectedEmployee.last_name
+//                     }
+//                 });
+//             } else {
+//                 navigate('/report', {
+//                     state: {
+//                         reportType,
+//                         reportData: reportArray,
+//                         startDate,
+//                         endDate,
+//                         employeeId: empId,
+//                         firstName: selectedEmployee.first_name,
+//                         lastName: selectedEmployee.last_name,
+//                         period
+//                     }
+//                 });
+//             }
+//         } catch (error) {
+//             console.error('Error fetching report data for individual employee:', error);
+//         }
+//     }
 
+// };
+
+const handleGenerateReport = async () => {
+  const { reportType, startDate, endDate, selectedEmployeeName, employees, period } = formState;
+
+  // Check if 'ALL' employees is selected
+  if (selectedEmployeeName === "ALL") {
+      // Route for ALL employees
+      if (reportType === 'employeeSummary') {
+          const url = `${API}/reports/all/employee-summary?startDate=${startDate}&endDate=${endDate}&period=${period}`;
+          console.log(`Fetching employee summary for ALL employees from: ${url}`);
+
+          // Fetching report for ALL employees
+          try {
+              const response = await fetch(`${url}`);
+              const reportData = await response.json();
+              const reportArray = Array.isArray(reportData.data) ? reportData.data : [];
+
+              if (reportArray.length === 0) {
+                  console.log("No timecards found for ALL employees. Generating default data.");
+                  const defaultReportData = [{
+                      start_date: startDate,
+                      end_date: endDate,
+                      employee_id: 'ALL',
+                      total_hours: { hours: 0, minutes: 0 }
+                  }];
+
+                  navigate('/report', {
+                      state: {
+                          reportType,
+                          reportData: defaultReportData,
+                          startDate,
+                          endDate,
+                          employeeId: 'ALL',
+                      }
+                  });
+              } else {
+                  navigate('/report', {
+                      state: {
+                          reportType,
+                          reportData: reportArray,
+                          startDate,
+                          endDate,
+                          employeeId: 'ALL',
+                      }
+                  });
+              }
+          } catch (error) {
+              console.error('Error fetching report data for ALL employees:', error);
+          }
+
+      } else if (reportType === 'totalHours') {
+          const url = `${API}/reports/all/range/${startDate}/${endDate}`;
+          console.log(`Fetching total hours for ALL employees from: ${url}`);
+
+          // Fetching report for ALL employees
+          try {
+              const response = await fetch(`${url}`);
+              const reportData = await response.json();
+              const reportArray = Array.isArray(reportData.data) ? reportData.data : [];
+
+              if (reportArray.length === 0) {
+                  console.log("No timecards found for ALL employees. Generating default data.");
+                  const defaultReportData = [{
+                      start_date: startDate,
+                      end_date: endDate,
+                      employee_id: 'ALL',
+                      total_hours: { hours: 0, minutes: 0 }
+                  }];
+
+                  navigate('/report', {
+                      state: {
+                          reportType,
+                          reportData: defaultReportData,
+                          startDate,
+                          endDate,
+                          employeeId: 'ALL',
+                      }
+                  });
+              } else {
+                  navigate('/report', {
+                      state: {
+                          reportType,
+                          reportData: reportArray,
+                          startDate,
+                          endDate,
+                          employeeId: 'ALL',
+                      }
+                  });
+              }
+          } catch (error) {
+              console.error('Error fetching report data for ALL employees:', error);
+          }
+
+      } else {
+          console.error('Invalid report type for ALL employees');
+          return;
+      }
+
+  } else {
+      // Validate employee selection and report fields
+      if (!selectedEmployeeName || !startDate || !endDate) {
+          alert("Please select an employee, start date, and end date before generating the report.");
+          return; // Prevent submission if fields are missing
+      }
+
+      // Logic for an individual employee
+      const selectedEmployee = employees.find(emp => `${emp.first_name} ${emp.last_name}`.trim() === selectedEmployeeName.trim());
+      const empId = selectedEmployee ? selectedEmployee.id : null;
+
+      if (!empId) {
+          console.error('Invalid employee selected or employee ID not found');
+          alert("Invalid employee selected. Please select a valid employee.");
+          return;
+      }
+
+      // Set employeeId in the formState
+      setFormState(prevState => ({
+          ...prevState,
+          employeeId: empId
+      }));
+
+      let url;
+      let queryParams = {};
+
+      switch (reportType) {
+          case 'totalHours':
+              url = `${API}/reports/${empId}`;
+              queryParams = { startDate, endDate };
+              console.log(`Fetching total hours for employee ID ${empId} from: ${url}?startDate=${startDate}&endDate=${endDate}`);
+              break;
+
+          case 'detailedTimecards':
+              url = `${API}/reports/detailed/${empId}`;
+              queryParams = { startDate, endDate };
+              console.log(`Fetching detailed timecards for employee ID ${empId} from: ${url}?startDate=${startDate}&endDate=${endDate}`);
+              break;
+
+          case 'employeeSummary':
+              url = `${API}/reports/employee-summary/${empId}`;
+              queryParams = { startDate, endDate, period };
+              console.log(`Fetching employee summary for employee ID ${empId} from: ${url}?startDate=${startDate}&endDate=${endDate}&period=${period}`);
+              break;
+
+          default:
+              console.error('Invalid report type for individual employee');
+              return;
+      }
+
+      const queryString = new URLSearchParams(queryParams).toString();
+      console.log(`Fetching report from: ${url}?${queryString}`);
+
+      try {
+          const response = await fetch(`${url}?${queryString}`);
+          const reportData = await response.json();
+          const reportArray = Array.isArray(reportData) ? reportData : [];
+
+          if (reportArray.length === 0) {
+              console.log("No timecards found. Generating default data.");
+              const defaultReportData = [{
+                  start_date: startDate,
+                  end_date: endDate,
+                  employee_id: empId,
+                  first_name: selectedEmployee.first_name,
+                  last_name: selectedEmployee.last_name,
+                  total_hours: { hours: 0, minutes: 0 }
+              }];
+
+              navigate('/report', {
+                  state: {
+                      reportType,
+                      reportData: defaultReportData,
+                      startDate,
+                      endDate,
+                      employeeId: empId,
+                      firstName: selectedEmployee.first_name,
+                      lastName: selectedEmployee.last_name
+                  }
+              });
+          } else {
+              navigate('/report', {
+                  state: {
+                      reportType,
+                      reportData: reportArray,
+                      startDate,
+                      endDate,
+                      employeeId: empId,
+                      firstName: selectedEmployee.first_name,
+                      lastName: selectedEmployee.last_name,
+                      period
+                  }
+              });
+          }
+      } catch (error) {
+          console.error('Error fetching report data for individual employee:', error);
+      }
+  }
 };
+
 
 
   const renderFormFields = () => {
