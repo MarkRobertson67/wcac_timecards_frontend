@@ -143,37 +143,6 @@ console.log("The year is:", year);
 
 
 
-  // const handleSaveCSV = () => {
-  //   let headers = ['Employee ID', 'First Name', 'Last Name', 'Hours Worked'];
-  //   let dataRows = reportData.map(record => {
-  //     const totalHours = `${record.total_hours.hours} hours ${record.total_hours.minutes} minutes`;
-  //     return [
-  //       record.employee_id,
-  //       record.first_name,
-  //       record.last_name,
-  //       totalHours,       
-  //     ];
-  //   });
-
-  //   let rows = [
-  //     ['Total Hours Report'],
-  //     [], // Empty row for spacing
-  //     headers,
-  //     ...dataRows
-  //   ];
-
-  //   const formattedStartDate = formatDate(startDate, 'YYYY-MM-DD');
-  //   const formattedEndDate = formatDate(endDate, 'YYYY-MM-DD');
-  //   const csvContent = "data:text/csv;charset=utf-8," + rows.map(row => row.join(",")).join("\n");
-  //   const encodedUri = encodeURI(csvContent);
-  //   const link = document.createElement("a");
-  //   link.setAttribute("href", encodedUri);
-  //   link.setAttribute("download", `Paychex_Timecard_Report_${formattedStartDate}_to_${formattedEndDate}.csv`);
-  //   document.body.appendChild(link);
-  //   link.click();
-  //   document.body.removeChild(link);
-  // };
-
   const handleSaveCSV = () => {
     let headers = ['Employee ID', 'First Name', 'Last Name', 'Hours Worked'];
     let dataRows = reportData.map(record => {

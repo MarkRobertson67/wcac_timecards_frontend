@@ -9,6 +9,7 @@ import styles from './ActiveTimeCard.module.css';
 import moment from 'moment-timezone';
 import Confetti from 'react-confetti';
 import { useWindowSize } from 'react-use';
+import { formatDate, formatTime } from '../utils/TimeAndDateUtils';
 
 const API = process.env.REACT_APP_API_URL;
 
