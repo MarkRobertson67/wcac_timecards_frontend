@@ -9,6 +9,7 @@ import styles from './ActiveTimeCard.module.css';
 import moment from 'moment-timezone';
 import Confetti from 'react-confetti';
 import { useWindowSize } from 'react-use';
+import { formatDate } from '../utils/TimeAndDateUtils';
 
 const API = process.env.REACT_APP_API_URL;
 
@@ -193,19 +194,35 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
   }, [employeeId]);
 
 
+  // useEffect(() => {
+  //   if (hasFetched.current) return; // Exit early if already fetched
+
+  //   const fetchData = async () => {
+  //     hasFetched.current = true; // Set the flag after fetching
+  //     const storedStartDateStr = localStorage.getItem('startDate');
+  //     const startDate = storedStartDateStr ? moment.utc(storedStartDateStr) : moment.utc();
+  //     console.log("Start Date for fetching:", startDate.format());
+  //     await fetchTimeCardData(startDate);
+  //   };
+  //   fetchData();
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
+
   useEffect(() => {
     if (hasFetched.current) return; // Exit early if already fetched
 
     const fetchData = async () => {
       hasFetched.current = true; // Set the flag after fetching
       const storedStartDateStr = localStorage.getItem('startDate');
-      const startDate = storedStartDateStr ? moment.utc(storedStartDateStr) : moment.utc();
-      console.log("Start Date for fetching:", startDate.format());
-      await fetchTimeCardData(startDate);
+      const startDate = storedStartDateStr ? new Date(storedStartDateStr) : new Date();
+      console.log("Start Date for fetching:", startDate.toISOString());
+
+      const previousMonday = getPreviousMonday(startDate); // Adjust to previous Monday
+      await fetchTimeCardData(previousMonday);
     };
+
     fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fetchTimeCardData]);
 
 
   const calculateTotalTime = (start, lunchStart, lunchEnd, end) => {
@@ -545,7 +562,8 @@ const handleSubmit = async () => {
             <tbody>
               {filteredEntries.map((entry, index) => (
                 <tr key={entry.date}>
-                  <td>{moment.utc(entry.date).format('dddd, MMM D, YYYY')}</td>
+                  <td>{formatDate(entry.date)}</td>
+                  {/* <td>{moment.utc(entry.date).format('dddd, MMM D, YYYY')}</td> */}
                   <td>
                     <input
                       type="time"
