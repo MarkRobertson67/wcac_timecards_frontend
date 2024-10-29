@@ -188,7 +188,8 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
 
       // Update state with all entries...
-      setTimeCard({ entries: [...Array.from(fetchedEntriesMap.values()), ...successfulCreatedEntries], isSubmitted: false });
+      // setTimeCard({ entries: [...Array.from(fetchedEntriesMap.values()), ...successfulCreatedEntries], isSubmitted: false });
+      setTimeCard({ entries: allEntries, isSubmitted: false });
     } catch (error) {
       console.error('Error fetching timecard data:', error);
       setTimeCard({ entries: [], isSubmitted: false });
@@ -320,6 +321,8 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
           body: JSON.stringify(requestPayload),
         });
 
+        console.log("Fetched data:", response)
+
         if (!response.ok) {
           const errorText = await response.text();
           throw new Error(`Failed to save entry: ${errorText}`);
@@ -368,6 +371,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
   const handleSubmit = async () => {
     const twoWeekPeriod = timeCard.entries;
+    console.log("Entries before submission:", twoWeekPeriod);
 
     // Check if all entries are already submitted
     const alreadySubmittedEntries = twoWeekPeriod.every(entry => entry.status === 'submitted');
@@ -412,7 +416,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
         twoWeekPeriod.map(async (entry) => {
           // Log the date and ID for each entry in the two-week period
           // Ensure the entry has a valid date before submitting
-          const entryDate = entry.work_date || 'No date found'; // Adjusted to log the date
+          const entryDate = entry.date || 'No date found'; // Adjusted to log the date
 
           console.log(`Processing entry for date: ${entryDate}, ID: ${entry.id ? entry.id : 'No ID assigned yet'}`);
 
