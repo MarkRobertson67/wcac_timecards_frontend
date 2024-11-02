@@ -511,7 +511,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
   };
 
 
-  const handleReset = () => { //Add here code to delete the entries made.
+  const handleReset = async () => { //Add here code to delete the entries made.
     console.log("Current timeCard submitted state:", timeCard.isSubmitted);
 
     // Check if all entries are already submitted
@@ -532,12 +532,40 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     const isConfirmed = window.confirm("Are you sure you want to reset? All data entered will be lost.");
     if (!isConfirmed) return;
 
-    setTimeCard({ entries: [], isSubmitted: false });
-    localStorage.removeItem('currentTimeCard');
-    localStorage.removeItem('startDate');
-    setIsNewTimeCardCreated(false);
-    navigate('/createNewTimeCard');
+    try {
+      // Deleting entries from the database
+      await Promise.all(
+          timeCard.entries.map(async (entry) => {
+              if (entry.id) {
+                  const url = `${API}/timecards/${entry.id}`;
+                  const response = await fetch(url, {
+                      method: 'DELETE',
+                      headers: { 'Content-Type': 'application/json' },
+                  });
+
+                  if (!response.ok) {
+                      const errorMessage = await response.text();
+                      console.error(`Failed to delete entry ID ${entry.id}: ${errorMessage}`);
+                      throw new Error(errorMessage);
+                  }
+                  console.log(`Successfully deleted entry with ID: ${entry.id}`);
+              }
+          })
+      );
+
+      // Proceed to reset the timecard
+      setTimeCard({ entries: [], isSubmitted: false });
+      localStorage.removeItem('currentTimeCard');
+      localStorage.removeItem('startDate');
+      setIsNewTimeCardCreated(false);
+      navigate('/createNewTimeCard');
+  } catch (error) {
+      console.error('Error deleting entries:', error);
+      alert('An error occurred while trying to reset the timecard. Please try again.');
+  }
   };
+
+
 
   const afterSubmitReset = () => {
     setTimeCard({ entries: [], isSubmitted: false });
@@ -546,9 +574,13 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     setIsNewTimeCardCreated(false);
   }
 
+
+
   const handleBack = () => {
     navigate('/createNewTimecard');
   };
+
+
 
   const filteredEntries = timeCard.entries.filter((entry) => isWeekday(entry.date));
 
