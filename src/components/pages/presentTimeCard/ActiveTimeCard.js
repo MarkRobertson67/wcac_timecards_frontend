@@ -152,7 +152,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
           // Map the saved entry to camelCase
           const savedEntryCamelCase = {
             id: savedEntry.data.id,
-            date: savedEntry.data.work_date, 
+            date: savedEntry.data.work_date,
             startTime: savedEntry.data.start_time || '',
             lunchStart: savedEntry.data.lunch_start || '',
             lunchEnd: savedEntry.data.lunch_end || '',
@@ -166,7 +166,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
           return savedEntryCamelCase;
         } catch (error) {
           console.error(`Error creating entry for ${date}:`, error);
-          return null; 
+          return null;
         }
       });
 
@@ -259,6 +259,23 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     return day !== 0 && day !== 6; // Not Sunday (0) or Saturday (6)
   };
 
+  // New function to calculate total time for all entries
+  const calculateTotalTimeForAllEntries = () => {
+    let totalMinutes = 0;
+
+    timeCard.entries.forEach((entry) => {
+      // Calculate each entry's total time using the existing function
+      const totalTimeParts = entry.totalTime.split('h');
+      const hours = parseInt(totalTimeParts[0], 10) || 0;
+      const minutes = parseInt(totalTimeParts[1], 10) || 0;
+
+      totalMinutes += hours * 60 + minutes;
+    });
+
+    const totalHours = Math.floor(totalMinutes / 60);
+    const remainingMinutes = totalMinutes % 60;
+    return `${totalHours}h ${remainingMinutes}m`;
+  };
 
 
   const handleChange = (index, field, value) => {
@@ -274,7 +291,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
         alert(`You cannot modify the entry for ${moment(entry.date).format('MMMM Do, YYYY')} because it has already been submitted.`);
         return prevState; // Return unchanged state if the entry is submitted
       }
-      
+
 
       // Update the specified field with the new value
       entry[field] = value;
@@ -339,7 +356,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
               if (entry.id === result.data.id) {
                 return {
                   ...entry,
-                  work_date: result.data.work_date, 
+                  work_date: result.data.work_date,
                   start_time: result.data.start_time || '',
                   lunch_start: result.data.lunch_start || '',
                   lunch_end: result.data.lunch_end || '',
@@ -620,10 +637,15 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                   <td>{entry.totalTime}</td>
                 </tr>
               ))}
+              <tr>
+        <td colSpan={5} style={{ textAlign: 'right' }}><strong>Total Time:</strong></td>
+        <td>{calculateTotalTimeForAllEntries()}</td>
+      </tr>
             </tbody>
           </table>
         </div>
       )}
+
     </div>
   );
 
