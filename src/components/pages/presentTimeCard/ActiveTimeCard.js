@@ -477,6 +477,8 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
         console.log('All submissions succeeded. Triggering confetti.');
         setShowConfetti(true); // Trigger confetti
         setIsSubmitted(true);   // Update button label to "Submitted"
+        console.log("Timecard submitted, current submitted state:", isSubmitted);
+        
 
         // Hide confetti after 5 seconds and navigate
         setTimeout(() => {
@@ -509,8 +511,24 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
   };
 
 
-
   const handleReset = () => { //Add here code to delete the entries made.
+    console.log("Current timeCard submitted state:", timeCard.isSubmitted);
+
+    // Check if all entries are already submitted
+    const alreadySubmittedEntries = timeCard.entries.every(entry => entry.status === 'submitted');
+    console.log("Checking if all entries are submitted:", alreadySubmittedEntries);
+
+    // Alert if all entries are submitted
+    if (alreadySubmittedEntries) {
+        alert("You cannot reset the timecard because all entries have already been submitted.");
+        return; // Exit the function to prevent reset
+    }
+
+    if (timeCard.isSubmitted) {
+      alert("You cannot reset the timecard because it has already been submitted.");
+      return; // Exit the function to prevent reset
+    }
+
     const isConfirmed = window.confirm("Are you sure you want to reset? All data entered will be lost.");
     if (!isConfirmed) return;
 
@@ -638,9 +656,9 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                 </tr>
               ))}
               <tr>
-        <td colSpan={5} style={{ textAlign: 'right' }}><strong>Total Time:</strong></td>
-        <td>{calculateTotalTimeForAllEntries()}</td>
-      </tr>
+                <td colSpan={5} style={{ textAlign: 'right' }}><strong>Total Time:</strong></td>
+                <td>{calculateTotalTimeForAllEntries()}</td>
+              </tr>
             </tbody>
           </table>
         </div>
