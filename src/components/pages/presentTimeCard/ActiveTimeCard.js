@@ -29,18 +29,6 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
   const [entryToUpdate, setEntryToUpdate] = useState(null);
 
-  // const getPreviousMonday = (date) => {
-  //   const utcDate = moment.utc(date); // Convert the input date to UTC
-  //   const day = utcDate.day();
-
-  //   if (day === 1) { // If the day is Monday (1)
-  //     return utcDate; // Return the same date in UTC
-  //   } else if (day === 0) { // If the day is Sunday (0)
-  //     return utcDate.add(1, 'days'); // Move to Monday
-  //   } else {
-  //     return utcDate.startOf('week').add(1, 'days'); // Start of the week is Sunday, get Monday
-  //   }
-  // };
 
 
   const getPreviousMonday = (date) => {
@@ -252,8 +240,19 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
   }, [fetchTimeCardData]);
 
 
-  const calculateTotalTime = (start, lunchStart, lunchEnd, end) => {
+  // This useEffect should be carefully managed to avoid infinite loops
+  useEffect(() => {
+    if (!timeCard.entries.length) return; // Prevent fetching if entries are empty
 
+    const fetchData = async () => {
+      await fetchTimeCardData(getPreviousMonday(new Date())); // Use current date to fetch new data
+    };
+
+    fetchData();
+  }, [timeCard.entries.length, fetchTimeCardData]); // Only react when the length of entries changes
+
+
+  const calculateTotalTime = (start, lunchStart, lunchEnd, end) => {
 
     const parseTime = (time) => (time ? moment(time, 'HH:mm') : null);
     const startTime = parseTime(start);
