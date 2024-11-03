@@ -9,7 +9,6 @@ import styles from './ActiveTimeCard.module.css';
 import moment from 'moment-timezone';
 import Confetti from 'react-confetti';
 import { useWindowSize } from 'react-use';
-// import { formatDate } from '../utils/TimeAndDateUtils';
 
 const API = process.env.REACT_APP_API_URL;
 
@@ -30,24 +29,54 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
   const [entryToUpdate, setEntryToUpdate] = useState(null);
 
+  // const getPreviousMonday = (date) => {
+  //   const utcDate = moment.utc(date); // Convert the input date to UTC
+  //   const day = utcDate.day();
+
+  //   if (day === 1) { // If the day is Monday (1)
+  //     return utcDate; // Return the same date in UTC
+  //   } else if (day === 0) { // If the day is Sunday (0)
+  //     return utcDate.add(1, 'days'); // Move to Monday
+  //   } else {
+  //     return utcDate.startOf('week').add(1, 'days'); // Start of the week is Sunday, get Monday
+  //   }
+  // };
+
+
   const getPreviousMonday = (date) => {
     const utcDate = moment.utc(date); // Convert the input date to UTC
     const day = utcDate.day();
 
+    // Get the last Monday based on the existing logic
+    let lastMonday;
     if (day === 1) { // If the day is Monday (1)
-      return utcDate; // Return the same date in UTC
+        lastMonday = utcDate; // Return the same date in UTC
     } else if (day === 0) { // If the day is Sunday (0)
-      return utcDate.add(1, 'days'); // Move to Monday
+        lastMonday = utcDate.add(1, 'days'); // Move to Monday
     } else {
-      return utcDate.startOf('week').add(1, 'days'); // Start of the week is Sunday, get Monday
+        lastMonday = utcDate.startOf('week').add(1, 'days'); // Start of the week is Sunday, get Monday
     }
-  };
+
+    // Now adjust this Monday based on the 2-week schedule starting from the reference date
+    const referenceDate = moment.utc("1970-01-05"); // Reference date
+    const daysDifference = lastMonday.diff(referenceDate, 'days');
+    const twoWeekPeriods = Math.floor(daysDifference / 14);
+    const adjustedMonday = referenceDate.clone().add(twoWeekPeriods * 14, 'days');
+
+    // Return the adjusted Monday
+    return adjustedMonday;
+};
+
+
+
+
 
   const getEndDate = (startDate) => {
     return moment(startDate).add(13, 'days'); // Two-week period
   };
 
 
+  
   const fetchTimeCardData = useCallback(async (startDate) => {
     try {
       const adjustedStartDate = getPreviousMonday(startDate);
@@ -152,7 +181,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
           // Map the saved entry to camelCase
           const savedEntryCamelCase = {
             id: savedEntry.data.id,
-            date: savedEntry.data.work_date, 
+            date: savedEntry.data.work_date,
             startTime: savedEntry.data.start_time || '',
             lunchStart: savedEntry.data.lunch_start || '',
             lunchEnd: savedEntry.data.lunch_end || '',
@@ -166,7 +195,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
           return savedEntryCamelCase;
         } catch (error) {
           console.error(`Error creating entry for ${date}:`, error);
-          return null; 
+          return null;
         }
       });
 
@@ -188,7 +217,6 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
 
       // Update state with all entries...
-      // setTimeCard({ entries: [...Array.from(fetchedEntriesMap.values()), ...successfulCreatedEntries], isSubmitted: false });
       setTimeCard({ entries: allEntries, isSubmitted: false });
     } catch (error) {
       console.error('Error fetching timecard data:', error);
@@ -210,6 +238,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
       console.log("Start Date for fetching:", startDate.toISOString());
 
       const previousMonday = getPreviousMonday(startDate); // Adjust to previous Monday
+      console.log("Previous Monday for fetching:", previousMonday.toISOString());
       await fetchTimeCardData(previousMonday);
     };
 
@@ -259,6 +288,23 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     return day !== 0 && day !== 6; // Not Sunday (0) or Saturday (6)
   };
 
+  // New function to calculate total time for all entries
+  const calculateTotalTimeForAllEntries = () => {
+    let totalMinutes = 0;
+
+    timeCard.entries.forEach((entry) => {
+      // Calculate each entry's total time using the existing function
+      const totalTimeParts = entry.totalTime.split('h');
+      const hours = parseInt(totalTimeParts[0], 10) || 0;
+      const minutes = parseInt(totalTimeParts[1], 10) || 0;
+
+      totalMinutes += hours * 60 + minutes;
+    });
+
+    const totalHours = Math.floor(totalMinutes / 60);
+    const remainingMinutes = totalMinutes % 60;
+    return `${totalHours}h ${remainingMinutes}m`;
+  };
 
 
   const handleChange = (index, field, value) => {
@@ -274,7 +320,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
         alert(`You cannot modify the entry for ${moment(entry.date).format('MMMM Do, YYYY')} because it has already been submitted.`);
         return prevState; // Return unchanged state if the entry is submitted
       }
-      
+
 
       // Update the specified field with the new value
       entry[field] = value;
@@ -339,7 +385,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
               if (entry.id === result.data.id) {
                 return {
                   ...entry,
-                  work_date: result.data.work_date, 
+                  work_date: result.data.work_date,
                   start_time: result.data.start_time || '',
                   lunch_start: result.data.lunch_start || '',
                   lunch_end: result.data.lunch_end || '',
@@ -407,6 +453,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     try {
       setIsSubmitting(true); // **Set submitting state to true**
       console.log("Submitting timecard...");
+      console.log("isSubmitting state in handleReset:", isSubmitting);
 
       // Array to keep track of failed submissions
       const failedSubmissions = [];
@@ -460,6 +507,8 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
         console.log('All submissions succeeded. Triggering confetti.');
         setShowConfetti(true); // Trigger confetti
         setIsSubmitted(true);   // Update button label to "Submitted"
+        console.log("Timecard submitted, current submitted state:", isSubmitted);
+        
 
         // Hide confetti after 5 seconds and navigate
         setTimeout(() => {
@@ -492,17 +541,61 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
   };
 
 
+  const handleReset = async () => { //Add here code to delete the entries made.
+    console.log("Current timeCard submitted state:", timeCard.isSubmitted);
 
-  const handleReset = () => { //Add here code to delete the entries made.
+    // Check if all entries are already submitted
+    const alreadySubmittedEntries = timeCard.entries.every(entry => entry.status === 'submitted');
+    console.log("Checking if all entries are submitted:", alreadySubmittedEntries);
+
+    // Alert if all entries are submitted
+    if (alreadySubmittedEntries) {
+        alert("You cannot reset the timecard because all entries have already been submitted.");
+        return; // Exit the function to prevent reset
+    }
+
+    if (timeCard.isSubmitted) {
+      alert("You cannot reset the timecard because it has already been submitted.");
+      return; // Exit the function to prevent reset
+    }
+
     const isConfirmed = window.confirm("Are you sure you want to reset? All data entered will be lost.");
     if (!isConfirmed) return;
 
-    setTimeCard({ entries: [], isSubmitted: false });
-    localStorage.removeItem('currentTimeCard');
-    localStorage.removeItem('startDate');
-    setIsNewTimeCardCreated(false);
-    navigate('/createNewTimeCard');
+    try {
+      // Deleting entries from the database
+      await Promise.all(
+          timeCard.entries.map(async (entry) => {
+              if (entry.id) {
+                  const url = `${API}/timecards/${entry.id}`;
+                  const response = await fetch(url, {
+                      method: 'DELETE',
+                      headers: { 'Content-Type': 'application/json' },
+                  });
+
+                  if (!response.ok) {
+                      const errorMessage = await response.text();
+                      console.error(`Failed to delete entry ID ${entry.id}: ${errorMessage}`);
+                      throw new Error(errorMessage);
+                  }
+                  console.log(`Successfully deleted entry with ID: ${entry.id}`);
+              }
+          })
+      );
+
+      // Proceed to reset the timecard
+      setTimeCard({ entries: [], isSubmitted: false });
+      localStorage.removeItem('currentTimeCard');
+      localStorage.removeItem('startDate');
+      setIsNewTimeCardCreated(false);
+      navigate('/createNewTimeCard');
+  } catch (error) {
+      console.error('Error deleting entries:', error);
+      alert('An error occurred while trying to reset the timecard. Please try again.');
+  }
   };
+
+
 
   const afterSubmitReset = () => {
     setTimeCard({ entries: [], isSubmitted: false });
@@ -511,9 +604,13 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     setIsNewTimeCardCreated(false);
   }
 
+
+
   const handleBack = () => {
     navigate('/createNewTimecard');
   };
+
+
 
   const filteredEntries = timeCard.entries.filter((entry) => isWeekday(entry.date));
 
@@ -620,10 +717,15 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                   <td>{entry.totalTime}</td>
                 </tr>
               ))}
+              <tr>
+                <td colSpan={5} style={{ textAlign: 'right' }}><strong>Total Time:</strong></td>
+                <td>{calculateTotalTimeForAllEntries()}</td>
+              </tr>
             </tbody>
           </table>
         </div>
       )}
+
     </div>
   );
 
