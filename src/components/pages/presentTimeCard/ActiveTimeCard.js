@@ -9,7 +9,6 @@ import styles from './ActiveTimeCard.module.css';
 import moment from 'moment-timezone';
 import Confetti from 'react-confetti';
 import { useWindowSize } from 'react-use';
-// import { formatDate } from '../utils/TimeAndDateUtils';
 
 const API = process.env.REACT_APP_API_URL;
 
@@ -30,24 +29,54 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
   const [entryToUpdate, setEntryToUpdate] = useState(null);
 
+  // const getPreviousMonday = (date) => {
+  //   const utcDate = moment.utc(date); // Convert the input date to UTC
+  //   const day = utcDate.day();
+
+  //   if (day === 1) { // If the day is Monday (1)
+  //     return utcDate; // Return the same date in UTC
+  //   } else if (day === 0) { // If the day is Sunday (0)
+  //     return utcDate.add(1, 'days'); // Move to Monday
+  //   } else {
+  //     return utcDate.startOf('week').add(1, 'days'); // Start of the week is Sunday, get Monday
+  //   }
+  // };
+
+
   const getPreviousMonday = (date) => {
     const utcDate = moment.utc(date); // Convert the input date to UTC
     const day = utcDate.day();
 
+    // Get the last Monday based on the existing logic
+    let lastMonday;
     if (day === 1) { // If the day is Monday (1)
-      return utcDate; // Return the same date in UTC
+        lastMonday = utcDate; // Return the same date in UTC
     } else if (day === 0) { // If the day is Sunday (0)
-      return utcDate.add(1, 'days'); // Move to Monday
+        lastMonday = utcDate.add(1, 'days'); // Move to Monday
     } else {
-      return utcDate.startOf('week').add(1, 'days'); // Start of the week is Sunday, get Monday
+        lastMonday = utcDate.startOf('week').add(1, 'days'); // Start of the week is Sunday, get Monday
     }
-  };
+
+    // Now adjust this Monday based on the 2-week schedule starting from the reference date
+    const referenceDate = moment.utc("1970-01-05"); // Reference date
+    const daysDifference = lastMonday.diff(referenceDate, 'days');
+    const twoWeekPeriods = Math.floor(daysDifference / 14);
+    const adjustedMonday = referenceDate.clone().add(twoWeekPeriods * 14, 'days');
+
+    // Return the adjusted Monday
+    return adjustedMonday;
+};
+
+
+
+
 
   const getEndDate = (startDate) => {
     return moment(startDate).add(13, 'days'); // Two-week period
   };
 
 
+  
   const fetchTimeCardData = useCallback(async (startDate) => {
     try {
       const adjustedStartDate = getPreviousMonday(startDate);
@@ -188,7 +217,6 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
 
       // Update state with all entries...
-      // setTimeCard({ entries: [...Array.from(fetchedEntriesMap.values()), ...successfulCreatedEntries], isSubmitted: false });
       setTimeCard({ entries: allEntries, isSubmitted: false });
     } catch (error) {
       console.error('Error fetching timecard data:', error);
@@ -210,6 +238,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
       console.log("Start Date for fetching:", startDate.toISOString());
 
       const previousMonday = getPreviousMonday(startDate); // Adjust to previous Monday
+      console.log("Previous Monday for fetching:", previousMonday.toISOString());
       await fetchTimeCardData(previousMonday);
     };
 
@@ -424,6 +453,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     try {
       setIsSubmitting(true); // **Set submitting state to true**
       console.log("Submitting timecard...");
+      console.log("isSubmitting state in handleReset:", isSubmitting);
 
       // Array to keep track of failed submissions
       const failedSubmissions = [];
