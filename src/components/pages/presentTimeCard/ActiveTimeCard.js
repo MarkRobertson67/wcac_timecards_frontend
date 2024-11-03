@@ -50,11 +50,11 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     // Get the last Monday based on the existing logic
     let lastMonday;
     if (day === 1) { // If the day is Monday (1)
-        lastMonday = utcDate; // Return the same date in UTC
+      lastMonday = utcDate; // Return the same date in UTC
     } else if (day === 0) { // If the day is Sunday (0)
-        lastMonday = utcDate.add(1, 'days'); // Move to Monday
+      lastMonday = utcDate.add(1, 'days'); // Move to Monday
     } else {
-        lastMonday = utcDate.startOf('week').add(1, 'days'); // Start of the week is Sunday, get Monday
+      lastMonday = utcDate.startOf('week').add(1, 'days'); // Start of the week is Sunday, get Monday
     }
 
     // Now adjust this Monday based on the 2-week schedule starting from the reference date
@@ -65,9 +65,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
     // Return the adjusted Monday
     return adjustedMonday;
-};
-
-
+  };
 
 
 
@@ -76,7 +74,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
   };
 
 
-  
+
   const fetchTimeCardData = useCallback(async (startDate) => {
     try {
       const adjustedStartDate = getPreviousMonday(startDate);
@@ -214,6 +212,14 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
       ];
 
       console.log("All Entries to be set in state:", allEntries);
+
+
+      // Fetch all timecards again to ensure the latest data
+      const allResponse = await fetch(`${API}/timecards/employee/${employeeId}/range/${formattedStart}/${formattedEnd}`);
+      if (!allResponse.ok) {
+        throw new Error(`HTTP error! status: ${allResponse.status}`);
+      }
+
 
 
       // Update state with all entries...
@@ -508,7 +514,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
         setShowConfetti(true); // Trigger confetti
         setIsSubmitted(true);   // Update button label to "Submitted"
         console.log("Timecard submitted, current submitted state:", isSubmitted);
-        
+
 
         // Hide confetti after 5 seconds and navigate
         setTimeout(() => {
@@ -550,8 +556,8 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
     // Alert if all entries are submitted
     if (alreadySubmittedEntries) {
-        alert("You cannot reset the timecard because all entries have already been submitted.");
-        return; // Exit the function to prevent reset
+      alert("You cannot reset the timecard because all entries have already been submitted.");
+      return; // Exit the function to prevent reset
     }
 
     if (timeCard.isSubmitted) {
@@ -565,22 +571,22 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     try {
       // Deleting entries from the database
       await Promise.all(
-          timeCard.entries.map(async (entry) => {
-              if (entry.id) {
-                  const url = `${API}/timecards/${entry.id}`;
-                  const response = await fetch(url, {
-                      method: 'DELETE',
-                      headers: { 'Content-Type': 'application/json' },
-                  });
+        timeCard.entries.map(async (entry) => {
+          if (entry.id) {
+            const url = `${API}/timecards/${entry.id}`;
+            const response = await fetch(url, {
+              method: 'DELETE',
+              headers: { 'Content-Type': 'application/json' },
+            });
 
-                  if (!response.ok) {
-                      const errorMessage = await response.text();
-                      console.error(`Failed to delete entry ID ${entry.id}: ${errorMessage}`);
-                      throw new Error(errorMessage);
-                  }
-                  console.log(`Successfully deleted entry with ID: ${entry.id}`);
-              }
-          })
+            if (!response.ok) {
+              const errorMessage = await response.text();
+              console.error(`Failed to delete entry ID ${entry.id}: ${errorMessage}`);
+              throw new Error(errorMessage);
+            }
+            console.log(`Successfully deleted entry with ID: ${entry.id}`);
+          }
+        })
       );
 
       // Proceed to reset the timecard
@@ -589,10 +595,10 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
       localStorage.removeItem('startDate');
       setIsNewTimeCardCreated(false);
       navigate('/createNewTimeCard');
-  } catch (error) {
+    } catch (error) {
       console.error('Error deleting entries:', error);
       alert('An error occurred while trying to reset the timecard. Please try again.');
-  }
+    }
   };
 
 
@@ -665,7 +671,11 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
       <h2 className="text-center mb-4">Active Timecard</h2>
 
       {isLoading ? (
-        <p>Loading timecard data...</p>
+        <div className="text-center">
+          <div className="spinner-border custom-spinner" role="status">
+            <span className="visually-hidden">Loading timecard data...</span>
+          </div>
+        </div>
       ) : (
         <div className="table-responsive">
           <table className="table table-bordered">
