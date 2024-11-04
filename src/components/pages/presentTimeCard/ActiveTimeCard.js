@@ -616,9 +616,17 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
   };
 
 
+  const [filteredEntries, setFilteredEntries] = useState([]);
 
-  const filteredEntries = timeCard.entries.filter((entry) => isWeekday(entry.date));
+  useEffect(() => {
+    const newFilteredEntries = timeCard.entries.filter((entry) => isWeekday(entry.date));
+    setFilteredEntries(newFilteredEntries);
+  }, [timeCard.entries]); // Run effect when entries change
 
+
+  // const filteredEntries = timeCard.entries.filter((entry) => isWeekday(entry.date));
+  console.log('Filtered Entries:', filteredEntries); // Log as an array
+  console.table(filteredEntries); // Log as a table for better readability
 
   return (
     <div className={`container mt-5 ${styles.container}`}>
