@@ -883,7 +883,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
           // Proceed with state reset and navigation
           setIsNewTimeCardCreated(false);
           afterSubmitReset();  // Reset the timecard after submission
-          navigate('/');
+          navigate('/CreatenewTimeCard');
         }, 5000); // 5000 milliseconds = 5 seconds
       } else if (failedSubmissions.length === twoWeekPeriod.length) {
         // All submissions failed
