@@ -787,69 +787,174 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
 
 
+  // const handleSubmit = async () => {
+  //   const twoWeekPeriod = timeCard.entries;
+  //   console.log("Entries before submission:", twoWeekPeriod);
+
+  //   // Check if all entries are already submitted
+  //   const alreadySubmittedEntries = twoWeekPeriod.every(entry => entry.status === 'submitted');
+  //   console.log("Checking if all entries are submitted:", alreadySubmittedEntries);
+
+  //   if (alreadySubmittedEntries) {
+  //     alert("All entries are already submitted.");
+  //     return;  // Prevent resubmission if everything is already submitted
+  //   }
+
+  //   // Define required fields
+  //   const requiredFields = ['startTime', 'lunchStart', 'lunchEnd', 'endTime'];
+
+  //   // Check for entries with missing required fields
+  //   const incompleteEntries = twoWeekPeriod.filter(entry =>
+  //     requiredFields.some(field => !entry[field] || entry[field].trim() === '')
+  //   );
+  //   console.log("Incomplete entries:", incompleteEntries);
+
+
+  //   if (incompleteEntries.length > 0) {
+  //     const confirmation = window.confirm(
+  //       `There are ${incompleteEntries.length} missing days. Click 'Cancel' to create them first, or 'OK' to ignore blank entries and proceed with the submission.`
+  //     );
+
+  //     if (!confirmation) {
+  //       console.log("User canceled submission due to missing fields.");
+  //       return;  // Halt the submission process
+  //     }
+  //     // If user confirms, proceed with submission
+  //   }
+
+  //   try {
+  //     setIsSubmitting(true); // **Set submitting state to true**
+  //     console.log("Submitting timecard...");
+  //     console.log("isSubmitting state in handleReset:", isSubmitting);
+
+  //     // Array to keep track of failed submissions
+  //     const failedSubmissions = [];
+
+  //     // Iterate through all entries and submit them
+  //     await Promise.all(
+  //       twoWeekPeriod.map(async (entry) => {
+  //         // Log the date and ID for each entry in the two-week period
+  //         // Ensure the entry has a valid date before submitting
+  //         const entryDate = entry.date || 'No date found'; // Adjusted to log the date
+
+  //         console.log(`Processing entry for date: ${entryDate}, ID: ${entry.id ? entry.id : 'No ID assigned yet'}`);
+
+  //         console.log(`Date: ${entryDate}, ID: ${entry.id ? entry.id : 'No ID assigned yet'}`);
+
+  //         if (entry.id) {
+  //           // Only submit if the entry has an ID
+  //           const url = `${API}/timecards/${entry.id}`;
+  //           const requestPayload = {
+  //             status: 'submitted',  // Always set status to 'submitted'
+  //             work_date: entryDate // Ensure the work date is included in the payload
+  //           };
+
+  //           console.log(`Submitting PUT request for date ${entryDate}`);
+
+  //           try {
+  //             const response = await fetch(url, {
+  //               method: 'PUT',
+  //               headers: { 'Content-Type': 'application/json' },
+  //               body: JSON.stringify(requestPayload),
+  //             });
+
+  //             if (!response.ok) {
+  //               const errorMessage = await response.text();
+  //               console.error(`Failed to submit entry for ${entryDate}: ${errorMessage}`);
+  //               throw new Error(errorMessage);
+  //             } else {
+  //               console.log(`Successfully updated entry with ID: ${entry.id}`);
+  //             }
+  //           } catch (error) {
+  //             console.error(`Error during PUT operation for date ${entryDate}:`, error);
+  //             failedSubmissions.push(entryDate);  // Add the date to failed submissions
+  //           }
+  //         }
+  //       })
+  //     );
+
+  //     // Determine the outcome based on failed submissions
+  //     if (failedSubmissions.length === 0) {
+  //       // All submissions succeeded
+  //       console.log('All submissions succeeded. Triggering confetti.');
+  //       setShowConfetti(true); // Trigger confetti
+  //       setIsSubmitted(true);   // Update button label to "Submitted"
+  //       console.log("Timecard submitted, current submitted state:", isSubmitted);
+
+
+  //       // Hide confetti after 5 seconds and navigate
+  //       setTimeout(() => {
+  //         setShowConfetti(false);
+  //         console.log('Hiding confetti after 5 seconds');
+
+  //         // Proceed with state reset and navigation
+  //         setIsNewTimeCardCreated(false);
+  //         afterSubmitReset();  // Reset the timecard after submission
+  //         navigate('/CreatenewTimeCard');
+  //       }, 5000); // 5000 milliseconds = 5 seconds
+  //     } else if (failedSubmissions.length === twoWeekPeriod.length) {
+  //       // All submissions failed
+  //       alert('Failed to submit the timecard. Please try again later.');
+  //       console.log('All submissions failed.');
+  //     } else {
+  //       // Partial failures
+  //       const failedDatesFormatted = failedSubmissions.map(date => moment(date).format('MMMM Do YYYY')).join(', ');
+  //       alert(`Timecard submitted with errors. Failed to submit entries for the following dates:\n${failedDatesFormatted}`);
+  //       console.log(`Partial failures for dates: ${failedDatesFormatted}`);
+  //     }
+
+  //     console.log('Timecard submission process completed.');
+  //   } catch (error) {
+  //     console.error('Unexpected error submitting timecard:', error);
+  //     alert(`An unexpected error occurred: ${error.message}`);
+  //   } finally {
+  //     setIsSubmitting(false); // **Set submitting state to false**
+  //   }
+  // };
+
+  
+
+
   const handleSubmit = async () => {
     const twoWeekPeriod = timeCard.entries;
     console.log("Entries before submission:", twoWeekPeriod);
 
-    // Check if all entries are already submitted
     const alreadySubmittedEntries = twoWeekPeriod.every(entry => entry.status === 'submitted');
     console.log("Checking if all entries are submitted:", alreadySubmittedEntries);
 
     if (alreadySubmittedEntries) {
       alert("All entries are already submitted.");
-      return;  // Prevent resubmission if everything is already submitted
+      return;
     }
 
-    // Define required fields
     const requiredFields = ['startTime', 'lunchStart', 'lunchEnd', 'endTime'];
 
-    // Check for entries with missing required fields
     const incompleteEntries = twoWeekPeriod.filter(entry =>
       requiredFields.some(field => !entry[field] || entry[field].trim() === '')
     );
     console.log("Incomplete entries:", incompleteEntries);
 
-
     if (incompleteEntries.length > 0) {
       const confirmation = window.confirm(
-        `There are ${incompleteEntries.length} missing days. Click 'Cancel' to create them first, or 'OK' to ignore blank entries and proceed with the submission.`
+        `There are ${incompleteEntries.length} incomplete entries. Do you still want to proceed with submission?`
       );
-
       if (!confirmation) {
-        console.log("User canceled submission due to missing fields.");
-        return;  // Halt the submission process
+        console.log("User canceled submission due to incomplete entries.");
+        return;
       }
-      // If user confirms, proceed with submission
     }
 
+    setIsSubmitting(true);
+
     try {
-      setIsSubmitting(true); // **Set submitting state to true**
-      console.log("Submitting timecard...");
-      console.log("isSubmitting state in handleReset:", isSubmitting);
-
-      // Array to keep track of failed submissions
-      const failedSubmissions = [];
-
-      // Iterate through all entries and submit them
       await Promise.all(
         twoWeekPeriod.map(async (entry) => {
-          // Log the date and ID for each entry in the two-week period
-          // Ensure the entry has a valid date before submitting
-          const entryDate = entry.date || 'No date found'; // Adjusted to log the date
-
-          console.log(`Processing entry for date: ${entryDate}, ID: ${entry.id ? entry.id : 'No ID assigned yet'}`);
-
-          console.log(`Date: ${entryDate}, ID: ${entry.id ? entry.id : 'No ID assigned yet'}`);
-
           if (entry.id) {
-            // Only submit if the entry has an ID
             const url = `${API}/timecards/${entry.id}`;
             const requestPayload = {
-              status: 'submitted',  // Always set status to 'submitted'
-              work_date: entryDate // Ensure the work date is included in the payload
+              status: 'submitted',
+              work_date: entry.date
             };
-
-            console.log(`Submitting PUT request for date ${entryDate}`);
 
             try {
               const response = await fetch(url, {
@@ -860,57 +965,37 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
               if (!response.ok) {
                 const errorMessage = await response.text();
-                console.error(`Failed to submit entry for ${entryDate}: ${errorMessage}`);
+                console.error(`Failed to submit entry for ${entry.date}: ${errorMessage}`);
                 throw new Error(errorMessage);
               } else {
                 console.log(`Successfully updated entry with ID: ${entry.id}`);
               }
             } catch (error) {
-              console.error(`Error during PUT operation for date ${entryDate}:`, error);
-              failedSubmissions.push(entryDate);  // Add the date to failed submissions
+              console.error(`Error during PUT operation for date ${entry.date}:`, error);
             }
           }
         })
       );
 
-      // Determine the outcome based on failed submissions
-      if (failedSubmissions.length === 0) {
-        // All submissions succeeded
-        console.log('All submissions succeeded. Triggering confetti.');
-        setShowConfetti(true); // Trigger confetti
-        setIsSubmitted(true);   // Update button label to "Submitted"
-        console.log("Timecard submitted, current submitted state:", isSubmitted);
+      console.log('All submissions succeeded. Triggering confetti.');
+      setShowConfetti(true);
+      setIsSubmitted(true);
 
-
-        // Hide confetti after 5 seconds and navigate
-        setTimeout(() => {
-          setShowConfetti(false);
-          console.log('Hiding confetti after 5 seconds');
-
-          // Proceed with state reset and navigation
-          setIsNewTimeCardCreated(false);
-          afterSubmitReset();  // Reset the timecard after submission
-          navigate('/CreatenewTimeCard');
-        }, 5000); // 5000 milliseconds = 5 seconds
-      } else if (failedSubmissions.length === twoWeekPeriod.length) {
-        // All submissions failed
-        alert('Failed to submit the timecard. Please try again later.');
-        console.log('All submissions failed.');
-      } else {
-        // Partial failures
-        const failedDatesFormatted = failedSubmissions.map(date => moment(date).format('MMMM Do YYYY')).join(', ');
-        alert(`Timecard submitted with errors. Failed to submit entries for the following dates:\n${failedDatesFormatted}`);
-        console.log(`Partial failures for dates: ${failedDatesFormatted}`);
-      }
-
-      console.log('Timecard submission process completed.');
+      setTimeout(() => {
+        setShowConfetti(false);
+        console.log('Hiding confetti after 5 seconds');
+        setIsNewTimeCardCreated(false);
+        afterSubmitReset();
+        navigate('/CreatenewTimeCard');
+      }, 5000);
     } catch (error) {
       console.error('Unexpected error submitting timecard:', error);
       alert(`An unexpected error occurred: ${error.message}`);
     } finally {
-      setIsSubmitting(false); // **Set submitting state to false**
+      setIsSubmitting(false);
     }
   };
+  
 
 
   const handleReset = async () => {
