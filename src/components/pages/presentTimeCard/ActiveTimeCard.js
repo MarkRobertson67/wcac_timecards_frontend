@@ -593,22 +593,29 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
   
 
   useEffect(() => {
-   
     const fetchData = async () => {
       if (hasFetched.current) return; // Exit early if already fetched
-
-      const storedStartDateStr = localStorage.getItem('startDate');
-      const startDate = storedStartDateStr ? new Date(storedStartDateStr) : new Date();
-      console.log("Start Date for fetching:", startDate.toISOString());
-
-      const previousMonday = getPreviousMonday(startDate); // Adjust to previous Monday
-      console.log("Previous Monday for fetching:", previousMonday.toISOString());
-      await fetchTimeCardData(previousMonday);
-      hasFetched.current = true; // Set the flag after fetching
+  
+      try {
+        hasFetched.current = true; // Set the flag to prevent multiple fetches
+  
+        const storedStartDateStr = localStorage.getItem('startDate');
+        const startDate = storedStartDateStr ? new Date(storedStartDateStr) : new Date();
+        console.log("Start Date for fetching:", startDate.toISOString());
+  
+        const previousMonday = getPreviousMonday(startDate); // Adjust to previous Monday
+        console.log("Previous Monday for fetching:", previousMonday.toISOString());
+  
+        await fetchTimeCardData(previousMonday);
+      } catch (error) {
+        console.error("Error during initial data fetch:", error);
+        hasFetched.current = false; // Reset if there's an error to allow retrying
+      }
     };
-
+  
     fetchData();
   }, [fetchTimeCardData]);
+  
 
 
   const calculateTotalTime = (start, lunchStart, lunchEnd, end) => {
@@ -906,28 +913,18 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
   };
 
 
-  const handleReset = async () => { //Add here code to delete the entries made.
-    console.log("Current timeCard submitted state:", timeCard.isSubmitted);
-
-    // Check if all entries are already submitted
-    const alreadySubmittedEntries = timeCard.entries.every(entry => entry.status === 'submitted');
-    console.log("Checking if all entries are submitted:", alreadySubmittedEntries);
-
-    // Alert if all entries are submitted
-    if (alreadySubmittedEntries) {
-      alert("You cannot reset the timecard because all entries have already been submitted.");
-      return; // Exit the function to prevent reset
-    }
-
+  const handleReset = async () => {
     if (timeCard.isSubmitted) {
-      alert("You cannot reset the timecard because it has already been submitted.");
-      return; // Exit the function to prevent reset
+      alert("Cannot reset a submitted timecard.");
+      return;
     }
-
-    const isConfirmed = window.confirm("Are you sure you want to reset? All data entered will be lost.");
-    if (!isConfirmed) return;
+  
+    const confirmation = window.confirm("Are you sure you want to reset the timecard? All data entered will be lost.");
+    if (!confirmation) return;
 
     try {
+      setIsLoading(true); // Set loading state to true before starting the reset process.
+
       // Deleting entries from the database
       await Promise.all(
         timeCard.entries.map(async (entry) => {
@@ -948,15 +945,17 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
         })
       );
 
-      // Proceed to reset the timecard
+      // Reset the timecard state and navigate to create a new timecard
       setTimeCard({ entries: [], isSubmitted: false });
       localStorage.removeItem('currentTimeCard');
       localStorage.removeItem('startDate');
       setIsNewTimeCardCreated(false);
-      navigate('/createNewTimeCard');
+      navigate('/createnewTimeCard');
     } catch (error) {
       console.error('Error deleting entries:', error);
       alert('An error occurred while trying to reset the timecard. Please try again.');
+    } finally {
+      setIsLoading(false); // Ensure loading state is false after operation is complete.
     }
   };
 
@@ -969,15 +968,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     setIsNewTimeCardCreated(false);
   }
 
-
-
-  const handleBack = () => {
-    navigate('/createNewTimecard');
-  };
-
-
-
-  const filteredEntries = timeCard.entries.filter((entry) => isWeekday(entry.date));
+  // const filteredEntries = timeCard.entries.filter((entry) => isWeekday(entry.date));
 
 
   return (
@@ -1000,7 +991,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
         <button
           className="btn btn-primary me-3"
           onClick={handleSubmit}
-          disabled={isSubmitting || isSubmitted} // Disable when submitting or after submission
+          disabled={isSubmitting || isSubmitted || isLoading} // Disable if submitting, submitted, or loading
         >
           {isSubmitting ? (
             <>
@@ -1018,19 +1009,30 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
         <button
           className="btn btn-danger me-3"
           onClick={handleReset}
-          disabled={isSubmitting} // disable during submission
+          disabled={isSubmitting || isLoading} // Disable if submitting or loading
         >
-          Reset
+          {isLoading ? (
+          <>
+            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Resetting...
+          </>
+        ) : (
+          'Reset'
+        )}
         </button>
 
         {/* Back to Calendar Button */}
-        <button className="btn btn-secondary" onClick={handleBack}>Back to Calendar</button>
+        <button className="btn btn-secondary" onClick={() => navigate('/createNewTimecard')}>Back to Calendar</button>
       </div>
 
       <h2 className="text-center mb-4">Active Timecard</h2>
 
       {isLoading ? (
-        <p>Loading timecard data...</p>
+        <div className="text-center">
+        <div className="spinner-border custom-spinner" role="status">
+          <span className="visually-hidden">Loading timecard data...</span>
+        </div>
+      </div>
       ) : (
         <div className="table-responsive">
           <table className="table table-bordered">
@@ -1045,7 +1047,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
               </tr>
             </thead>
             <tbody>
-              {filteredEntries.map((entry, index) => (
+              {timeCard.entries.map((entry, index) => (
                 <tr key={entry.date}>
                   {/* <td>{formatDate(entry.date)}</td> */}
                   <td>{moment.utc(entry.date).format('dddd, MMM D, YYYY')}</td>
