@@ -86,8 +86,8 @@ function TimeCardsIndex() {
       {isLoading ? (
         <div className="text-center">
           <div className="spinner-border custom-spinner" role="status">
-            <span className="visually-hidden">Loading timecard data...</span>
           </div>
+          <div className="mt-2">Loading timecard data...</div>
         </div>
       ) : (
 
