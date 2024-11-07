@@ -2,16 +2,26 @@
 // Copyright (c) 2024 Mark Robertson
 // See LICENSE.txt file for details.
 
-function AboutComponemt() {
+function AboutComponent() {
+    return (
+        <div>
+            <br />
+            <br />
+            <h1 style={{ textAlign: 'center' }}>Welcome to the wcac timecards about page</h1>
+            <p style={{ textAlign: 'center', marginTop: '20px' }}>
+                To learn more about how to create a new time card online, please visit the guide:
+                <br />
+                <a
+                    href="https://scribehow.com/shared/How_To_Create_A_New_Time_Card_Online__QVlOmQ_QRFS0ejBRGI5GPQ"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: 'blue', textDecoration: 'underline' }}
+                >
+                    How to Create a New Time Card Online
+                </a>
+            </p>
+        </div>
+    );
+}
 
-    return(
-    <div>
-    <br></br>
-    <br></br>
-    <h1 style={{ textAlign: 'center' }}>Welcome to the wcac timecards about page</h1>
-    </div>
-    )
-    }
-    
-    
-    export default AboutComponemt;
+export default AboutComponent;
