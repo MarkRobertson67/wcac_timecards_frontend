@@ -3,7 +3,7 @@
 // See LICENSE.txt file for details.
 
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction'; // Needed for dateClick
@@ -15,6 +15,34 @@ function TimeCardsIndex() {
   const [timeEntries, setTimeEntries] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const employeeId = 1;  // currentUser?.employeeId; Replace with actual employee ID from FireBase authentication
+  const timeoutRef = useRef(null); // Ref to keep track of the inactivity timer
+
+  useEffect(() => {
+    // Function to reset the inactivity timer
+    const resetInactivityTimer = () => {
+      clearTimeout(timeoutRef.current); // Clear existing timer if any
+      timeoutRef.current = setTimeout(() => {
+        // Reload page after 5 minutes of inactivity
+        console.log("Inactivity detected, reloading page...");
+        window.location.reload();
+      }, 5 * 60 * 1000); // 5 minutes in milliseconds
+    };
+
+    // Set up event listeners to detect user activity
+    const events = ['mousemove', 'mousedown', 'keypress', 'scroll', 'touchstart'];
+    events.forEach(event => window.addEventListener(event, resetInactivityTimer));
+
+    // Initial timer setup
+    resetInactivityTimer();
+
+    // Cleanup event listeners on unmount
+    return () => {
+      events.forEach(event => window.removeEventListener(event, resetInactivityTimer));
+      clearTimeout(timeoutRef.current); // Clear timer when component unmounts
+    };
+  }, []);
+
+
 
   useEffect(() => {
     const fetchTimeEntries = async () => {
