@@ -13,17 +13,21 @@ const API = process.env.REACT_APP_API_URL;
 
 function TimeCardsIndex() {
   const [timeEntries, setTimeEntries] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const employeeId = 1;  // currentUser?.employeeId; Replace with actual employee ID from FireBase authentication
 
   useEffect(() => {
     const fetchTimeEntries = async () => {
       try {
+        setIsLoading(true); // Set loading state to true before fetching
         const response = await fetch(`${API}/timecards/employee/${employeeId}`);
         const data = await response.json();
         console.log('Fetched data:', data);
         setTimeEntries(data.data);
       } catch (error) {
         console.error('Error fetching time entries:', error);
+      } finally {
+        setIsLoading(false); // Set loading state to false after fetching completes
       }
     };
 
@@ -78,21 +82,32 @@ function TimeCardsIndex() {
   return (
     <div className={styles.container}>
       <h2>Total Hours Worked</h2>
-      <FullCalendar
-        timeZone="UTC"
-        plugins={[dayGridPlugin, interactionPlugin]}
-        initialView="dayGridMonth"
-        initialDate={new Date()}
-        headerToolbar={{
-          left: 'prev,next today',
-          center: 'title',
-          right: 'dayGridMonth,dayGridDay'
-        }}
-        events={events} // Pass the logged events to FullCalendar
-        eventContent={renderEventContent}
-        dateClick={handleDateClick}
-        height="auto" // height of calendar
-      />
+
+      {isLoading ? (
+        <div className="text-center">
+          <div className="spinner-border custom-spinner" role="status">
+            <span className="visually-hidden">Loading timecard data...</span>
+          </div>
+        </div>
+      ) : (
+
+        <FullCalendar
+          timeZone="UTC"
+          plugins={[dayGridPlugin, interactionPlugin]}
+          initialView="dayGridMonth"
+          initialDate={new Date()}
+          headerToolbar={{
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,dayGridDay'
+          }}
+          events={events} // Pass the logged events to FullCalendar
+          eventContent={renderEventContent}
+          dateClick={handleDateClick}
+          height="auto" // height of calendar
+        />
+      )}
+
     </div>
   );
 }

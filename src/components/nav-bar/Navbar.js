@@ -25,6 +25,10 @@ function NavBar({ isNewTimeCardCreated }) {
         <Link className="navbar-brand" to="/" onClick={closeMenu}>
           <img src={logo} alt="Logo" style={{ height: '40px' }} />
         </Link>
+
+        <span className="navbar-title ms-2 text-white">We Care Adult Care Timecards</span>
+
+
         <button
           className="navbar-toggler"
           type="button"
