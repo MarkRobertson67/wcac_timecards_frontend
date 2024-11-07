@@ -66,6 +66,8 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     try {
       // Set loading state
       setIsLoading(true);
+      const timestamp = new Date().toLocaleString(); // Get the current timestamp
+      console.log(`[${timestamp}] Fetching timecard data... likely due to page reload from inactivity`);
 
       const adjustedStartDate = getPreviousMonday(startDate);
       const endDate = getEndDate(adjustedStartDate);
