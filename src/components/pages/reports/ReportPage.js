@@ -88,6 +88,7 @@ const ReportPage = () => {
     }
   }, [reportType, employeeId, startDate, endDate]);
 
+
   // Fetch the initial data on component mount
   useEffect(() => {
     fetchReportData(period); // Fetch data for the initial period (weekly by default)
@@ -103,7 +104,13 @@ const ReportPage = () => {
 
   // If loading, display a loading spinner/message
   if (loading) {
-    return <div className="text-center">Loading report data...</div>;
+    return (
+      <div className="text-center mt-4">
+        <div className="spinner-border custom-spinner" role="status">
+          <span className="visually-hidden">Loading report data...</span>
+        </div>
+      </div>
+    );
   }
 
 
