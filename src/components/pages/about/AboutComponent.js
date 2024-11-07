@@ -7,7 +7,7 @@ function AboutComponent() {
         <div>
             <br />
             <br />
-            <h1 style={{ textAlign: 'center' }}>Welcome to the wcac timecards about page</h1>
+            <h1 style={{ textAlign: 'center' }}>Welcome to the wcac timecards tutorials page</h1>
             <p style={{ textAlign: 'center', marginTop: '20px' }}>
                 To learn more about how to create a new time card online, please visit the guide:
                 <br />

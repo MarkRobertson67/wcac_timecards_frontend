@@ -48,7 +48,7 @@ function NavBar({ isNewTimeCardCreated }) {
             </li>
             <li className={`nav-item ${location.pathname === '/about' ? 'active' : ''}`}>
               <Link className="nav-link" to="/about" onClick={closeMenu}>
-                About
+                Tutorials
               </Link>
             </li>
             <li className={`nav-item ${location.pathname === '/createNewTimeCard' || location.pathname === '/currentTimeCard' ? 'active' : ''}`}>
