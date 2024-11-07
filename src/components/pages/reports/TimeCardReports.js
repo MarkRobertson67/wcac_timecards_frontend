@@ -411,12 +411,12 @@ const handleGenerateReport = async () => {
       <h2 className="text-center mb-4">Time Card Reports</h2>
 
       {isLoading ? (
-      <div className="text-center mt-4">
-        <div className="spinner-border custom-spinner" role="status">
-          <span className="visually-hidden">Loading employee data...</span>
+        <div className="text-center mt-4">
+          <div className="spinner-border custom-spinner" role="status">
+          </div>
+          <div className="mt-2">Loading employee data...</div>
         </div>
-      </div>
-    ) : (
+      ) : (
         <>
           <div className="mb-3">
 
