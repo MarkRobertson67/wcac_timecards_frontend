@@ -37,6 +37,9 @@ function TimeCardReports() {
     period: 'weekly',
     employees: []
   });
+
+  const [isLoading, setIsLoading] = useState(false); // State for loading status
+
   
   useEffect(() => {
     if (formState.employees.length > 0) {
@@ -90,6 +93,7 @@ function TimeCardReports() {
   };
 
   const fetchEmployees = async () => {
+    setIsLoading(true); // Set loading to true before fetching
     try {
       const response = await fetch(`${API}/employees?ts=${new Date().getTime()}`);
 
@@ -106,6 +110,8 @@ function TimeCardReports() {
       }
     } catch (error) {
       console.error('Error fetching employees:', error);
+    } finally {
+      setIsLoading(false); // Set loading to false after fetching completes
     }
   };
 
@@ -404,7 +410,16 @@ const handleGenerateReport = async () => {
     <div className="container mt-4">
       <h2 className="text-center mb-4">Time Card Reports</h2>
 
-      <div className="mb-3">
+      {isLoading ? (
+      <div className="text-center mt-4">
+        <div className="spinner-border custom-spinner" role="status">
+          <span className="visually-hidden">Loading employee data...</span>
+        </div>
+      </div>
+    ) : (
+        <>
+          <div className="mb-3">
+
         <label htmlFor="reportType" className="form-label">Select Report Type:</label>
         <select id="reportType" className="form-select" value={formState.reportType} onChange={handleChange}>
           <option value="totalHours">Total Hours Worked by Employee</option>
@@ -419,6 +434,8 @@ const handleGenerateReport = async () => {
         <button className="btn btn-primary mx-2" onClick={handleGenerateReport}>Generate Report</button>
         <button className="btn btn-secondary mx-2" onClick={resetForm}>Reset</button>
       </div>
+      </>
+      )}
     </div>
   );
 }

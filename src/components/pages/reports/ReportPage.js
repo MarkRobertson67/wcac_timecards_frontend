@@ -20,7 +20,7 @@ const ReportPage = () => {
   // State for toggling periods
   const [period, setPeriod] = useState('weekly');  // 'weekly', 'monthly', or 'yearly'
   const [reportData, setReportData] = useState(initialReportData || []); // Only use the data passed through location.state
-  const [loading, setLoading] = useState(false); // Loading state
+  const [loading, setLoading] = useState(true); // Loading state
   const [cachedData, setCachedData] = useState({}); // Cache fetched data for each period
 
 
