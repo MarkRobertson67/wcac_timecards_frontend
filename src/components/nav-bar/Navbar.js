@@ -51,9 +51,9 @@ function NavBar({ isNewTimeCardCreated }) {
                 Tutorials
               </Link>
             </li>
-            <li className={`nav-item ${location.pathname === '/createNewTimeCard' || location.pathname === '/currentTimeCard' ? 'active' : ''}`}>
-              <Link className="nav-link" to={isNewTimeCardCreated ? '/currentTimeCard' : '/createNewTimeCard'} onClick={closeMenu}>
-                {isNewTimeCardCreated ? 'Current Time Card' : 'Create New Time Card'}
+            <li className={`nav-item ${location.pathname === '/createNewTimeCard' || location.pathname === '/activeTimeCard' ? 'active' : ''}`}>
+              <Link className="nav-link" to={isNewTimeCardCreated ? '/activeTimeCard' : '/createNewTimeCard'} onClick={closeMenu}>
+                {isNewTimeCardCreated ? 'Active Time Card' : 'Create New Time Card'}
               </Link>
             </li>
             <li className={`nav-item ${location.pathname === '/timeCardIndex' ? 'active' : ''}`}>
