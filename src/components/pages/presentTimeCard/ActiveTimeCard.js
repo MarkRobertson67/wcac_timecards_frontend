@@ -543,7 +543,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
   }
 
   // const filteredEntries = timeCard.entries.filter((entry) => isWeekday(entry.date));
-
+  
 
   return (
     <div className={`container mt-5 ${styles.container}`}>
@@ -620,6 +620,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                 <th>Total Time</th>
               </tr>
             </thead>
+
             <tbody>
               {timeCard.entries.map((entry, index) => (
                 <tr key={entry.date}>
@@ -629,7 +630,10 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                     <input
                       type="time"
                       value={entry.startTime}
-                      onChange={(e) => handleChange(index, 'startTime', e.target.value)}
+                      onChange={(e) => {
+                        handleChange(index, 'startTime', e.target.value);
+                        validateAMPM(e.target.value, 'startTime'); // Call validation here for mobile users
+                      }}
                       onBlur={(e) => validateAMPM(e.target.value, 'startTime')}
                     />
                   </td>
@@ -637,7 +641,10 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                     <input
                       type="time"
                       value={entry.lunchStart}
-                      onChange={(e) => handleChange(index, 'lunchStart', e.target.value)}
+                      onChange={(e) => {
+                        handleChange(index, 'lunchStart', e.target.value);
+                        validateAMPM(e.target.value, 'lunchStart');
+                      }}
                       onBlur={(e) => validateAMPM(e.target.value, 'lunchStart')}
                     />
                   </td>
@@ -645,7 +652,10 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                     <input
                       type="time"
                       value={entry.lunchEnd}
-                      onChange={(e) => handleChange(index, 'lunchEnd', e.target.value)}
+                      onChange={(e) => {
+                        handleChange(index, 'lunchEnd', e.target.value);
+                        validateAMPM(e.target.value, 'lunchEnd');
+                      }}
                       onBlur={(e) => validateAMPM(e.target.value, 'lunchEnd')}
                     />
                   </td>
@@ -653,7 +663,10 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                     <input
                       type="time"
                       value={entry.endTime}
-                      onChange={(e) => handleChange(index, 'endTime', e.target.value)}
+                      onChange={(e) => {
+                        handleChange(index, 'endTime', e.target.value);
+                        validateAMPM(e.target.value, 'endTime');
+                      }}
                       onBlur={(e) => validateAMPM(e.target.value, 'endTime')}
                     />
                   </td>
@@ -665,6 +678,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                 <td>{calculateTotalTimeForAllEntries()}</td>
               </tr>
             </tbody>
+            
           </table>
         </div>
       )}
@@ -675,3 +689,166 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 }
 
 export default ActiveTimeCard;
+
+
+// return (
+//   <div className={`container mt-5 ${styles.container}`}>
+//     {showConfetti && (
+//       <Confetti
+//         width={width}
+//         height={height}
+//         style={{
+//           position: 'fixed',
+//           top: 0,
+//           left: 0,
+//           zIndex: 9999, // Ensure it's on top of other elements
+//         }}
+//       />
+//     )}
+
+//     <div className="text-center mb-3">
+//       <button
+//         className="btn btn-primary me-3"
+//         onClick={handleSubmit}
+//         disabled={isSubmitting || isSubmitted || isLoading}
+//       >
+//         {isSubmitting ? (
+//           <>
+//             <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+//             Submitting...
+//           </>
+//         ) : isSubmitted ? (
+//           'Submitted'
+//         ) : (
+//           'Submit'
+//         )}
+//       </button>
+
+//       <button
+//         className="btn btn-danger me-3"
+//         onClick={handleReset}
+//         disabled={isSubmitting || isLoading}
+//       >
+//         {isLoading ? (
+//           <>
+//             <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+//             Resetting...
+//           </>
+//         ) : (
+//           'Reset'
+//         )}
+//       </button>
+
+//       <button className="btn btn-secondary" onClick={() => navigate('/createNewTimecard')}>
+//         Back to Calendar
+//       </button>
+//     </div>
+
+//     <h2 className="text-center mb-4">Active Timecard</h2>
+
+//     {isLoading ? (
+//       <div className="text-center">
+//         <div className="spinner-border custom-spinner" role="status"></div>
+//         <div className="mt-2">Loading timecard data...</div>
+//       </div>
+//     ) : (
+//       <div className="table-responsive">
+//         <table className="table table-bordered">
+//           <thead>
+//             <tr>
+//               <th>Date</th>
+//               <th>Activity</th>
+//               <th>Start Time</th>
+//               <th>Lunch Start</th>
+//               <th>Activity</th>
+//               <th>Lunch End</th>
+//               <th>End Time</th>
+//               <th>Total Time</th>
+//             </tr>
+//           </thead>
+
+//           <tbody>
+//             {timeCard.entries.map((entry, index) => (
+//               <tr key={entry.date}>
+//                 <td>{moment.utc(entry.date).format('dddd, MMM D, YYYY')}</td>
+
+//                 {/* Activity (First Activity) */}
+//                 <td>
+//                   <select
+//                     value={entry.morningActivity || 'Facility'}
+//                     onChange={(e) => handleChange(index, 'morningActivity', e.target.value)}
+//                     style={{ width: '84px' }} // 30% narrower from 120px to 84px
+//                   >
+//                     <option value="Facility">Facility</option>
+//                     <option value="Driving">Driving</option>
+//                   </select>
+//                 </td>
+
+//                 {/* Start Time */}
+//                 <td>
+//                   <input
+//                     type="time"
+//                     value={entry.startTime}
+//                     onChange={(e) => handleChange(index, 'startTime', e.target.value)}
+//                     onBlur={(e) => validateAMPM(e.target.value, 'startTime')}
+//                   />
+//                 </td>
+
+//                 {/* Lunch Start */}
+//                 <td>
+//                   <input
+//                     type="time"
+//                     value={entry.lunchStart}
+//                     onChange={(e) => handleChange(index, 'lunchStart', e.target.value)}
+//                     onBlur={(e) => validateAMPM(e.target.value, 'lunchStart')}
+//                   />
+//                 </td>
+
+//                 {/* Activity (Second Activity) */}
+//                 <td>
+//                   <select
+//                     value={entry.afternoonActivity || 'Facility'}
+//                     onChange={(e) => handleChange(index, 'afternoonActivity', e.target.value)}
+//                     style={{ width: '84px' }} // 30% narrower from 120px to 84px
+//                   >
+//                     <option value="Facility">Facility</option>
+//                     <option value="Driving">Driving</option>
+//                   </select>
+//                 </td>
+
+//                 {/* Lunch End */}
+//                 <td>
+//                   <input
+//                     type="time"
+//                     value={entry.lunchEnd}
+//                     onChange={(e) => handleChange(index, 'lunchEnd', e.target.value)}
+//                     onBlur={(e) => validateAMPM(e.target.value, 'lunchEnd')}
+//                   />
+//                 </td>
+
+//                 {/* End Time */}
+//                 <td>
+//                   <input
+//                     type="time"
+//                     value={entry.endTime}
+//                     onChange={(e) => handleChange(index, 'endTime', e.target.value)}
+//                     onBlur={(e) => validateAMPM(e.target.value, 'endTime')}
+//                   />
+//                 </td>
+
+//                 {/* Total Time */}
+//                 <td>{entry.totalTime}</td>
+//               </tr>
+//             ))}
+//             <tr>
+//               <td colSpan={7} style={{ textAlign: 'right' }}>
+//                 <strong>Total Time:</strong>
+//               </td>
+//               <td>{calculateTotalTimeForAllEntries()}</td>
+//             </tr>
+//           </tbody>
+//         </table>
+//       </div>
+//     )}
+//   </div>
+// );
