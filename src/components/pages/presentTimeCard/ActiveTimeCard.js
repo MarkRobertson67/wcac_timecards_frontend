@@ -634,7 +634,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                         handleChange(index, 'startTime', e.target.value);
                         validateAMPM(e.target.value, 'startTime'); // Call validation here for mobile users
                       }}
-                      onBlur={(e) => validateAMPM(e.target.value, 'startTime')}
+                      //onBlur={(e) => validateAMPM(e.target.value, 'startTime')}
                     />
                   </td>
                   <td>
@@ -645,7 +645,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                         handleChange(index, 'lunchStart', e.target.value);
                         validateAMPM(e.target.value, 'lunchStart');
                       }}
-                      onBlur={(e) => validateAMPM(e.target.value, 'lunchStart')}
+                      //onBlur={(e) => validateAMPM(e.target.value, 'lunchStart')}
                     />
                   </td>
                   <td>
@@ -656,7 +656,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                         handleChange(index, 'lunchEnd', e.target.value);
                         validateAMPM(e.target.value, 'lunchEnd');
                       }}
-                      onBlur={(e) => validateAMPM(e.target.value, 'lunchEnd')}
+                      //onBlur={(e) => validateAMPM(e.target.value, 'lunchEnd')}
                     />
                   </td>
                   <td>
@@ -667,7 +667,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                         handleChange(index, 'endTime', e.target.value);
                         validateAMPM(e.target.value, 'endTime');
                       }}
-                      onBlur={(e) => validateAMPM(e.target.value, 'endTime')}
+                      //onBlur={(e) => validateAMPM(e.target.value, 'endTime')}
                     />
                   </td>
                   <td>{entry.totalTime}</td>
