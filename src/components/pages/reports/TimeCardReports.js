@@ -153,19 +153,26 @@ function TimeCardReports() {
   }, []);
 
   const resetInactivityTimer = () => {
+    const timestamp = new Date().toLocaleString(); // Get the current timestamp
+  
     // Log when resetting the timer
-    console.log("Resetting inactivity timer...");
-
+    console.log(`[${timestamp}] Resetting inactivity timer...`);
+  
     // Clear the existing timer, if any  
     clearTimeout(timeoutRef.current); // Clear existing timer if any
-
+  
     // Set a new timer
     timeoutRef.current = setTimeout(() => {
       // Reload page after a specific period of inactivity (e.g., 5 minutes)
-      console.log("Inactivity detected. Timer expired, reloading page and refetching employee data...");
+      const reloadTimestamp = new Date().toLocaleString();
+      console.log(`[${reloadTimestamp}] Inactivity detected. Timer expired, reloading page and refetching employee data...`);
       window.location.reload();
     }, 5 * 60 * 1000); // 5 minutes in milliseconds
+  
+    // Log when a new timer is set
+    console.log(`[${timestamp}] New inactivity timer set for 5 minutes.`);
   };
+  
 
 
   const handleGenerateReport = async () => {
