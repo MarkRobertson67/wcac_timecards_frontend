@@ -23,6 +23,8 @@ const ReportPage = () => {
   const [loading, setLoading] = useState(true); // Loading state
   const [cachedData, setCachedData] = useState({}); // Cache fetched data for each period
 
+  
+
 
     // Group the report data by employee_id
     const groupByEmployee = (reportData) => {
