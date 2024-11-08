@@ -309,11 +309,6 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
       // Update the specified field with the new value
       entry[field] = value;
 
-      // Validate AM/PM logic when the user finishes editing the time field (onBlur)
-      if (['startTime', 'lunchStart', 'lunchEnd', 'endTime'].includes(field)) {
-        validateAMPM(value, field);
-      }
-
 
       // Calculate total time after the update
       entry.totalTime = calculateTotalTime(
@@ -635,7 +630,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                       type="time"
                       value={entry.startTime}
                       onChange={(e) => handleChange(index, 'startTime', e.target.value)}
-                      required
+                      onBlur={(e) => validateAMPM(e.target.value, 'startTime')}
                     />
                   </td>
                   <td>
@@ -643,6 +638,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                       type="time"
                       value={entry.lunchStart}
                       onChange={(e) => handleChange(index, 'lunchStart', e.target.value)}
+                      onBlur={(e) => validateAMPM(e.target.value, 'lunchStart')}
                     />
                   </td>
                   <td>
@@ -650,6 +646,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                       type="time"
                       value={entry.lunchEnd}
                       onChange={(e) => handleChange(index, 'lunchEnd', e.target.value)}
+                      onBlur={(e) => validateAMPM(e.target.value, 'lunchEnd')}
                     />
                   </td>
                   <td>
@@ -657,7 +654,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                       type="time"
                       value={entry.endTime}
                       onChange={(e) => handleChange(index, 'endTime', e.target.value)}
-                      required
+                      onBlur={(e) => validateAMPM(e.target.value, 'endTime')}
                     />
                   </td>
                   <td>{entry.totalTime}</td>
