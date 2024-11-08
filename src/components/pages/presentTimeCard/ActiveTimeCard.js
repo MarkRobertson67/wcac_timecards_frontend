@@ -273,6 +273,24 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
   };
 
 
+  // Helper function to parse and check AM/PM
+  const validateAMPM = (time, field) => {
+    const parsedTime = moment(time, 'HH:mm');
+
+    if (field === 'startTime' || field === 'lunchStart') {
+      // Alert if the start or lunch start time is entered as PM (past 12:00 PM)
+      if (parsedTime.isAfter(moment('12:00', 'HH:mm'))) {
+        alert(`${field === 'startTime' ? 'Start time' : 'Lunch start time'} seems to be in the PM. Should it be AM?`);
+      }
+    } else if (field === 'lunchEnd' || field === 'endTime') {
+      // Alert if lunch end or end time is entered as AM (before 12:00 PM)
+      if (parsedTime.isBefore(moment('12:00', 'HH:mm'))) {
+        alert(`${field === 'lunchEnd' ? 'Lunch end time' : 'End time'} seems to be in the AM. Should it be PM?`);
+      }
+    }
+  };
+
+
   const handleChange = (index, field, value) => {
     setTimeCard((prevState) => {
       const updatedEntries = [...prevState.entries];
@@ -290,6 +308,12 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
       // Update the specified field with the new value
       entry[field] = value;
+
+      // Validate AM/PM logic when the user finishes editing the time field (onBlur)
+      if (['startTime', 'lunchStart', 'lunchEnd', 'endTime'].includes(field)) {
+        validateAMPM(value, field);
+      }
+
 
       // Calculate total time after the update
       entry.totalTime = calculateTotalTime(

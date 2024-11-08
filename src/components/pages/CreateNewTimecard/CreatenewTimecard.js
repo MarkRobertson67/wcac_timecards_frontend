@@ -18,7 +18,7 @@ function CreateNewTimeCard({ setIsNewTimeCardCreated }) {
 
    // Call this method on logout or when you need to ensure fresh data is loaded
   const clearLocalStorage = () => {
-    localStorage.removeItem('currentTimeCard');
+    localStorage.removeItem('activeTimeCard');
     localStorage.removeItem('startDate');
   };
 
@@ -37,7 +37,7 @@ function CreateNewTimeCard({ setIsNewTimeCardCreated }) {
     localStorage.setItem('startDate', formattedDate);
 
     setIsNewTimeCardCreated(true);
-    navigate('/currentTimeCard', { state: { startDate: formattedDate } });
+    navigate('/activeTimeCard', { state: { startDate: formattedDate } });
   };
 
   return (
