@@ -213,8 +213,6 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
 
   const calculateTotalTime = (start, lunchStart, lunchEnd, end) => {
-
-
     const parseTime = (time) => (time ? moment(time, 'HH:mm') : null);
     const startTime = parseTime(start);
     const lunchStartTime = parseTime(lunchStart);
@@ -224,19 +222,23 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     let totalMinutes = 0;
 
     if (startTime && lunchStartTime) {
-      totalMinutes += (lunchStartTime - startTime) / (1000 * 60);
+      const duration = (lunchStartTime - startTime) / (1000 * 60);
+      totalMinutes += Math.max(duration, 0); // Ensure no negative values
     }
 
     if (lunchEndTime && endTime) {
-      totalMinutes += (endTime - lunchEndTime) / (1000 * 60);
+      const duration = (endTime - lunchEndTime) / (1000 * 60);
+      totalMinutes += Math.max(duration, 0); 
     }
 
     if (startTime && endTime && !lunchStartTime && !lunchEndTime) {
-      totalMinutes = (endTime - startTime) / (1000 * 60);
+      const duration = (endTime - startTime) / (1000 * 60);
+      totalMinutes += Math.max(duration, 0); 
     }
 
     if (startTime && lunchStartTime && lunchEndTime && !endTime) {
-      totalMinutes = (lunchStartTime - startTime) / (1000 * 60);
+      const duration = (lunchStartTime - startTime) / (1000 * 60);
+      totalMinutes += Math.max(duration, 0); 
     }
 
     totalMinutes = Math.max(totalMinutes, 0);
@@ -246,8 +248,11 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
     const totalTime = `${hours}h ${minutes}m`;
     console.log('Calculated Total Time:', totalTime);
-    return totalTime || '00:00';
+    return totalTime || '0h 0m';
   };
+
+
+
 
   const isWeekday = (date) => {
     const day = moment(date).day();
@@ -291,6 +296,27 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
   };
 
 
+  const isValidTimeOrder = (start, lunchStart, lunchEnd, end) => {
+    if (start && lunchStart && moment(lunchStart, 'HH:mm').isBefore(moment(start, 'HH:mm'))) {
+      alert('Lunch start cannot be before start time.');
+      return false; // Lunch start cannot be before start time
+    }
+    if (lunchStart && lunchEnd && moment(lunchEnd, 'HH:mm').isBefore(moment(lunchStart, 'HH:mm'))) {
+      alert('Lunch end cannot be before lunch start.');
+      return false; // Lunch end cannot be before lunch start
+    }
+    if (end && lunchEnd && moment(end, 'HH:mm').isBefore(moment(lunchEnd, 'HH:mm'))) {
+      alert('End time cannot be before lunch end.');
+      return false; // End time cannot be before lunch end
+    }
+    if (end && start && moment(end, 'HH:mm').isBefore(moment(start, 'HH:mm'))) {
+      alert('End time cannot be before start time.');
+      return false; // End time cannot be before start time
+    }
+    return true;
+  };
+
+
   const handleChange = (index, field, value) => {
     setTimeCard((prevState) => {
       const updatedEntries = [...prevState.entries];
@@ -310,6 +336,8 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
       entry[field] = value;
 
 
+          // Validate time order before calculating total time
+    if (isValidTimeOrder(entry.startTime, entry.lunchStart, entry.lunchEnd, entry.endTime)) {
       // Calculate total time after the update
       entry.totalTime = calculateTotalTime(
         entry.startTime,
@@ -317,6 +345,10 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
         entry.lunchEnd,
         entry.endTime
       );
+    } else {
+      entry.totalTime = '0h 0m'; // Reset to 0 if times are not valid
+    }
+
 
       // Ensure status is active if it is not submitted
       if (entry.status !== 'submitted') {
@@ -542,8 +574,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     setIsNewTimeCardCreated(false);
   }
 
-  // const filteredEntries = timeCard.entries.filter((entry) => isWeekday(entry.date));
-  
+
 
   return (
     <div className={`container mt-5 ${styles.container}`}>
@@ -634,7 +665,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                         handleChange(index, 'startTime', e.target.value);
                         validateAMPM(e.target.value, 'startTime'); // Call validation here for mobile users
                       }}
-                      //onBlur={(e) => validateAMPM(e.target.value, 'startTime')}
+                    onBlur={(e) => validateAMPM(e.target.value, 'startTime')}
                     />
                   </td>
                   <td>
@@ -645,7 +676,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                         handleChange(index, 'lunchStart', e.target.value);
                         validateAMPM(e.target.value, 'lunchStart');
                       }}
-                      //onBlur={(e) => validateAMPM(e.target.value, 'lunchStart')}
+                    onBlur={(e) => validateAMPM(e.target.value, 'lunchStart')}
                     />
                   </td>
                   <td>
@@ -654,9 +685,9 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                       value={entry.lunchEnd}
                       onChange={(e) => {
                         handleChange(index, 'lunchEnd', e.target.value);
-                        validateAMPM(e.target.value, 'lunchEnd');
+                        // validateAMPM(e.target.value, 'lunchEnd');
                       }}
-                      //onBlur={(e) => validateAMPM(e.target.value, 'lunchEnd')}
+                    onBlur={(e) => validateAMPM(e.target.value, 'lunchEnd')}
                     />
                   </td>
                   <td>
@@ -667,7 +698,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                         handleChange(index, 'endTime', e.target.value);
                         validateAMPM(e.target.value, 'endTime');
                       }}
-                      //onBlur={(e) => validateAMPM(e.target.value, 'endTime')}
+                    onBlur={(e) => validateAMPM(e.target.value, 'endTime')}
                     />
                   </td>
                   <td>{entry.totalTime}</td>
@@ -678,7 +709,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                 <td>{calculateTotalTimeForAllEntries()}</td>
               </tr>
             </tbody>
-            
+
           </table>
         </div>
       )}
