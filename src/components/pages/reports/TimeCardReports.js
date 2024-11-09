@@ -7,7 +7,7 @@
 // Copyright (c) 2024 Mark Robertson
 // See LICENSE.txt file for details.
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const API = process.env.REACT_APP_API_URL;
@@ -30,6 +30,7 @@ const monthOptions = [
 function TimeCardReports() {
 
   const navigate = useNavigate();
+  const timeoutRef = useRef(null);
 
   const [formState, setFormState] = useState({
     reportType: 'totalHours',
@@ -45,13 +46,34 @@ function TimeCardReports() {
 
   const [isLoading, setIsLoading] = useState(false); // State for loading status
 
-  
+
   useEffect(() => {
     if (formState.employees.length > 0) {
       console.log("Employees updated after fetch:", formState.employees);  // This log after the state updates
     }
   }, [formState.employees]);
-  
+
+
+  // Add inactivity tracking and reset timer when user interacts
+  useEffect(() => {
+
+    console.log("Setting up inactivity event listeners...");
+
+    // Set initial timer when component mounts
+    resetInactivityTimer();
+
+    // Events to track user activity
+    const events = ['mousemove', 'mousedown', 'keypress', 'scroll', 'touchstart'];
+    events.forEach(event => window.addEventListener(event, resetInactivityTimer));
+
+    // Cleanup event listeners and timer on component unmount
+    return () => {
+      console.log("Cleaning up inactivity event listeners...");
+      events.forEach(event => window.removeEventListener(event, resetInactivityTimer));
+      clearTimeout(timeoutRef.current);
+    };
+  }, []); // Empty dependency array to run only once
+
 
   const handleChange = (e) => {
     const { id, value, type } = e.target;
@@ -80,10 +102,12 @@ function TimeCardReports() {
         [id]: type === 'checkbox' ? value === 'on' : value
       }));
     }
-};
+    // Reset inactivity timer on user interaction
+    resetInactivityTimer();
+  };
 
   const resetForm = () => {
-    
+
     setFormState({
       reportType: 'totalHours',
       startDate: '',
@@ -95,9 +119,13 @@ function TimeCardReports() {
       period: 'weekly',
       employees: []
     });
+    resetInactivityTimer(); // Reset inactivity timer
   };
 
   const fetchEmployees = async () => {
+    const timestamp = new Date().toLocaleString(); // Get the current timestamp
+    console.log(`[${timestamp}] Fetching employee data... likely due to page reload from inactivity`);
+
     setIsLoading(true); // Set loading to true before fetching
     try {
       const response = await fetch(`${API}/employees?ts=${new Date().getTime()}`);
@@ -122,113 +150,138 @@ function TimeCardReports() {
 
   useEffect(() => {
     fetchEmployees();
-  }, []); // Empty dependency array to run only once on component mount
+    resetInactivityTimer(); // Set up initial inactivity timer
+
+    return () => {
+      clearTimeout(timeoutRef.current); // Clear the timer on component unmount
+    };
+  }, []);
+
+  const resetInactivityTimer = () => {
+    const timestamp = new Date().toLocaleString(); // Get the current timestamp
+  
+    // Log when resetting the timer
+    console.log(`[${timestamp}] Resetting inactivity timer...`);
+  
+    // Clear the existing timer, if any  
+    clearTimeout(timeoutRef.current); // Clear existing timer if any
+  
+    // Set a new timer
+    timeoutRef.current = setTimeout(() => {
+      // Reload page after a specific period of inactivity (e.g., 5 minutes)
+      const reloadTimestamp = new Date().toLocaleString();
+      console.log(`[${reloadTimestamp}] Inactivity detected. Timer expired, reloading page and refetching employee data...`);
+      window.location.reload();
+    }, 5 * 60 * 1000); // 5 minutes in milliseconds
+  
+    // Log when a new timer is set
+    console.log(`[${timestamp}] New inactivity timer set for 5 minutes.`);
+  };
+  
 
 
+  const handleGenerateReport = async () => {
+    const { reportType, startDate, endDate, selectedEmployeeName, employees, period } = formState;
 
-
-const handleGenerateReport = async () => {
-  const { reportType, startDate, endDate, selectedEmployeeName, employees, period } = formState;
-
-  // Check if 'ALL' employees is selected
-  if (selectedEmployeeName === "ALL") {
+    // Check if 'ALL' employees is selected
+    if (selectedEmployeeName === "ALL") {
       // Route for ALL employees
       if (reportType === 'employeeSummary') {
-          const url = `${API}/reports/all/employee-summary?startDate=${startDate}&endDate=${endDate}&period=${period}`;
-          console.log(`Fetching employee summary for ALL employees from: ${url}`);
+        const url = `${API}/reports/all/employee-summary?startDate=${startDate}&endDate=${endDate}&period=${period}`;
+        console.log(`Fetching employee summary for ALL employees from: ${url}`);
 
-          // Fetching report for ALL employees
-          try {
-              const response = await fetch(`${url}`);
-              const reportData = await response.json();
-              const reportArray = Array.isArray(reportData.data) ? reportData.data : [];
+        // Fetching report for ALL employees
+        try {
+          const response = await fetch(`${url}`);
+          const reportData = await response.json();
+          const reportArray = Array.isArray(reportData.data) ? reportData.data : [];
 
-              if (reportArray.length === 0) {
-                  console.log("No timecards found for ALL employees. Generating default data.");
-                  const defaultReportData = [{
-                      start_date: startDate,
-                      end_date: endDate,
-                      employee_id: 'ALL',
-                      total_hours: { hours: 0, minutes: 0 }
-                  }];
+          if (reportArray.length === 0) {
+            console.log("No timecards found for ALL employees. Generating default data.");
+            const defaultReportData = [{
+              start_date: startDate,
+              end_date: endDate,
+              employee_id: 'ALL',
+              total_hours: { hours: 0, minutes: 0 }
+            }];
 
-                  navigate('/report', {
-                      state: {
-                          reportType,
-                          reportData: defaultReportData,
-                          startDate,
-                          endDate,
-                          employeeId: 'ALL',
-                      }
-                  });
-              } else {
-                  navigate('/report', {
-                      state: {
-                          reportType,
-                          reportData: reportArray,
-                          startDate,
-                          endDate,
-                          employeeId: 'ALL',
-                      }
-                  });
+            navigate('/report', {
+              state: {
+                reportType,
+                reportData: defaultReportData,
+                startDate,
+                endDate,
+                employeeId: 'ALL',
               }
-          } catch (error) {
-              console.error('Error fetching report data for ALL employees:', error);
+            });
+          } else {
+            navigate('/report', {
+              state: {
+                reportType,
+                reportData: reportArray,
+                startDate,
+                endDate,
+                employeeId: 'ALL',
+              }
+            });
           }
+        } catch (error) {
+          console.error('Error fetching report data for ALL employees:', error);
+        }
 
       } else if (reportType === 'totalHours') {
-          const url = `${API}/reports/all/range/${startDate}/${endDate}`;
-          console.log(`Fetching total hours for ALL employees from: ${url}`);
+        const url = `${API}/reports/all/range/${startDate}/${endDate}`;
+        console.log(`Fetching total hours for ALL employees from: ${url}`);
 
-          // Fetching report for ALL employees
-          try {
-              const response = await fetch(`${url}`);
-              const reportData = await response.json();
-              const reportArray = Array.isArray(reportData.data) ? reportData.data : [];
+        // Fetching report for ALL employees
+        try {
+          const response = await fetch(`${url}`);
+          const reportData = await response.json();
+          const reportArray = Array.isArray(reportData.data) ? reportData.data : [];
 
-              if (reportArray.length === 0) {
-                  console.log("No timecards found for ALL employees. Generating default data.");
-                  const defaultReportData = [{
-                      start_date: startDate,
-                      end_date: endDate,
-                      employee_id: 'ALL',
-                      total_hours: { hours: 0, minutes: 0 }
-                  }];
+          if (reportArray.length === 0) {
+            console.log("No timecards found for ALL employees. Generating default data.");
+            const defaultReportData = [{
+              start_date: startDate,
+              end_date: endDate,
+              employee_id: 'ALL',
+              total_hours: { hours: 0, minutes: 0 }
+            }];
 
-                  navigate('/report', {
-                      state: {
-                          reportType,
-                          reportData: defaultReportData,
-                          startDate,
-                          endDate,
-                          employeeId: 'ALL',
-                      }
-                  });
-              } else {
-                  navigate('/report', {
-                      state: {
-                          reportType,
-                          reportData: reportArray,
-                          startDate,
-                          endDate,
-                          employeeId: 'ALL',
-                      }
-                  });
+            navigate('/report', {
+              state: {
+                reportType,
+                reportData: defaultReportData,
+                startDate,
+                endDate,
+                employeeId: 'ALL',
               }
-          } catch (error) {
-              console.error('Error fetching report data for ALL employees:', error);
+            });
+          } else {
+            navigate('/report', {
+              state: {
+                reportType,
+                reportData: reportArray,
+                startDate,
+                endDate,
+                employeeId: 'ALL',
+              }
+            });
           }
+        } catch (error) {
+          console.error('Error fetching report data for ALL employees:', error);
+        }
 
       } else {
-          console.error('Invalid report type for ALL employees');
-          return;
+        console.error('Invalid report type for ALL employees');
+        return;
       }
 
-  } else {
+    } else {
       // Validate employee selection and report fields
       if (!selectedEmployeeName || !startDate || !endDate) {
-          alert("Please select an employee, start date, and end date before generating the report.");
-          return; // Prevent submission if fields are missing
+        alert("Please select an employee, start date, and end date before generating the report.");
+        return; // Prevent submission if fields are missing
       }
 
       // Logic for an individual employee
@@ -236,93 +289,93 @@ const handleGenerateReport = async () => {
       const empId = selectedEmployee ? selectedEmployee.id : null;
 
       if (!empId) {
-          console.error('Invalid employee selected or employee ID not found');
-          alert("Invalid employee selected. Please select a valid employee.");
-          return;
+        console.error('Invalid employee selected or employee ID not found');
+        alert("Invalid employee selected. Please select a valid employee.");
+        return;
       }
 
       // Set employeeId in the formState
       setFormState(prevState => ({
-          ...prevState,
-          employeeId: empId
+        ...prevState,
+        employeeId: empId
       }));
 
       let url;
       let queryParams = {};
 
       switch (reportType) {
-          case 'totalHours':
-              url = `${API}/reports/${empId}`;
-              queryParams = { startDate, endDate };
-              console.log(`Fetching total hours for employee ID ${empId} from: ${url}?startDate=${startDate}&endDate=${endDate}`);
-              break;
+        case 'totalHours':
+          url = `${API}/reports/${empId}`;
+          queryParams = { startDate, endDate };
+          console.log(`Fetching total hours for employee ID ${empId} from: ${url}?startDate=${startDate}&endDate=${endDate}`);
+          break;
 
-          case 'detailedTimecards':
-              url = `${API}/reports/detailed/${empId}`;
-              queryParams = { startDate, endDate };
-              console.log(`Fetching detailed timecards for employee ID ${empId} from: ${url}?startDate=${startDate}&endDate=${endDate}`);
-              break;
+        case 'detailedTimecards':
+          url = `${API}/reports/detailed/${empId}`;
+          queryParams = { startDate, endDate };
+          console.log(`Fetching detailed timecards for employee ID ${empId} from: ${url}?startDate=${startDate}&endDate=${endDate}`);
+          break;
 
-          case 'employeeSummary':
-              url = `${API}/reports/employee-summary/${empId}`;
-              queryParams = { startDate, endDate, period };
-              console.log(`Fetching employee summary for employee ID ${empId} from: ${url}?startDate=${startDate}&endDate=${endDate}&period=${period}`);
-              break;
+        case 'employeeSummary':
+          url = `${API}/reports/employee-summary/${empId}`;
+          queryParams = { startDate, endDate, period };
+          console.log(`Fetching employee summary for employee ID ${empId} from: ${url}?startDate=${startDate}&endDate=${endDate}&period=${period}`);
+          break;
 
-          default:
-              console.error('Invalid report type for individual employee');
-              return;
+        default:
+          console.error('Invalid report type for individual employee');
+          return;
       }
 
       const queryString = new URLSearchParams(queryParams).toString();
       console.log(`Fetching report from: ${url}?${queryString}`);
 
       try {
-          const response = await fetch(`${url}?${queryString}`);
-          const reportData = await response.json();
-          const reportArray = Array.isArray(reportData) ? reportData : [];
+        const response = await fetch(`${url}?${queryString}`);
+        const reportData = await response.json();
+        const reportArray = Array.isArray(reportData) ? reportData : [];
 
-          if (reportArray.length === 0) {
-              console.log("No timecards found. Generating default data.");
-              const defaultReportData = [{
-                  start_date: startDate,
-                  end_date: endDate,
-                  employee_id: empId,
-                  first_name: selectedEmployee.first_name,
-                  last_name: selectedEmployee.last_name,
-                  total_hours: { hours: 0, minutes: 0 }
-              }];
+        if (reportArray.length === 0) {
+          console.log("No timecards found. Generating default data.");
+          const defaultReportData = [{
+            start_date: startDate,
+            end_date: endDate,
+            employee_id: empId,
+            first_name: selectedEmployee.first_name,
+            last_name: selectedEmployee.last_name,
+            total_hours: { hours: 0, minutes: 0 }
+          }];
 
-              navigate('/report', {
-                  state: {
-                      reportType,
-                      reportData: defaultReportData,
-                      startDate,
-                      endDate,
-                      employeeId: empId,
-                      firstName: selectedEmployee.first_name,
-                      lastName: selectedEmployee.last_name
-                  }
-              });
-          } else {
-              navigate('/report', {
-                  state: {
-                      reportType,
-                      reportData: reportArray,
-                      startDate,
-                      endDate,
-                      employeeId: empId,
-                      firstName: selectedEmployee.first_name,
-                      lastName: selectedEmployee.last_name,
-                      period
-                  }
-              });
-          }
+          navigate('/report', {
+            state: {
+              reportType,
+              reportData: defaultReportData,
+              startDate,
+              endDate,
+              employeeId: empId,
+              firstName: selectedEmployee.first_name,
+              lastName: selectedEmployee.last_name
+            }
+          });
+        } else {
+          navigate('/report', {
+            state: {
+              reportType,
+              reportData: reportArray,
+              startDate,
+              endDate,
+              employeeId: empId,
+              firstName: selectedEmployee.first_name,
+              lastName: selectedEmployee.last_name,
+              period
+            }
+          });
+        }
       } catch (error) {
-          console.error('Error fetching report data for individual employee:', error);
+        console.error('Error fetching report data for individual employee:', error);
       }
-  }
-};
+    }
+  };
 
 
 
@@ -343,6 +396,12 @@ const handleGenerateReport = async () => {
                   className="form-select"
                   value={selectedEmployeeName || ''}
                   onChange={handleChange}
+                  disabled={isLoading}  // Disable input if loading
+                  style={{
+                    backgroundColor: isLoading ? '#e9ecef' : '',
+                    cursor: isLoading ? 'not-allowed' : 'pointer',
+                    opacity: isLoading ? 0.7 : 1
+                  }}
                 >
                   <option value="">Select Employee</option>
 
@@ -367,6 +426,7 @@ const handleGenerateReport = async () => {
                   className="form-control"
                   value={startDate}
                   onChange={handleChange}
+                  disabled={isLoading}  // Disable input if loading
                 />
               </div>
               <div className="col">
@@ -377,6 +437,7 @@ const handleGenerateReport = async () => {
                   className="form-control"
                   value={endDate}
                   onChange={handleChange}
+                  disabled={isLoading}  // Disable input if loading
                 />
               </div>
             </div>
@@ -425,21 +486,38 @@ const handleGenerateReport = async () => {
         <>
           <div className="mb-3">
 
-        <label htmlFor="reportType" className="form-label">Select Report Type:</label>
-        <select id="reportType" className="form-select" value={formState.reportType} onChange={handleChange}>
-          <option value="totalHours">Total Hours Worked by Employee</option>
-          <option value="detailedTimecards">Detailed Timecards by Employee</option>
-          <option value="employeeSummary">Employee Summary Report</option>
-        </select>
-      </div>
+            <label htmlFor="reportType" className="form-label">Select Report Type:</label>
+            <select id="reportType" className="form-select" value={formState.reportType} onChange={handleChange}>
+              <option value="totalHours">Total Hours Worked by Employee</option>
+              <option value="detailedTimecards">Detailed Timecards by Employee</option>
+              <option value="employeeSummary">Employee Summary Report</option>
+            </select>
+          </div>
 
-      {renderFormFields()}
+          {renderFormFields()}
 
-      <div className="text-center">
-        <button className="btn btn-primary mx-2" onClick={handleGenerateReport}>Generate Report</button>
-        <button className="btn btn-secondary mx-2" onClick={resetForm}>Reset</button>
-      </div>
-      </>
+          <div className="text-center">
+            {/* <button className="btn btn-primary mx-2" onClick={handleGenerateReport}>Generate Report</button>
+            <button className="btn btn-secondary mx-2" onClick={resetForm}>Reset</button> */}
+            <div className="text-center">
+              <button
+                className="btn btn-primary mx-2"
+                onClick={handleGenerateReport}
+                disabled={isLoading}  // Disable the button if loading
+              >
+                {isLoading ? 'Loading...' : 'Generate Report'}
+              </button>
+              <button
+                className="btn btn-secondary mx-2"
+                onClick={resetForm}
+                disabled={isLoading}  // Disable the button if loading
+              >
+                {isLoading ? 'Loading...' : 'Reset'}
+              </button>
+            </div>
+
+          </div>
+        </>
       )}
     </div>
   );
