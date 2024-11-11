@@ -99,7 +99,7 @@ function TimeCardsIndex() {
         start: eventStart,
         end: eventStart,
         extendedProps: {
-          time: `Facility: ${formatTotalTime(entry.facility_total_hours)}`,
+          time: `F: ${formatTotalTime(entry.facility_total_hours)}`,
         },
       });
     }
@@ -111,7 +111,7 @@ function TimeCardsIndex() {
         start: eventStart,
         end: eventStart,
         extendedProps: {
-          time: `Driving: ${formatTotalTime(entry.driving_total_hours)}`,
+          time: `D: ${formatTotalTime(entry.driving_total_hours)}`,
         },
       });
     }
@@ -150,6 +150,7 @@ function TimeCardsIndex() {
           height="auto" // height of calendar
         />
       )}
+      <h7>Key:<br></br>D = Driving<br></br>  F = Facility</h7>
 
     </div>
   );
