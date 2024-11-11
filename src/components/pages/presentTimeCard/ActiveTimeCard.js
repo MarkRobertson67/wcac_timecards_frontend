@@ -91,16 +91,21 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
       const fetchedEntriesMap = new Map();
       fetchedData.data.forEach(entry => {
         const date = moment.utc(entry.work_date).format('YYYY-MM-DD');
-        const totalTime = entry.total_time ? `${entry.total_time.hours}h ${entry.total_time.minutes}m` : '0h 0m';
+        //const totalTime = entry.total_time ? `${entry.total_time.hours}h ${entry.total_time.minutes}m` : '0h 0m';
         fetchedEntriesMap.set(date, {
           id: entry.id,
           date,
-          startTime: entry.start_time || '',
-          lunchStart: entry.lunch_start || '',
-          lunchEnd: entry.lunch_end || '',
-          endTime: entry.end_time || '',
-          totalTime,
-          status: entry.status || 'active',
+          facilityStartTime: entry.facility_start_time || '',
+          facilityLunchStart: entry.facility_lunch_start || '',
+          facilityLunchEnd: entry.facility_lunch_end || '',
+          facilityEndTime: entry.facility_end_time || '',
+          facilityTotalHours: entry.facility_total_hours || '0h 0m',
+          drivingStartTime: entry.driving_start_time || '',
+          drivingLunchStart: entry.driving_lunch_start || '',
+          drivingLunchEnd: entry.driving_lunch_end || '',
+          drivingEndTime: entry.driving_end_time || '',
+          drivingTotalHours: entry.driving_total_hours || '0h 0m',
+          status: entry.status || 'active'
         });
         console.log(`Setting fetched entry for date: ${date}`);
       });
@@ -125,13 +130,18 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
       const createdEntriesPromises = missingDates.map(async (date) => {
         const newEntry = {
           work_date: date,
-          start_time: '',
-          lunch_start: '',
-          lunch_end: '',
-          end_time: '',
-          total_time: '',
+          facility_start_time: '',
+          facility_lunch_start: '',
+          facility_lunch_end: '',
+          facility_end_time: '',
+          facility_total_hours: '0h 0m',
+          driving_start_time: '',
+          driving_lunch_start: '',
+          driving_lunch_end: '',
+          driving_end_time: '',
+          driving_total_hours: '0h 0m',
           status: 'active',
-          employee_id: employeeId,
+          employee_id: employeeId
         };
 
         console.log(`Creating new entry for date: ${date}`);
@@ -155,12 +165,17 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
           return {
             id: savedEntry.data.id,
             date: savedEntry.data.work_date,
-            startTime: savedEntry.data.start_time || '',
-            lunchStart: savedEntry.data.lunch_start || '',
-            lunchEnd: savedEntry.data.lunch_end || '',
-            endTime: savedEntry.data.end_time || '',
-            totalTime: savedEntry.data.total_time || '0h 0m',
-            status: savedEntry.data.status || 'active',
+            facilityStartTime: savedEntry.data.facility_start_time || '',
+            facilityLunchStart: savedEntry.data.facility_lunch_start || '',
+            facilityLunchEnd: savedEntry.data.facility_lunch_end || '',
+            facilityEndTime: savedEntry.data.facility_end_time || '',
+            facilityTotalHours: savedEntry.data.facility_total_hours || '0h 0m',
+            drivingStartTime: savedEntry.data.driving_start_time || '',
+            drivingLunchStart: savedEntry.data.driving_lunch_start || '',
+            drivingLunchEnd: savedEntry.data.driving_lunch_end || '',
+            drivingEndTime: savedEntry.data.driving_end_time || '',
+            drivingTotalHours: savedEntry.data.driving_total_hours || '0h 0m',
+            status: savedEntry.data.status || 'active'
           };
         } catch (error) {
           console.error(`Error creating entry for ${date}:`, error);
@@ -212,33 +227,33 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
 
 
-  const calculateTotalTime = (start, lunchStart, lunchEnd, end) => {
+  const calculateTotalTime = (startTime, lunchStartTime, lunchEndTime, endTime) => {
     const parseTime = (time) => (time ? moment(time, 'HH:mm') : null);
-    const startTime = parseTime(start);
-    const lunchStartTime = parseTime(lunchStart);
-    const lunchEndTime = parseTime(lunchEnd);
-    const endTime = parseTime(end);
+    const parsedStartTime = parseTime(startTime);
+    const parsedLunchStartTime = parseTime(lunchStartTime);
+    const parsedLunchEndTime = parseTime(lunchEndTime);
+    const parsedEndTime = parseTime(endTime);
 
     let totalMinutes = 0;
 
-    if (startTime && lunchStartTime) {
-      const duration = (lunchStartTime - startTime) / (1000 * 60);
+    if (parsedStartTime && parsedLunchStartTime) {
+      const duration = parsedLunchStartTime.diff(parsedStartTime, 'minutes');
       totalMinutes += Math.max(duration, 0); // Ensure no negative values
     }
 
-    if (lunchEndTime && endTime) {
-      const duration = (endTime - lunchEndTime) / (1000 * 60);
-      totalMinutes += Math.max(duration, 0); 
+    if (parsedLunchEndTime && parsedEndTime) {
+      const duration = parsedEndTime.diff(parsedLunchEndTime, 'minutes');
+      totalMinutes += Math.max(duration, 0);
     }
 
-    if (startTime && endTime && !lunchStartTime && !lunchEndTime) {
-      const duration = (endTime - startTime) / (1000 * 60);
-      totalMinutes += Math.max(duration, 0); 
+    if (parsedStartTime && parsedEndTime && !parsedLunchStartTime && !parsedLunchEndTime) {
+      const duration = parsedEndTime.diff(parsedStartTime, 'minutes');
+      totalMinutes += Math.max(duration, 0);
     }
 
-    if (startTime && lunchStartTime && lunchEndTime && !endTime) {
-      const duration = (lunchStartTime - startTime) / (1000 * 60);
-      totalMinutes += Math.max(duration, 0); 
+    if (parsedStartTime && parsedLunchStartTime && parsedLunchEndTime && !parsedEndTime) {
+      const duration = parsedLunchStartTime.diff(parsedStartTime, 'minutes');
+      totalMinutes += Math.max(duration, 0);
     }
 
     totalMinutes = Math.max(totalMinutes, 0);
@@ -253,28 +268,61 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
 
 
-
   const isWeekday = (date) => {
     const day = moment(date).day();
     return day !== 0 && day !== 6; // Not Sunday (0) or Saturday (6)
   };
 
-  // New function to calculate total time for all entries
+
+
+  // const calculateTotalTimeForAllEntries = () => {
+  //   let facilityTotalMinutes = 0;
+  //   let drivingTotalMinutes = 0;
+
+  //   timeCard.entries.forEach((entry) => {
+  //     const [facilityHours, facilityMinutes] = entry.facilityTotalHours.split(' ').map((val) => parseInt(val) || 0);
+  //     const [drivingHours, drivingMinutes] = entry.drivingTotalHours.split(' ').map((val) => parseInt(val) || 0);
+
+  //     facilityTotalMinutes += facilityHours * 60 + facilityMinutes;
+  //     drivingTotalMinutes += drivingHours * 60 + drivingMinutes;
+  //   });
+
+  //   const totalFacilityHours = Math.floor(facilityTotalMinutes / 60);
+  //   const remainingFacilityMinutes = facilityTotalMinutes % 60;
+  //   const facilityTotalTime = `${totalFacilityHours}h ${remainingFacilityMinutes}m`;
+
+  //   const totalDrivingHours = Math.floor(drivingTotalMinutes / 60);
+  //   const remainingDrivingMinutes = drivingTotalMinutes % 60;
+  //   const drivingTotalTime = `${totalDrivingHours}h ${remainingDrivingMinutes}m`;
+
+  //   return `${facilityTotalTime} / ${drivingTotalTime}`;
+  // };
+
   const calculateTotalTimeForAllEntries = () => {
-    let totalMinutes = 0;
-
+    let facilityTotalMinutes = 0;
+    let drivingTotalMinutes = 0;
+  
     timeCard.entries.forEach((entry) => {
-      // Calculate each entry's total time using the existing function
-      const totalTimeParts = entry.totalTime.split('h');
-      const hours = parseInt(totalTimeParts[0], 10) || 0;
-      const minutes = parseInt(totalTimeParts[1], 10) || 0;
-
-      totalMinutes += hours * 60 + minutes;
+      // Parse facility total time
+      const [facilityHours, facilityMinutes] = entry.facilityTotalHours.split(' ').map((val) => parseInt(val) || 0);
+      facilityTotalMinutes += facilityHours * 60 + facilityMinutes;
+  
+      // Parse driving total time
+      const [drivingHours, drivingMinutes] = entry.drivingTotalHours.split(' ').map((val) => parseInt(val) || 0);
+      drivingTotalMinutes += drivingHours * 60 + drivingMinutes;
     });
-
-    const totalHours = Math.floor(totalMinutes / 60);
-    const remainingMinutes = totalMinutes % 60;
-    return `${totalHours}h ${remainingMinutes}m`;
+  
+    // Calculate total Facility time
+    const totalFacilityHours = Math.floor(facilityTotalMinutes / 60);
+    const remainingFacilityMinutes = facilityTotalMinutes % 60;
+    const facilityTotalTime = `${totalFacilityHours}h ${remainingFacilityMinutes}m`;
+  
+    // Calculate total Driving time
+    const totalDrivingHours = Math.floor(drivingTotalMinutes / 60);
+    const remainingDrivingMinutes = drivingTotalMinutes % 60;
+    const drivingTotalTime = `${totalDrivingHours}h ${remainingDrivingMinutes}m`;
+  
+    return `${facilityTotalTime} / ${drivingTotalTime}`;
   };
 
 
@@ -317,50 +365,118 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
   };
 
 
+  // const handleChange = (index, field, value) => {
+  //   setTimeCard((prevState) => {
+  //     const updatedEntries = [...prevState.entries];
+  //     const entry = updatedEntries[index];
+
+  //     console.log('Current entry before update:', entry);
+
+
+  //     // Check if the entry is already submitted
+  //     if (entry.status === 'submitted') {
+  //       console.log(`Cannot update entry for date ${entry.date} as it is already submitted.`);
+  //       alert(`You cannot modify the entry for ${moment(entry.date).format('MMMM Do, YYYY')} because it has already been submitted.`);
+  //       return prevState; // Return unchanged state if the entry is submitted
+  //     }
+
+  //     // Update the specified field with the new value
+  //     entry[field] = value;
+
+  //     // Validate time order before calculating total time
+  //     if (isValidTimeOrder(entry.facilityStartTime, entry.facilityLunchStart, entry.facilityLunchEnd, entry.facilityEndTime)) {
+  //       // Calculate total time after the update
+  //       entry.facilityTotalHours = calculateTotalTime(
+  //         entry.facilityStartTime,
+  //         entry.facilityLunchStart,
+  //         entry.facilityLunchEnd,
+  //         entry.facilityEndTime
+  //       );
+  //     } else {
+  //       entry.facilityTotalHours = '0h 0m'; // Reset to 0 if times are not valid
+  //     }
+
+  //     if (isValidTimeOrder(entry.drivingStartTime, entry.drivingLunchStart, entry.drivingLunchEnd, entry.drivingEndTime)) {
+  //       // Calculate total time for driving work after the update
+  //       entry.drivingTotalHours = calculateTotalTime(
+  //         entry.drivingStartTime,
+  //         entry.drivingLunchStart,
+  //         entry.drivingLunchEnd,
+  //         entry.drivingEndTime
+  //       );
+  //     } else {
+  //       entry.drivingTotalHours = '0h 0m'; // Reset to 0 if times are not valid
+  //     }
+
+  //     console.log('Updated entry after calculation:', entry);
+
+  //     // Ensure status is active if it is not submitted
+  //     if (entry.status !== 'submitted') {
+  //       entry.status = 'active';
+  //     }
+
+  //     // Set the entry to update for the API call
+  //     setEntryToUpdate(entry);
+
+  //     return { ...prevState, entries: updatedEntries };
+  //   });
+  // };
+
   const handleChange = (index, field, value) => {
     setTimeCard((prevState) => {
       const updatedEntries = [...prevState.entries];
       const entry = updatedEntries[index];
-
-      console.log('Current entry:', entry);
-
+  
+      console.log('Current entry before update:', entry);
+  
       // Check if the entry is already submitted
       if (entry.status === 'submitted') {
         console.log(`Cannot update entry for date ${entry.date} as it is already submitted.`);
         alert(`You cannot modify the entry for ${moment(entry.date).format('MMMM Do, YYYY')} because it has already been submitted.`);
         return prevState; // Return unchanged state if the entry is submitted
       }
-
-
+  
       // Update the specified field with the new value
       entry[field] = value;
-
-
-          // Validate time order before calculating total time
-    if (isValidTimeOrder(entry.startTime, entry.lunchStart, entry.lunchEnd, entry.endTime)) {
-      // Calculate total time after the update
-      entry.totalTime = calculateTotalTime(
-        entry.startTime,
-        entry.lunchStart,
-        entry.lunchEnd,
-        entry.endTime
-      );
-    } else {
-      entry.totalTime = '0h 0m'; // Reset to 0 if times are not valid
-    }
-
-
+  
+      // Validate time order before calculating total time for Facility
+      if (isValidTimeOrder(entry.facilityStartTime, entry.facilityLunchStart, entry.facilityLunchEnd, entry.facilityEndTime)) {
+        entry.facilityTotalHours = calculateTotalTime(
+          entry.facilityStartTime,
+          entry.facilityLunchStart,
+          entry.facilityLunchEnd,
+          entry.facilityEndTime
+        );
+      } else {
+        entry.facilityTotalHours = '0h 0m';
+      }
+  
+      // Validate time order before calculating total time for Driving
+      if (isValidTimeOrder(entry.drivingStartTime, entry.drivingLunchStart, entry.drivingLunchEnd, entry.drivingEndTime)) {
+        entry.drivingTotalHours = calculateTotalTime(
+          entry.drivingStartTime,
+          entry.drivingLunchStart,
+          entry.drivingLunchEnd,
+          entry.drivingEndTime
+        );
+      } else {
+        entry.drivingTotalHours = '0h 0m';
+      }
+  
+      console.log('Updated entry after calculation:', entry);
+  
       // Ensure status is active if it is not submitted
       if (entry.status !== 'submitted') {
         entry.status = 'active';
       }
-
+  
       // Set the entry to update for the API call
       setEntryToUpdate(entry);
-
+  
       return { ...prevState, entries: updatedEntries };
     });
   };
+
 
   useEffect(() => {
     if (!entryToUpdate) return; // Exit if there's no entry to update
@@ -369,12 +485,17 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     const requestPayload = {
       employee_id: employeeId,
       work_date: entryToUpdate.date,
-      start_time: entryToUpdate.startTime || null,
-      lunch_start: entryToUpdate.lunchStart || null,
-      lunch_end: entryToUpdate.lunchEnd || null,
-      end_time: entryToUpdate.endTime || null,
-      total_time: entryToUpdate.totalTime || '0h 0m',
-      status: entryToUpdate.status || 'active',
+      facility_start_time: entryToUpdate.facilityStartTime || null,
+      facility_lunch_start: entryToUpdate.facilityLunchStart || null,
+      facility_lunch_end: entryToUpdate.facilityLunchEnd || null,
+      facility_end_time: entryToUpdate.facilityEndTime || null,
+      facility_total_hours: entryToUpdate.facilityTotalHours || '0h 0m',
+      driving_start_time: entryToUpdate.drivingStartTime || null,
+      driving_lunch_start: entryToUpdate.drivingLunchStart || null,
+      driving_lunch_end: entryToUpdate.drivingLunchEnd || null,
+      driving_end_time: entryToUpdate.drivingEndTime || null,
+      driving_total_hours: entryToUpdate.drivingTotalHours || '0h 0m',
+      status: entryToUpdate.status || 'active'
     };
 
     console.log('Request payload for update:', requestPayload);
@@ -406,13 +527,17 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                 return {
                   ...entry,
                   work_date: result.data.work_date,
-                  start_time: result.data.start_time || '',
-                  lunch_start: result.data.lunch_start || '',
-                  lunch_end: result.data.lunch_end || '',
-                  end_time: result.data.end_time || '',
-                  total_time: result.data.total_time || '0h 0m',
-                  status: result.data.status || 'active',
-
+                  facility_start_time: result.data.facility_start_time || '',
+                  facility_lunch_start: result.data.facility_lunch_start || '',
+                  facility_lunch_end: result.data.facility_lunch_end || '',
+                  facility_end_time: result.data.facility_end_time || '',
+                  facility_total_hours: result.data.facility_total_hours || '0h 0m',
+                  driving_start_time: result.data.driving_start_time || '',
+                  driving_lunch_start: result.data.driving_lunch_start || '',
+                  driving_lunch_end: result.data.driving_lunch_end || '',
+                  driving_end_time: result.data.driving_end_time || '',
+                  driving_total_hours: result.data.driving_total_hours || '0h 0m',
+                  status: result.data.status || 'active'
                 };
               }
               return entry;
@@ -575,7 +700,6 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
   }
 
 
-
   return (
     <div className={`container mt-5 ${styles.container}`}>
       {showConfetti && (
@@ -592,11 +716,10 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
       )}
 
       <div className="text-center mb-3">
-        {/* Submit Button with Conditional Label */}
         <button
           className="btn btn-primary me-3"
           onClick={handleSubmit}
-          disabled={isSubmitting || isSubmitted || isLoading} // Disable if submitting, submitted, or loading
+          disabled={isSubmitting || isSubmitted || isLoading}
         >
           {isSubmitting ? (
             <>
@@ -610,11 +733,10 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
           )}
         </button>
 
-        {/* Reset Button - Optionally disable during submission */}
         <button
           className="btn btn-danger me-3"
           onClick={handleReset}
-          disabled={isSubmitting || isLoading} // Disable if submitting or loading
+          disabled={isSubmitting || isLoading}
         >
           {isLoading ? (
             <>
@@ -626,16 +748,16 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
           )}
         </button>
 
-        {/* Back to Calendar Button */}
-        <button className="btn btn-secondary" onClick={() => navigate('/createNewTimecard')}>Back to Calendar</button>
+        <button className="btn btn-secondary" onClick={() => navigate('/createNewTimecard')}>
+          Back to Calendar
+        </button>
       </div>
 
       <h2 className="text-center mb-4">Active Timecard</h2>
 
       {isLoading ? (
         <div className="text-center">
-          <div className="spinner-border custom-spinner" role="status">
-          </div>
+          <div className="spinner-border custom-spinner" role="status"></div>
           <div className="mt-2">Loading timecard data...</div>
         </div>
       ) : (
@@ -644,82 +766,129 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
             <thead>
               <tr>
                 <th>Date</th>
+                <th>Activity</th>
                 <th>Start Time</th>
                 <th>Lunch Start</th>
+                <th>Activity</th>
                 <th>Lunch End</th>
                 <th>End Time</th>
-                <th>Total Time</th>
+                <th>Facility<br/>Total Time</th>
+                <th>Driving<br/>Total Time</th>
               </tr>
             </thead>
 
             <tbody>
               {timeCard.entries.map((entry, index) => (
                 <tr key={entry.date}>
-                  {/* <td>{formatDate(entry.date)}</td> */}
                   <td>{moment.utc(entry.date).format('dddd, MMM D, YYYY')}</td>
+
+                  {/* Activity (Morning) */}
+                  <td>
+                    <select
+                      value={entry.morningActivity || 'Facility'}
+                      onChange={(e) => handleChange(index, 'morningActivity', e.target.value)}
+                      style={{ width: '84px' }} // 30% narrower from 120px to 84px
+                    >
+                      <option value="Facility">Facility</option>
+                      <option value="Driving">Driving</option>
+                    </select>
+                  </td>
+
+                  {/* Facility or Driving Start Time */}
                   <td>
                     <input
                       type="time"
-                      value={entry.startTime}
-                      onChange={(e) => {
-                        handleChange(index, 'startTime', e.target.value);
-                        validateAMPM(e.target.value, 'startTime'); // Call validation here for mobile users
-                      }}
-                    onBlur={(e) => validateAMPM(e.target.value, 'startTime')}
+                      value={entry.activity === 'Facility' ? entry.facilityStartTime : entry.drivingStartTime}
+                      onChange={(e) => handleChange(index, entry.activity === 'Facility' ? 'facilityStartTime' : 'drivingStartTime', e.target.value)}
+                      onBlur={(e) => validateAMPM(e.target.value, 'startTime')}
                     />
                   </td>
+
+                  {/* Facility or Driving Lunch Start */}
                   <td>
                     <input
                       type="time"
-                      value={entry.lunchStart}
-                      onChange={(e) => {
-                        handleChange(index, 'lunchStart', e.target.value);
-                        validateAMPM(e.target.value, 'lunchStart');
-                      }}
-                    onBlur={(e) => validateAMPM(e.target.value, 'lunchStart')}
+                      value={entry.activity === 'Facility' ? entry.facilityLunchStart : entry.drivingLunchStart}
+                      onChange={(e) => handleChange(index, entry.activity === 'Facility' ? 'facilityLunchStart' : 'drivingLunchStart', e.target.value)}
+                      onBlur={(e) => validateAMPM(e.target.value, 'lunchStart')}
                     />
                   </td>
+
+                  {/* Activity (Afternoon) */}
+                  <td>
+                    <select
+                      value={entry.afternoonActivity || 'Facility'}
+                      onChange={(e) => handleChange(index, 'afternoonActivity', e.target.value)}
+                      style={{ width: '84px' }} // 30% narrower from 120px to 84px
+                    >
+                      <option value="Facility">Facility</option>
+                      <option value="Driving">Driving</option>
+                    </select>
+                  </td>
+
+                  {/* Facility or Driving Lunch End */}
                   <td>
                     <input
                       type="time"
-                      value={entry.lunchEnd}
-                      onChange={(e) => {
-                        handleChange(index, 'lunchEnd', e.target.value);
-                        // validateAMPM(e.target.value, 'lunchEnd');
-                      }}
-                    onBlur={(e) => validateAMPM(e.target.value, 'lunchEnd')}
+                      value={entry.activity === 'Facility' ? entry.facilityLunchEnd : entry.drivingLunchEnd}
+                      onChange={(e) => handleChange(index, entry.activity === 'Facility' ? 'facilityLunchEnd' : 'drivingLunchEnd', e.target.value)}
+                      onBlur={(e) => validateAMPM(e.target.value, 'lunchEnd')}
                     />
                   </td>
+
+                  {/* Facility or Driving End Time */}
                   <td>
                     <input
                       type="time"
-                      value={entry.endTime}
-                      onChange={(e) => {
-                        handleChange(index, 'endTime', e.target.value);
-                        validateAMPM(e.target.value, 'endTime');
-                      }}
-                    onBlur={(e) => validateAMPM(e.target.value, 'endTime')}
+                      value={entry.activity === 'Facility' ? entry.facilityEndTime : entry.drivingEndTime}
+                      onChange={(e) => handleChange(index, entry.activity === 'Facility' ? 'facilityEndTime' : 'drivingEndTime', e.target.value)}
+                      onBlur={(e) => validateAMPM(e.target.value, 'endTime')}
                     />
                   </td>
-                  <td>{entry.totalTime}</td>
+
+                  {/* Facility Total Time */}
+                  <td>{entry.facilityTotalHours}</td>
+                  {/* Driving Total Time */}
+                  <td>{entry.drivingTotalHours}</td>
                 </tr>
               ))}
               <tr>
-                <td colSpan={5} style={{ textAlign: 'right' }}><strong>Total Time:</strong></td>
-                <td>{calculateTotalTimeForAllEntries()}</td>
+                <td colSpan={7} style={{ textAlign: 'right' }}>
+                  <strong>Total Time:</strong>
+                </td>
+                <td>{calculateTotalTimeForAllEntries().split(' / ')[0]}</td>
+                <td>{calculateTotalTimeForAllEntries().split(' / ')[1]}</td>
               </tr>
             </tbody>
-
           </table>
         </div>
       )}
-
     </div>
   );
 
 }
 
 export default ActiveTimeCard;
+
+
+
+
+  // // New function to calculate total time for all entries
+  // const calculateTotalTimeForAllEntries = () => {
+  //   let totalMinutes = 0;
+
+  //   timeCard.entries.forEach((entry) => {
+  //     const facilityMinutes = entry.facilityTotalHours || 0;
+  //     const drivingMinutes = entry.drivingTotalHours || 0;
+
+  //     totalMinutes += facilityMinutes + drivingMinutes;
+  //   });
+
+  //   const totalHours = Math.floor(totalMinutes / 60);
+  //   const remainingMinutes = totalMinutes % 60;
+  //   return `${isNaN(totalHours) ? 0 : totalHours}h ${isNaN(remainingMinutes) ? 0 : remainingMinutes}m`;
+
+  // };
 
 
 // return (
@@ -738,10 +907,11 @@ export default ActiveTimeCard;
 //     )}
 
 //     <div className="text-center mb-3">
+//       {/* Submit Button with Conditional Label */}
 //       <button
 //         className="btn btn-primary me-3"
 //         onClick={handleSubmit}
-//         disabled={isSubmitting || isSubmitted || isLoading}
+//         disabled={isSubmitting || isSubmitted || isLoading} // Disable if submitting, submitted, or loading
 //       >
 //         {isSubmitting ? (
 //           <>
@@ -755,10 +925,11 @@ export default ActiveTimeCard;
 //         )}
 //       </button>
 
+//       {/* Reset Button - Optionally disable during submission */}
 //       <button
 //         className="btn btn-danger me-3"
 //         onClick={handleReset}
-//         disabled={isSubmitting || isLoading}
+//         disabled={isSubmitting || isLoading} // Disable if submitting or loading
 //       >
 //         {isLoading ? (
 //           <>
@@ -770,16 +941,16 @@ export default ActiveTimeCard;
 //         )}
 //       </button>
 
-//       <button className="btn btn-secondary" onClick={() => navigate('/createNewTimecard')}>
-//         Back to Calendar
-//       </button>
+//       {/* Back to Calendar Button */}
+//       <button className="btn btn-secondary" onClick={() => navigate('/createNewTimecard')}>Back to Calendar</button>
 //     </div>
 
 //     <h2 className="text-center mb-4">Active Timecard</h2>
 
 //     {isLoading ? (
 //       <div className="text-center">
-//         <div className="spinner-border custom-spinner" role="status"></div>
+//         <div className="spinner-border custom-spinner" role="status">
+//         </div>
 //         <div className="mt-2">Loading timecard data...</div>
 //       </div>
 //     ) : (
@@ -788,10 +959,8 @@ export default ActiveTimeCard;
 //           <thead>
 //             <tr>
 //               <th>Date</th>
-//               <th>Activity</th>
 //               <th>Start Time</th>
 //               <th>Lunch Start</th>
-//               <th>Activity</th>
 //               <th>Lunch End</th>
 //               <th>End Time</th>
 //               <th>Total Time</th>
@@ -801,85 +970,65 @@ export default ActiveTimeCard;
 //           <tbody>
 //             {timeCard.entries.map((entry, index) => (
 //               <tr key={entry.date}>
+//                 {/* <td>{formatDate(entry.date)}</td> */}
 //                 <td>{moment.utc(entry.date).format('dddd, MMM D, YYYY')}</td>
-
-//                 {/* Activity (First Activity) */}
-//                 <td>
-//                   <select
-//                     value={entry.morningActivity || 'Facility'}
-//                     onChange={(e) => handleChange(index, 'morningActivity', e.target.value)}
-//                     style={{ width: '84px' }} // 30% narrower from 120px to 84px
-//                   >
-//                     <option value="Facility">Facility</option>
-//                     <option value="Driving">Driving</option>
-//                   </select>
-//                 </td>
-
-//                 {/* Start Time */}
 //                 <td>
 //                   <input
 //                     type="time"
 //                     value={entry.startTime}
-//                     onChange={(e) => handleChange(index, 'startTime', e.target.value)}
-//                     onBlur={(e) => validateAMPM(e.target.value, 'startTime')}
+//                     onChange={(e) => {
+//                       handleChange(index, 'startTime', e.target.value);
+//                       validateAMPM(e.target.value, 'startTime'); // Call validation here for mobile users
+//                     }}
+//                   onBlur={(e) => validateAMPM(e.target.value, 'startTime')}
 //                   />
 //                 </td>
-
-//                 {/* Lunch Start */}
 //                 <td>
 //                   <input
 //                     type="time"
 //                     value={entry.lunchStart}
-//                     onChange={(e) => handleChange(index, 'lunchStart', e.target.value)}
-//                     onBlur={(e) => validateAMPM(e.target.value, 'lunchStart')}
+//                     onChange={(e) => {
+//                       handleChange(index, 'lunchStart', e.target.value);
+//                       validateAMPM(e.target.value, 'lunchStart');
+//                     }}
+//                   onBlur={(e) => validateAMPM(e.target.value, 'lunchStart')}
 //                   />
 //                 </td>
-
-//                 {/* Activity (Second Activity) */}
-//                 <td>
-//                   <select
-//                     value={entry.afternoonActivity || 'Facility'}
-//                     onChange={(e) => handleChange(index, 'afternoonActivity', e.target.value)}
-//                     style={{ width: '84px' }} // 30% narrower from 120px to 84px
-//                   >
-//                     <option value="Facility">Facility</option>
-//                     <option value="Driving">Driving</option>
-//                   </select>
-//                 </td>
-
-//                 {/* Lunch End */}
 //                 <td>
 //                   <input
 //                     type="time"
 //                     value={entry.lunchEnd}
-//                     onChange={(e) => handleChange(index, 'lunchEnd', e.target.value)}
-//                     onBlur={(e) => validateAMPM(e.target.value, 'lunchEnd')}
+//                     onChange={(e) => {
+//                       handleChange(index, 'lunchEnd', e.target.value);
+//                       // validateAMPM(e.target.value, 'lunchEnd');
+//                     }}
+//                   onBlur={(e) => validateAMPM(e.target.value, 'lunchEnd')}
 //                   />
 //                 </td>
-
-//                 {/* End Time */}
 //                 <td>
 //                   <input
 //                     type="time"
 //                     value={entry.endTime}
-//                     onChange={(e) => handleChange(index, 'endTime', e.target.value)}
-//                     onBlur={(e) => validateAMPM(e.target.value, 'endTime')}
+//                     onChange={(e) => {
+//                       handleChange(index, 'endTime', e.target.value);
+//                       validateAMPM(e.target.value, 'endTime');
+//                     }}
+//                   onBlur={(e) => validateAMPM(e.target.value, 'endTime')}
 //                   />
 //                 </td>
-
-//                 {/* Total Time */}
 //                 <td>{entry.totalTime}</td>
 //               </tr>
 //             ))}
 //             <tr>
-//               <td colSpan={7} style={{ textAlign: 'right' }}>
-//                 <strong>Total Time:</strong>
-//               </td>
+//               <td colSpan={5} style={{ textAlign: 'right' }}><strong>Total Time:</strong></td>
 //               <td>{calculateTotalTimeForAllEntries()}</td>
 //             </tr>
 //           </tbody>
+
 //         </table>
 //       </div>
 //     )}
+
 //   </div>
 // );
+
