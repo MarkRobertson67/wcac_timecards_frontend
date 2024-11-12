@@ -38,7 +38,7 @@ function Home() {
 
   return (
     <div className="container mt-5">
-      <h1 className="text-center mb-4">Welcome to the Timecards Home Page</h1>
+      <h1 className="text-center mb-4">Please Login to access your account</h1>
       <form onSubmit={handleSubmit} className="card p-3 mx-auto" style={{ maxWidth: '400px' }}>
         <div className="mb-3">
           <input
