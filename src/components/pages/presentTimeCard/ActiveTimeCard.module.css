@@ -15,9 +15,9 @@ See LICENSE.txt file for details. */
 
 /* Container for layout and footer spacing */
 .container {
-  max-width: 900px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding-bottom: 150px; /* Space for footer */
+  padding-bottom: 90px; /* Space for footer */
 }
 
 /* Ensure table fills the container width */
