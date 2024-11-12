@@ -219,33 +219,30 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     fetchData();
   }, [fetchTimeCardData]);
 
-  const calculateTotalTime = (startTime, lunchStartTime, lunchEndTime, endTime) => {
+  const calculateTotalTime = (start, lunchStart, lunchEnd, end) => {
+
     const parseTime = (time) => (time ? moment(time, 'HH:mm') : null);
-    const parsedStartTime = parseTime(startTime);
-    const parsedLunchStartTime = parseTime(lunchStartTime);
-    const parsedLunchEndTime = parseTime(lunchEndTime);
-    const parsedEndTime = parseTime(endTime);
+    const startTime = parseTime(start);
+    const lunchStartTime = parseTime(lunchStart);
+    const lunchEndTime = parseTime(lunchEnd);
+    const endTime = parseTime(end);
 
     let totalMinutes = 0;
 
-    if (parsedStartTime && parsedLunchStartTime) {
-      const duration = parsedLunchStartTime.diff(parsedStartTime, 'minutes');
-      totalMinutes += Math.max(duration, 0); // Ensure no negative values
+    if (startTime && lunchStartTime) {
+      totalMinutes += (lunchStartTime - startTime) / (1000 * 60);
     }
 
-    if (parsedLunchEndTime && parsedEndTime) {
-      const duration = parsedEndTime.diff(parsedLunchEndTime, 'minutes');
-      totalMinutes += Math.max(duration, 0);
+    if (lunchEndTime && endTime) {
+      totalMinutes += (endTime - lunchEndTime) / (1000 * 60);
     }
 
-    if (parsedStartTime && parsedEndTime && !parsedLunchStartTime && !parsedLunchEndTime) {
-      const duration = parsedEndTime.diff(parsedStartTime, 'minutes');
-      totalMinutes += Math.max(duration, 0);
+    if (startTime && endTime && !lunchStartTime && !lunchEndTime) {
+      totalMinutes = (endTime - startTime) / (1000 * 60);
     }
 
-    if (parsedStartTime && parsedLunchStartTime && parsedLunchEndTime && !parsedEndTime) {
-      const duration = parsedLunchStartTime.diff(parsedStartTime, 'minutes');
-      totalMinutes += Math.max(duration, 0);
+    if (startTime && lunchStartTime && lunchEndTime && !endTime) {
+      totalMinutes = (lunchStartTime - startTime) / (1000 * 60);
     }
 
     totalMinutes = Math.max(totalMinutes, 0);
@@ -255,8 +252,10 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
     const totalTime = `${hours}h ${minutes}m`;
     console.log('Calculated Total Time:', totalTime);
-    return totalTime || '0h 0m';
+    return totalTime || '00:00';
   };
+
+
 
   const isWeekday = (date) => {
     const day = moment(date).day();
@@ -602,7 +601,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
   }
 
   return (
-    <div className={`container-fluid mt-5 ${styles.container}`}>
+    <div className={`container-fluid mt-4 ${styles.container}`}>
       {showConfetti && (
         <Confetti
           width={width}
