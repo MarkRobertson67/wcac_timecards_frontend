@@ -21,7 +21,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const navigate = useNavigate();
-  const employeeId = 1;
+  const employeeId = 2;
 
   // Get window size for Confetti
   const { width, height } = useWindowSize();
@@ -57,6 +57,8 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     return moment(startDate).add(13, 'days'); // Two-week period
   };
 
+
+
   const fetchTimeCardData = useCallback(async (startDate) => {
     try {
       // Set loading state
@@ -86,21 +88,22 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
       const fetchedEntriesMap = new Map();
       fetchedData.data.forEach(entry => {
         const date = moment.utc(entry.work_date).format('YYYY-MM-DD');
-        //const totalTime = entry.total_time ? `${entry.total_time.hours}h ${entry.total_time.minutes}m` : '0h 0m';
         fetchedEntriesMap.set(date, {
           id: entry.id,
           date,
-          facilityStartTime: entry.facility_start_time || '',
-          facilityLunchStart: entry.facility_lunch_start || '',
-          facilityLunchEnd: entry.facility_lunch_end || '',
-          facilityEndTime: entry.facility_end_time || '',
-          facilityTotalHours: typeof entry.facility_total_hours === 'string' ? entry.facility_total_hours : '0h 0m',
-          drivingStartTime: entry.driving_start_time || '',
-          drivingLunchStart: entry.driving_lunch_start || '',
-          drivingLunchEnd: entry.driving_lunch_end || '',
-          drivingEndTime: entry.driving_end_time || '',
-          drivingTotalHours: typeof entry.driving_total_hours === 'string' ? entry.driving_total_hours : '0h 0m',
-          status: entry.status || 'active'
+          morningActivity: entry.morning_activity || 'Facility',
+    afternoonActivity: entry.afternoon_activity || 'Facility',
+    facilityStartTime: entry.facility_start_time || '',
+    facilityLunchStart: entry.facility_lunch_start || '',
+    facilityLunchEnd: entry.facility_lunch_end || '',
+    facilityEndTime: entry.facility_end_time || '',
+    facilityTotalHours: typeof entry.facility_total_hours === 'string' ? entry.facility_total_hours : '0h 0m',
+    drivingStartTime: entry.driving_start_time || '',
+    drivingLunchStart: entry.driving_lunch_start || '',
+    drivingLunchEnd: entry.driving_lunch_end || '',
+    drivingEndTime: entry.driving_end_time || '',
+    drivingTotalHours: typeof entry.driving_total_hours === 'string' ? entry.driving_total_hours : '0h 0m',
+    status: entry.status || 'active',
         });
         console.log(`Setting fetched entry for date: ${date}`);
       });
@@ -219,7 +222,11 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     fetchData();
   }, [fetchTimeCardData]);
 
+
+
   const calculateTotalTime = (start, lunchStart, lunchEnd, end) => {
+    console.log('Calculating total time with:', { start, lunchStart, lunchEnd, end });
+
 
     const parseTime = (time) => (time ? moment(time, 'HH:mm') : null);
     const startTime = parseTime(start);
@@ -267,7 +274,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     let drivingTotalMinutes = 0;
 
     timeCard.entries.forEach((entry) => {
-      console.log('Current entry for total time calculation:', entry);
+      //console.log('Current entry for total time calculation:', entry);
       if (typeof entry.facilityTotalHours === 'string') {
         const [facilityHours, facilityMinutes] = entry.facilityTotalHours.split(' ').map((val) => parseInt(val) || 0);
         facilityTotalMinutes += facilityHours * 60 + facilityMinutes;
@@ -331,69 +338,301 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     return true;
   };
 
+  // const handleChange = (index, field, value) => {
+  //   setTimeCard((prevState) => {
+  //     const updatedEntries = [...prevState.entries];
+  //     const entry = updatedEntries[index];
+
+  //     console.log('Current entry before update:', entry);
+
+  //     // Check if the entry is already submitted
+  //     if (entry.status === 'submitted') {
+  //       console.log(`Cannot update entry for date ${entry.date} as it is already submitted.`);
+  //       alert(`You cannot modify the entry for ${moment(entry.date).format('MMMM Do, YYYY')} because it has already been submitted.`);
+  //       return prevState; // Return unchanged state if the entry is submitted
+  //     }
+
+  //     // Update the specified field with the new value
+  //     entry[field] = value;
+
+  //     // Validate time order before calculating total time
+  //     if (isValidTimeOrder(entry.facilityStartTime, entry.facilityLunchStart, entry.facilityLunchEnd, entry.facilityEndTime)) {
+  //       // Calculate total time after the update
+  //       entry.facilityTotalHours = calculateTotalTime(
+  //         entry.facilityStartTime,
+  //         entry.facilityLunchStart,
+  //         entry.facilityLunchEnd,
+  //         entry.facilityEndTime
+  //       );
+  //     } else {
+  //       entry.facilityTotalHours = '0h 0m'; // Reset to 0 if times are not valid
+  //     }
+
+  //     if (isValidTimeOrder(entry.drivingStartTime, entry.drivingLunchStart, entry.drivingLunchEnd, entry.drivingEndTime)) {
+  //       // Calculate total time for driving work after the update
+  //       entry.drivingTotalHours = calculateTotalTime(
+  //         entry.drivingStartTime,
+  //         entry.drivingLunchStart,
+  //         entry.drivingLunchEnd,
+  //         entry.drivingEndTime
+  //       );
+  //     } else {
+  //       entry.drivingTotalHours = '0h 0m'; // Reset to 0 if times are not valid
+  //     }
+
+  //     console.log('Updated entry after calculation:', entry);
+
+  //     // Ensure status is active if it is not submitted
+  //     if (entry.status !== 'submitted') {
+  //       entry.status = 'active';
+  //     }
+
+  //     // Set the entry to update for the API call
+  //     setEntryToUpdate(entry);
+
+  //     return { ...prevState, entries: updatedEntries };
+  //   });
+  // };
+
+  // useEffect(() => {
+  //   if (!entryToUpdate) return; // Exit if there's no entry to update
+
+  //   // Construct the payload based on the updated entry
+  //   const requestPayload = {
+  //     employee_id: employeeId,
+  //     work_date: entryToUpdate.date,
+  //     facility_start_time: entryToUpdate.facilityStartTime || null,
+  //     facility_lunch_start: entryToUpdate.facilityLunchStart || null,
+  //     facility_lunch_end: entryToUpdate.facilityLunchEnd || null,
+  //     facility_end_time: entryToUpdate.facilityEndTime || null,
+  //     facility_total_hours: typeof entryToUpdate.facilityTotalHours === 'string' ? entryToUpdate.facilityTotalHours : '0h 0m',
+  //     driving_start_time: entryToUpdate.drivingStartTime || null,
+  //     driving_lunch_start: entryToUpdate.drivingLunchStart || null,
+  //     driving_lunch_end: entryToUpdate.drivingLunchEnd || null,
+  //     driving_end_time: entryToUpdate.drivingEndTime || null,
+  //     driving_total_hours: typeof entryToUpdate.drivingTotalHours === 'string' ? entryToUpdate.drivingTotalHours : '0h 0m',
+  //     status: entryToUpdate.status || 'active'
+  //   };
+
+  //   console.log('Request payload for update:', requestPayload);
+
+  //   const updateEntry = async () => {
+  //     try {
+  //       const response = await fetch(`${API}/timecards/${entryToUpdate.id}`, {
+  //         method: 'PUT',
+  //         headers: { 'Content-Type': 'application/json' },
+  //         body: JSON.stringify(requestPayload),
+  //       });
+
+  //       console.log("Fetched data:", response)
+
+  //       if (!response.ok) {
+  //         const errorText = await response.text();
+  //         throw new Error(`Failed to save entry: ${errorText}`);
+  //       }
+
+  //       const result = await response.json();
+  //       console.log('Response from server:', result);
+
+  //       // Update local state with the server response
+  //       setTimeCard((prevState) => {
+  //         return {
+  //           ...prevState,
+  //           entries: prevState.entries.map((entry) => {
+  //             if (entry.id === result.data.id) {
+  //               return {
+  //                 ...entry,
+  //                 work_date: result.data.work_date,
+  //                 facility_start_time: result.data.facility_start_time || '',
+  //                 facility_lunch_start: result.data.facility_lunch_start || '',
+  //                 facility_lunch_end: result.data.facility_lunch_end || '',
+  //                 facility_end_time: result.data.facility_end_time || '',
+  //                 facility_total_hours: typeof result.data.facility_total_hours === 'string' ? result.data.facility_total_hours : '0h 0m',
+  //                 driving_start_time: result.data.driving_start_time || '',
+  //                 driving_lunch_start: result.data.driving_lunch_start || '',
+  //                 driving_lunch_end: result.data.driving_lunch_end || '',
+  //                 driving_end_time: result.data.driving_end_time || '',
+  //                 driving_total_hours: typeof result.data.driving_total_hours === 'string' ? result.data.driving_total_hours : '0h 0m',
+  //                 status: result.data.status || 'active'
+  //               };
+  //             }
+  //             return entry;
+  //           }),
+  //         };
+  //       });
+
+  //       console.log(`Successfully updated timecard with ID ${result.data.id} for date: ${result.data.work_date}`);
+  //     } catch (error) {
+  //       console.error(`Error during PUT operation:`, error);
+  //       alert(`Error saving timecard entry: ${error.message}`);
+  //     }
+  //   };
+
+  //   updateEntry(); // Call the function to perform the API update
+
+  //   setEntryToUpdate(null); // Reset after update
+  // }, [entryToUpdate]); // Run this effect whenever entryToUpdate changes
+
   const handleChange = (index, field, value) => {
+    // Log the current arguments received by the function
+  console.log("handleChange called with:", { index, field, value });
     setTimeCard((prevState) => {
       const updatedEntries = [...prevState.entries];
       const entry = updatedEntries[index];
 
-      console.log('Current entry before update:', entry);
+      // Set default activity if none is selected or provided
+if (field === "morning_activity" && (value === undefined || value === null || value === "")) {
+  entry.morning_activity = "Facility";
+} else if (field === "afternoon_activity" && (value === undefined || value === null || value === "")) {
+  entry.afternoon_activity = "Facility";
+} else {
+  entry[field] = value;
+}
 
+  
+      console.log('Current entry before update:', entry);
+  
       // Check if the entry is already submitted
       if (entry.status === 'submitted') {
         console.log(`Cannot update entry for date ${entry.date} as it is already submitted.`);
         alert(`You cannot modify the entry for ${moment(entry.date).format('MMMM Do, YYYY')} because it has already been submitted.`);
         return prevState; // Return unchanged state if the entry is submitted
       }
-
+  
       // Update the specified field with the new value
       entry[field] = value;
 
-      // Validate time order before calculating total time
-      if (isValidTimeOrder(entry.facilityStartTime, entry.facilityLunchStart, entry.facilityLunchEnd, entry.facilityEndTime)) {
-        // Calculate total time after the update
-        entry.facilityTotalHours = calculateTotalTime(
-          entry.facilityStartTime,
-          entry.facilityLunchStart,
-          entry.facilityLunchEnd,
-          entry.facilityEndTime
-        );
-      } else {
-        entry.facilityTotalHours = '0h 0m'; // Reset to 0 if times are not valid
-      }
+//     // Set morning or afternoon activity based on the field updated
+//       if (field === 'morning_activity' || field === 'afternoon_activity') {
+//         console.log(`Activity change detected: ${field} to ${value}`);
 
-      if (isValidTimeOrder(entry.drivingStartTime, entry.drivingLunchStart, entry.drivingLunchEnd, entry.drivingEndTime)) {
-        // Calculate total time for driving work after the update
-        entry.drivingTotalHours = calculateTotalTime(
-          entry.drivingStartTime,
-          entry.drivingLunchStart,
-          entry.drivingLunchEnd,
-          entry.drivingEndTime
-        );
-      } else {
-        entry.drivingTotalHours = '0h 0m'; // Reset to 0 if times are not valid
-      }
+//     // Determine if activity is Driving or Facility
+//       if (value === 'Driving') {
+//     // Save times for driving if activity is Driving
+//     entry.drivingStartTime = entry.drivingStartTime || null;
+//     entry.drivingLunchStart = entry.drivingLunchStart || null;
+//     entry.drivingLunchEnd = entry.drivingLunchEnd || null;
+//     entry.drivingEndTime = entry.drivingEndTime || null;
+
+//     if (isValidTimeOrder(entry.drivingStartTime, entry.drivingLunchStart, entry.drivingLunchEnd, entry.drivingEndTime)) {
+//       entry.drivingTotalHours = calculateTotalTime(
+//         entry.drivingStartTime,
+//         entry.drivingLunchStart,
+//         entry.drivingLunchEnd,
+//         entry.drivingEndTime
+//       );
+//     } 
+//     // else {
+//     //   entry.drivingTotalHours = '0h 0m'; // Reset to 0 if times are not valid
+//     // }
+//   } else if (value === 'Facility') {
+//     // Save times for facility if activity is Facility
+//     entry.facilityStartTime = entry.facilityStartTime || null;
+//     entry.facilityLunchStart = entry.facilityLunchStart || null;
+//     entry.facilityLunchEnd = entry.facilityLunchEnd || null;
+//     entry.facilityEndTime = entry.facilityEndTime || null;
+
+//     if (isValidTimeOrder(entry.facilityStartTime, entry.facilityLunchStart, entry.facilityLunchEnd, entry.facilityEndTime)) {
+//       entry.facilityTotalHours = calculateTotalTime(
+//         entry.facilityStartTime,
+//         entry.facilityLunchStart,
+//         entry.facilityLunchEnd,
+//         entry.facilityEndTime
+//       );
+//     } 
+//     // else {
+//     //   entry.facilityTotalHours = '0h 0m'; // Reset to 0 if times are not valid
+//     // }
+//   }
+// }
+
+      // Update activity dropdown (morning or afternoon)
+if (field === 'morning_activity' || field === 'afternoon_activity') {
+  entry[field] = value;
+
+  // Clear related fields when switching activities
+  if (value === 'Facility') {
+    // Clear driving fields if switching to Facility
+    entry.drivingStartTime = null;
+    entry.drivingLunchStart = null;
+    entry.drivingLunchEnd = null;
+    entry.drivingEndTime = null;
+  } else if (value === 'Driving') {
+    // Clear facility fields if switching to Driving
+    entry.facilityStartTime = null;
+    entry.facilityLunchStart = null;
+    entry.facilityLunchEnd = null;
+    entry.facilityEndTime = null;
+  }
+} else {
+  // Update time fields based on the current activity selection
+  if (entry.morning_activity === 'Facility') {
+    if (field.startsWith('driving')) {
+      // Prevent updating driving fields when activity is Facility
+      console.warn(`Ignoring driving field update for Facility activity`);
+    } else {
+      entry[field] = value;
+    }
+  } else if (entry.morning_activity === 'Driving') {
+    if (field.startsWith('facility')) {
+      // Prevent updating facility fields when activity is Driving
+      console.warn(`Ignoring facility field update for Driving activity`);
+    } else {
+      entry[field] = value;
+    }
+  }
+// Validate time order and calculate total time after time change
+if (isValidTimeOrder(entry.facilityStartTime, entry.facilityLunchStart, entry.facilityLunchEnd, entry.facilityEndTime)) {
+  entry.facilityTotalHours = calculateTotalTime(
+    entry.facilityStartTime,
+    entry.facilityLunchStart,
+    entry.facilityLunchEnd,
+    entry.facilityEndTime
+  );
+} else {
+  entry.facilityTotalHours = '0h 0m';
+}
+
+if (isValidTimeOrder(entry.drivingStartTime, entry.drivingLunchStart, entry.drivingLunchEnd, entry.drivingEndTime)) {
+  entry.drivingTotalHours = calculateTotalTime(
+    entry.drivingStartTime,
+    entry.drivingLunchStart,
+    entry.drivingLunchEnd,
+    entry.drivingEndTime
+  );
+} else {
+  entry.drivingTotalHours = '0h 0m';
+}
+}
+
+
+
 
       console.log('Updated entry after calculation:', entry);
-
+  
       // Ensure status is active if it is not submitted
       if (entry.status !== 'submitted') {
         entry.status = 'active';
       }
-
+  
       // Set the entry to update for the API call
       setEntryToUpdate(entry);
-
+  
       return { ...prevState, entries: updatedEntries };
     });
   };
-
+  
+  // Update useEffect to include activity in the payload
+  
   useEffect(() => {
     if (!entryToUpdate) return; // Exit if there's no entry to update
-
+  
     // Construct the payload based on the updated entry
     const requestPayload = {
       employee_id: employeeId,
       work_date: entryToUpdate.date,
+      morning_activity: entryToUpdate.morningActivity || 'Facility', // Default to Facility if null
+      afternoon_activity: entryToUpdate.afternoonActivity || 'Facility', // Default to Facility if null
       facility_start_time: entryToUpdate.facilityStartTime || null,
       facility_lunch_start: entryToUpdate.facilityLunchStart || null,
       facility_lunch_end: entryToUpdate.facilityLunchEnd || null,
@@ -404,11 +643,11 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
       driving_lunch_end: entryToUpdate.drivingLunchEnd || null,
       driving_end_time: entryToUpdate.drivingEndTime || null,
       driving_total_hours: typeof entryToUpdate.drivingTotalHours === 'string' ? entryToUpdate.drivingTotalHours : '0h 0m',
-      status: entryToUpdate.status || 'active'
+      status: entryToUpdate.status || 'active',
     };
-
+  
     console.log('Request payload for update:', requestPayload);
-
+  
     const updateEntry = async () => {
       try {
         const response = await fetch(`${API}/timecards/${entryToUpdate.id}`, {
@@ -416,17 +655,17 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(requestPayload),
         });
-
-        console.log("Fetched data:", response)
-
+  
+        console.log('Fetched data:', response);
+  
         if (!response.ok) {
           const errorText = await response.text();
           throw new Error(`Failed to save entry: ${errorText}`);
         }
-
+  
         const result = await response.json();
         console.log('Response from server:', result);
-
+  
         // Update local state with the server response
         setTimeCard((prevState) => {
           return {
@@ -436,6 +675,8 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                 return {
                   ...entry,
                   work_date: result.data.work_date,
+                  morning_activity: result.data.morning_activity || 'Facility',
+                  afternoon_activity: result.data.afternoon_activity || 'Facility',
                   facility_start_time: result.data.facility_start_time || '',
                   facility_lunch_start: result.data.facility_lunch_start || '',
                   facility_lunch_end: result.data.facility_lunch_end || '',
@@ -446,25 +687,28 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                   driving_lunch_end: result.data.driving_lunch_end || '',
                   driving_end_time: result.data.driving_end_time || '',
                   driving_total_hours: typeof result.data.driving_total_hours === 'string' ? result.data.driving_total_hours : '0h 0m',
-                  status: result.data.status || 'active'
+                  status: result.data.status || 'active',
                 };
               }
               return entry;
             }),
           };
         });
-
+  
         console.log(`Successfully updated timecard with ID ${result.data.id} for date: ${result.data.work_date}`);
       } catch (error) {
         console.error(`Error during PUT operation:`, error);
         alert(`Error saving timecard entry: ${error.message}`);
       }
     };
-
+  
     updateEntry(); // Call the function to perform the API update
-
+  
     setEntryToUpdate(null); // Reset after update
   }, [entryToUpdate]); // Run this effect whenever entryToUpdate changes
+  
+
+
 
   const handleSubmit = async () => {
     const twoWeekPeriod = timeCard.entries;
@@ -548,7 +792,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
   };
 
   const handleReset = async () => {
-    if (timeCard.isSubmitted) {
+    if (timeCard.entries.some(entry => entry.status === 'submitted')) {
       alert("Cannot reset a submitted timecard.");
       return;
     }
@@ -557,9 +801,8 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     if (!confirmation) return;
 
     try {
-      setIsLoading(true); // Set loading state to true before starting the reset process.
+      setIsLoading(true);
 
-      // Deleting entries from the database
       await Promise.all(
         timeCard.entries.map(async (entry) => {
           if (entry.id) {
@@ -579,7 +822,6 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
         })
       );
 
-      // Reset the timecard state and navigate to create a new timecard
       setTimeCard({ entries: [], isSubmitted: false });
       localStorage.removeItem('currentTimeCard');
       localStorage.removeItem('startDate');
@@ -589,7 +831,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
       console.error('Error deleting entries:', error);
       alert('An error occurred while trying to reset the timecard. Please try again.');
     } finally {
-      setIsLoading(false); // Ensure loading state is false after operation is complete.
+      setIsLoading(false);
     }
   };
 
@@ -662,7 +904,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
         </div>
       ) : (
         <div className="table-responsive">
-          <table className="table table-bordered table-sm"> {/* Ensure table-sm is still there for compactness */}
+          <table className="table table-bordered table-sm">
           <thead>
               <tr>
                 <th>Date</th>
@@ -678,88 +920,186 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
             </thead>
 
             <tbody>
-              {timeCard.entries.map((entry, index) => (
-                <tr key={entry.date}>
-                  <td>{moment.utc(entry.date).format('dddd, MMM D, YYYY')}</td>
+  {timeCard.entries.map((entry, index) => (
+    <tr key={entry.date}>
+      <td>{moment.utc(entry.date).format('dddd, MMM D, YYYY')}</td>
 
-                  {/* Activity (Morning) */}
-                  <td>
-                    <select
-                      value={entry.morningActivity || 'Facility'}
-                      onChange={(e) => handleChange(index, 'morningActivity', e.target.value)}
-                      style={{ width: '84px' }} // 30% narrower from 120px to 84px
-                    >
-                      <option value="Facility">Facility</option>
-                      <option value="Driving">Driving</option>
-                    </select>
-                  </td>
+      {/* Activity (Morning) */}
+      <td>
+        <select
+          value={entry.morningActivity || 'Facility'}
+          onChange={(e) => handleChange(index, 'morningActivity', e.target.value)}
+          style={{ width: '84px' }}
+        >
+          <option value="Facility">Facility</option>
+          <option value="Driving">Driving</option>
+        </select>
+      </td>
 
-                  {/* Facility or Driving Start Time */}
-                  <td>
-                    <input
-                      type="time"
-                      value={entry.activity === 'Facility' ? entry.facilityStartTime : entry.drivingStartTime}
-                      onChange={(e) => handleChange(index, entry.activity === 'Facility' ? 'facilityStartTime' : 'drivingStartTime', e.target.value)}
-                      onBlur={(e) => validateAMPM(e.target.value, 'startTime')}
-                    />
-                  </td>
+      {/* Facility or Driving Start Time */}
+      {/* <td>
+        <input
+          type="time"
+          value={entry.activity === 'Facility' ? entry.facilityStartTime : entry.drivingStartTime}
+          onChange={(e) =>
+            handleChange(index, entry.activity === 'Facility' ? 'facilityStartTime' : 'drivingStartTime', e.target.value)
+          }
+          onBlur={(e) => validateAMPM(e.target.value, 'startTime')}
+        />
+      </td> */}
+      <td>
+  <input
+    type="time"
+    value={
+      entry.morning_activity === 'Facility'
+        ? entry.facilityStartTime
+        : entry.morning_activity === 'Driving'
+        ? entry.drivingStartTime
+        : '' // Fallback to an empty value if neither activity is set
+    }
+    onChange={(e) =>
+      handleChange(
+        index,
+        entry.morning_activity === 'Facility' ? 'facilityStartTime' : 'drivingStartTime',
+        e.target.value
+      )
+    }
+    onBlur={(e) => validateAMPM(e.target.value, 'startTime')}
+  />
+</td>
 
-                  {/* Facility or Driving Lunch Start */}
-                  <td>
-                    <input
-                      type="time"
-                      value={entry.activity === 'Facility' ? entry.facilityLunchStart : entry.drivingLunchStart}
-                      onChange={(e) => handleChange(index, entry.activity === 'Facility' ? 'facilityLunchStart' : 'drivingLunchStart', e.target.value)}
-                      onBlur={(e) => validateAMPM(e.target.value, 'lunchStart')}
-                    />
-                  </td>
+     
 
-                  {/* Activity (Afternoon) */}
-                  <td>
-                    <select
-                      value={entry.afternoonActivity || 'Facility'}
-                      onChange={(e) => handleChange(index, 'afternoonActivity', e.target.value)}
-                      style={{ width: '84px' }} // 30% narrower from 120px to 84px
-                    >
-                      <option value="Facility">Facility</option>
-                      <option value="Driving">Driving</option>
-                    </select>
-                  </td>
+      {/* Facility or Driving Lunch Start */}
+      {/* <td>
+        <input
+          type="time"
+          value={entry.activity === 'Facility' ? entry.facilityLunchStart : entry.drivingLunchStart}
+          onChange={(e) =>
+            handleChange(index, entry.activity === 'Facility' ? 'facilityLunchStart' : 'drivingLunchStart', e.target.value)
+          }
+          onBlur={(e) => validateAMPM(e.target.value, 'lunchStart')}
+        />
+      </td> */}
+      <td>
+  <input
+    type="time"
+    value={
+      entry.morning_activity === 'Facility'
+        ? entry.facilityLunchStart
+        : entry.morning_activity === 'Driving'
+        ? entry.drivingLunchStart
+        : '' // Fallback to an empty value if neither activity is set
+    }
+    onChange={(e) =>
+      handleChange(
+        index,
+        entry.morning_activity === 'Facility' ? 'facilityLunchStart' : 'drivingLunchStart',
+        e.target.value
+      )
+    }
+    onBlur={(e) => validateAMPM(e.target.value, 'lunchStart')}
+  />
+</td>
 
-                  {/* Facility or Driving Lunch End */}
-                  <td>
-                    <input
-                      type="time"
-                      value={entry.activity === 'Facility' ? entry.facilityLunchEnd : entry.drivingLunchEnd}
-                      onChange={(e) => handleChange(index, entry.activity === 'Facility' ? 'facilityLunchEnd' : 'drivingLunchEnd', e.target.value)}
-                      onBlur={(e) => validateAMPM(e.target.value, 'lunchEnd')}
-                    />
-                  </td>
+      
 
-                  {/* Facility or Driving End Time */}
-                  <td>
-                    <input
-                      type="time"
-                      value={entry.activity === 'Facility' ? entry.facilityEndTime : entry.drivingEndTime}
-                      onChange={(e) => handleChange(index, entry.activity === 'Facility' ? 'facilityEndTime' : 'drivingEndTime', e.target.value)}
-                      onBlur={(e) => validateAMPM(e.target.value, 'endTime')}
-                    />
-                  </td>
+      {/* Activity (Afternoon) */}
+      <td>
+        <select
+          value={entry.afternoonActivity || 'Facility'}
+          onChange={(e) => handleChange(index, 'afternoonActivity', e.target.value)}
+          style={{ width: '84px' }}
+        >
+          <option value="Facility">Facility</option>
+          <option value="Driving">Driving</option>
+        </select>
+      </td>
 
-                  {/* Facility Total Time */}
-                  <td>{entry.facilityTotalHours}</td>
-                  {/* Driving Total Time */}
-                  <td>{entry.drivingTotalHours}</td>
-                </tr>
-              ))}
-              <tr>
-                <td colSpan={7} style={{ textAlign: 'right' }}>
-                  <strong>Total Time:</strong>
-                </td>
-                <td>{calculateTotalTimeForAllEntries().split(' / ')[0]}</td>
-                <td>{calculateTotalTimeForAllEntries().split(' / ')[1]}</td>
-              </tr>
-            </tbody>
+      {/* Facility or Driving Lunch End */}
+      {/* <td>
+        <input
+          type="time"
+          value={entry.activity === 'Facility' ? entry.facilityLunchEnd : entry.drivingLunchEnd}
+          onChange={(e) =>
+            handleChange(index, entry.activity === 'Facility' ? 'facilityLunchEnd' : 'drivingLunchEnd', e.target.value)
+          }
+          onBlur={(e) => validateAMPM(e.target.value, 'lunchEnd')}
+        />
+      </td> */}
+      <td>
+  <input
+    type="time"
+    value={
+      entry.afternoon_activity === 'Facility'
+        ? entry.facilityLunchEnd
+        : entry.afternoon_activity === 'Driving'
+        ? entry.drivingLunchEnd
+        : '' // Fallback to an empty value if neither activity is set
+    }
+    onChange={(e) =>
+      handleChange(
+        index,
+        entry.afternoon_activity === 'Facility' ? 'facilityLunchEnd' : 'drivingLunchEnd',
+        e.target.value
+      )
+    }
+    onBlur={(e) => validateAMPM(e.target.value, 'lunchEnd')}
+  />
+</td>
+
+      
+
+      {/* Facility or Driving End Time */}
+      {/* <td>
+        <input
+          type="time"
+          value={entry.activity === 'Facility' ? entry.facilityEndTime : entry.drivingEndTime}
+          onChange={(e) =>
+            handleChange(index, entry.activity === 'Facility' ? 'facilityEndTime' : 'drivingEndTime', e.target.value)
+          }
+          onBlur={(e) => validateAMPM(e.target.value, 'endTime')}
+        />
+      </td> */}
+      <td>
+  <input
+    type="time"
+    value={
+      entry.afternoon_activity === 'Facility'
+        ? entry.facilityEndTime
+        : entry.afternoon_activity === 'Driving'
+        ? entry.drivingEndTime
+        : '' // Fallback to an empty value if neither activity is set
+    }
+    onChange={(e) =>
+      handleChange(
+        index,
+        entry.afternoon_activity === 'Facility' ? 'facilityEndTime' : 'drivingEndTime',
+        e.target.value
+      )
+    }
+    onBlur={(e) => validateAMPM(e.target.value, 'endTime')}
+  />
+</td>
+
+      
+
+      {/* Facility Total Time */}
+      <td>{entry.facilityTotalHours}</td>
+
+      {/* Driving Total Time */}
+      <td>{entry.drivingTotalHours}</td>
+    </tr>
+  ))}
+  <tr>
+    <td colSpan={7} style={{ textAlign: 'right' }}>
+      <strong>Total Time:</strong>
+    </td>
+    <td>{calculateTotalTimeForAllEntries().split(' / ')[0]}</td>
+    <td>{calculateTotalTimeForAllEntries().split(' / ')[1]}</td>
+  </tr>
+</tbody>
+
           </table>
         </div>
       )}
