@@ -3,10 +3,6 @@
 // See LICENSE.txt file for details.
 
 
-// Proprietary Software License
-// Copyright (c) 2024 Mark Robertson
-// See LICENSE.txt file for details.
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -245,7 +241,8 @@ function TimeCardReports() {
               start_date: startDate,
               end_date: endDate,
               employee_id: 'ALL',
-              total_hours: { hours: 0, minutes: 0 }
+              facility_total_hours: { hours: 0, minutes: 0 },
+              driving_total_hours: { hours: 0, minutes: 0 }
             }];
 
             navigate('/report', {
@@ -343,7 +340,8 @@ function TimeCardReports() {
             employee_id: empId,
             first_name: selectedEmployee.first_name,
             last_name: selectedEmployee.last_name,
-            total_hours: { hours: 0, minutes: 0 }
+            facility_total_hours: { hours: 0, minutes: 0 },
+            driving_total_hours: { hours: 0, minutes: 0 }
           }];
 
           navigate('/report', {
