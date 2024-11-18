@@ -55,16 +55,30 @@ function TimeCardsIndex() {
 
   const isLoading = isEmployeeLoading || isTimecardsLoading;
 
-
+  
+  const isMobile = () => {
+    return window.innerWidth <= 768; // You can adjust the breakpoint as per your requirements
+  };
+  
 
   const formatTotalTime = (interval) => {
     if (!interval) {
-      return;
+      return isMobile() ? '0:00' : '0h 0m'; // Default values for mobile and desktop
     }
-
+  
     const { hours, minutes } = interval;
-    return `${hours || 0}h ${minutes || 0}m`;
+  
+    if (isMobile()) {
+      // Mobile: Format as "5:30"
+      const formattedHours = hours || 0;
+      const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes; // Add leading zero for single-digit minutes
+      return `${formattedHours}:${formattedMinutes}`;
+    } else {
+      // Desktop: Format as "5h 30m"
+      return `${hours || 0}h ${minutes || 0}m`;
+    }
   };
+
 
   const handleDateClick = (info) => {
     const calendarApi = info.view.calendar;
