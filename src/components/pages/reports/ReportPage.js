@@ -185,56 +185,80 @@ console.log("The year is:", year);
 
 
 
-  const renderDetailedTimecards = () => {
-    const employeeInfo = reportData.length > 0 ? reportData[0] : {};
-    console.log(employeeInfo)
+const renderDetailedTimecards = () => {
+  const employeeInfo = reportData.length > 0 ? reportData[0] : {};
+  console.log(employeeInfo);
 
-    return (
-      <div className={`${styles.container} mt-4`}>
-        <h2 className="text-center mb-4">Detailed Timecards Report</h2>
-        <p className="text-center mb-3">
-          {`Report for: ${formatDate(startDate)} - ${formatDate(endDate)}`}<br />
-          <strong>Employee ID:</strong> {employeeId || 'N/A'}<br />
-          <strong>Employee Name:</strong> {firstName || 'N/A'} {lastName || 'N/A'}
-        </p>
-        <div className="text-center mb-4 print-hide">
-          <button className="btn btn-primary mx-2" onClick={handlePrint}>Print Report</button>
-          {reportType === 'totalHours' && (
-            <button className="btn btn-secondary mx-2" onClick={handleSaveCSV}>Save as CSV</button>
-          )}
-          <button className="btn btn-dark mx-2" onClick={() => navigate(-1)}>Back</button>
-        </div>
-        <table className="table table-striped table-bordered text-center">
-          <thead>
-            <tr>
-              <th>Work Date</th>
-              <th>Start Time</th>
-              <th>Lunch Start</th>
-              <th>Lunch End</th>
-              <th>End Time</th>
-              <th>Total Hours</th>
-            </tr>
-          </thead>
-          <tbody>
-            {reportData.map((record) => (
-              <tr key={record.timecard_id}>
-                <td>{formatDate(record.work_date)}</td>
-                <td>{formatTime(record.start_time)}</td>
-                <td>{formatTime(record.lunch_start)}</td>
-                <td>{formatTime(record.lunch_end)}</td>
-                <td>{formatTime(record.end_time)}</td>
-                <td>
-                  {record.total_hours
-                    ? `${record.total_hours.hours} hours ${record.total_hours.minutes} minutes`
-                    : "0 Hours 0 Minutes"}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+  return (
+    <div className={`${styles.container} mt-4`}>
+      <h2 className="text-center mb-4">Detailed Timecards Report</h2>
+      <p className="text-center mb-3">
+        {`Report for: ${formatDate(startDate)} - ${formatDate(endDate)}`}<br />
+        <strong>Employee ID:</strong> {employeeId || 'N/A'}<br />
+        <strong>Employee Name:</strong> {firstName || 'N/A'} {lastName || 'N/A'}
+      </p>
+      <div className="text-center mb-4 print-hide">
+        <button className="btn btn-primary mx-2" onClick={handlePrint}>Print Report</button>
+        {reportType === 'totalHours' && (
+          <button className="btn btn-secondary mx-2" onClick={handleSaveCSV}>Save as CSV</button>
+        )}
+        <button className="btn btn-dark mx-2" onClick={() => navigate(-1)}>Back</button>
       </div>
-    );
-  };
+      <table className="table table-striped table-bordered text-center">
+        <thead>
+          <tr>
+            <th>Work Date</th>
+            <th colSpan="5">Facility Activity</th>
+            <th colSpan="5">Driving Activity</th>
+          </tr>
+          <tr>
+            <th></th>
+            <th>Start Time</th>
+            <th>Lunch Start</th>
+            <th>Lunch End</th>
+            <th>End Time</th>
+            <th>Total Hours</th>
+            <th>Start Time</th>
+            <th>Lunch Start</th>
+            <th>Lunch End</th>
+            <th>End Time</th>
+            <th>Total Hours</th>
+          </tr>
+        </thead>
+        <tbody>
+          {reportData.map((record) => (
+            <tr key={record.timecard_id}>
+              <td>{formatDate(record.work_date)}</td>
+
+              {/* Facility Activity Columns */}
+              <td>{record.facility_start_time ? formatTime(record.facility_start_time) : "N/A"}</td>
+              <td>{record.facility_lunch_start ? formatTime(record.facility_lunch_start) : "N/A"}</td>
+              <td>{record.facility_lunch_end ? formatTime(record.facility_lunch_end) : "N/A"}</td>
+              <td>{record.facility_end_time ? formatTime(record.facility_end_time) : "N/A"}</td>
+              <td>
+                {record.facility_total_hours
+                  ? `${record.facility_total_hours.hours} hours ${record.facility_total_hours.minutes} minutes`
+                  : "0 Hours 0 Minutes"}
+              </td>
+
+              {/* Driving Activity Columns */}
+              <td>{record.driving_start_time ? formatTime(record.driving_start_time) : "N/A"}</td>
+              <td>{record.driving_lunch_start ? formatTime(record.driving_lunch_start) : "N/A"}</td>
+              <td>{record.driving_lunch_end ? formatTime(record.driving_lunch_end) : "N/A"}</td>
+              <td>{record.driving_end_time ? formatTime(record.driving_end_time) : "N/A"}</td>
+              <td>
+                {record.driving_total_hours
+                  ? `${record.driving_total_hours.hours} hours ${record.driving_total_hours.minutes} minutes`
+                  : "0 Hours 0 Minutes"}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
 
 
   const renderTotalHours = () => {
