@@ -25,7 +25,7 @@ function TimeCardsIndex() {
       try {
         setIsEmployeeLoading(true);
         const employeeResponse = await fetch(`${API}/employees/${employeeId}`);
-        const employeeData = await employeeResponse.json();
+        const employeeData = await employeeResponse.json(); 
         console.log('Fetched employee data:', employeeData);
         setEmployee(employeeData.data);
       } catch (error) {
@@ -93,7 +93,7 @@ function TimeCardsIndex() {
     const eventsForDay = [];
 
     // Facility work event
-    if (entry.facility_total_hours) {
+    if (entry.facility_total_hours && (entry.facility_total_hours.hours > 0 || entry.facility_total_hours.minutes > 0)) {
       eventsForDay.push({
         title: 'Facility Work',
         start: eventStart,
@@ -105,7 +105,7 @@ function TimeCardsIndex() {
     }
 
     // Driving work event
-    if (entry.driving_total_hours) {
+    if (entry.driving_total_hours && (entry.driving_total_hours.hours > 0 || entry.driving_total_hours.minutes > 0)) {
       eventsForDay.push({
         title: 'Driving Work',
         start: eventStart,
@@ -150,11 +150,12 @@ function TimeCardsIndex() {
           height="auto" // height of calendar
         />
       )}
-      <h7>Key:<br></br>D = Driving<br></br>  F = Facility</h7>
+      <h6>Key:<br></br>D = Driving<br></br>  F = Facility</h6>
 
     </div>
   );
 }
 
 export default TimeCardsIndex;
+
 
