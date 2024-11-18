@@ -373,57 +373,64 @@ const renderDetailedTimecards = () => {
 
   const renderEmployeeSummary = () => {
     const groupedData = groupByEmployee(reportData);
-  
+
     return (
-      <div className={`${styles.container} mt-4`}>
-        <h2 className="text-center mb-4">Employee Summary Report</h2>
-  
-        {/* Place the period toggle buttons at the top */}
-        <div className="text-center mb-4">
-          <button className={`btn btn-sm mx-2 ${period === 'weekly' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => handlePeriodChange('weekly')}>Weekly</button>
-          <button className={`btn btn-sm mx-2 ${period === 'monthly' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => handlePeriodChange('monthly')}>Monthly</button>
-          <button className={`btn btn-sm mx-2 ${period === 'yearly' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => handlePeriodChange('yearly')}>Yearly</button>
+        <div className={`${styles.container} mt-4`}>
+            <h2 className="text-center mb-4">Employee Summary Report</h2>
+
+            {/* Place the period toggle buttons at the top */}
+            <div className="text-center mb-4">
+                <button className={`btn btn-sm mx-2 ${period === 'weekly' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => handlePeriodChange('weekly')}>Weekly</button>
+                <button className={`btn btn-sm mx-2 ${period === 'monthly' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => handlePeriodChange('monthly')}>Monthly</button>
+                <button className={`btn btn-sm mx-2 ${period === 'yearly' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => handlePeriodChange('yearly')}>Yearly</button>
+            </div>
+
+            <div className="text-center mb-4">
+                <button className="btn btn-primary mx-2" onClick={handlePrint}>Print Report</button>
+                <button className="btn btn-dark mx-2" onClick={() => navigate(-1)}>Back</button>
+            </div>
+
+            {/* Iterate through each employee */}
+            {Object.values(groupedData).map(employee => (
+                <div key={employee.employee_id}>
+                    <h3>{employee.first_name} {employee.last_name}</h3>
+
+                    <table className="table table-striped table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th>{period === 'weekly' ? 'Period (Date Range)' : period === 'monthly' ? 'Month' : 'Year'}</th>
+                                <th>Facility Total Hours</th>
+                                <th>Driving Total Hours</th>
+                                <th>Days Worked</th>
+                                <th>Days Absent</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {employee.periods.map((record, index) => (
+                                <tr key={`${record.employee_id}-${index}`}>
+                                    <td>{formatPeriodRange(record.summary_period, period)}</td>
+                                    <td>
+                                        {record.facility_total_hours && typeof record.facility_total_hours === 'object' 
+                                            ? `${record.facility_total_hours.hours || 0} hours ${record.facility_total_hours.minutes || 0} minutes` 
+                                            : '0 hours 0 minutes'}
+                                    </td>
+                                    <td>
+                                        {record.driving_total_hours && typeof record.driving_total_hours === 'object' 
+                                            ? `${record.driving_total_hours.hours || 0} hours ${record.driving_total_hours.minutes || 0} minutes` 
+                                            : '0 hours 0 minutes'}
+                                    </td>
+                                    <td>{record.days_worked}</td>
+                                    <td>{record.absentee_days}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            ))}
         </div>
-  
-        <div className="text-center mb-4">
-          <button className="btn btn-primary mx-2" onClick={handlePrint}>Print Report</button>
-          <button className="btn btn-dark mx-2" onClick={() => navigate(-1)}>Back</button>
-        </div>
-  
-        {/* Iterate through each employee */}
-        {Object.values(groupedData).map(employee => (
-          <div key={employee.employee_id}>
-            <h3>{employee.first_name} {employee.last_name}</h3>
-  
-            <table className="table table-striped table-bordered text-center">
-              <thead>
-                <tr>
-                  <th>{period === 'weekly' ? 'Period (Date Range)' : period === 'monthly' ? 'Month' : 'Year'}</th>
-                  <th>Total Hours Worked</th>
-                  <th>Days Worked</th>
-                  <th>Days Absent</th>
-                </tr>
-              </thead>
-              <tbody>
-                {employee.periods.map((record, index) => (
-                  <tr key={`${record.employee_id}-${index}`}>
-                    <td>{formatPeriodRange(record.summary_period, period)}</td>
-                    <td>
-                      {record.total_hours && typeof record.total_hours === 'object' 
-                        ? `${record.total_hours.hours || 0} hours ${record.total_hours.minutes || 0} minutes` 
-                        : '0 hours 0 minutes'}
-                    </td>
-                    <td>{record.days_worked}</td>
-                    <td>{record.absentee_days}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ))}
-      </div>
     );
-  };
+};
+
   
 
   return (
