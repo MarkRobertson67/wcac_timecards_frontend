@@ -236,63 +236,84 @@ console.log("The year is:", year);
     );
   };
 
-  const renderTotalHours = () => {
-    let totalHours = 0;
-    let totalMinutes = 0;
 
+  const renderTotalHours = () => {
+    let facilityTotalHours = 0;
+    let facilityTotalMinutes = 0;
+    let drivingTotalHours = 0;
+    let drivingTotalMinutes = 0;
+
+    // Calculate total hours and minutes for facility and driving
     reportData.forEach(record => {
-      if (record.total_hours) {
-        const { hours, minutes } = record.total_hours;
-        totalHours += hours;
-        totalMinutes += minutes;
-      }
+        if (record.facility_total_hours) {
+            const { hours, minutes } = record.facility_total_hours;
+            facilityTotalHours += hours;
+            facilityTotalMinutes += minutes;
+        }
+        if (record.driving_total_hours) {
+            const { hours, minutes } = record.driving_total_hours;
+            drivingTotalHours += hours;
+            drivingTotalMinutes += minutes;
+        }
     });
 
-    totalHours += Math.floor(totalMinutes / 60);
-    totalMinutes = totalMinutes % 60;
+    // Adjust facility minutes into hours
+    facilityTotalHours += Math.floor(facilityTotalMinutes / 60);
+    facilityTotalMinutes = facilityTotalMinutes % 60;
+
+    // Adjust driving minutes into hours
+    drivingTotalHours += Math.floor(drivingTotalMinutes / 60);
+    drivingTotalMinutes = drivingTotalMinutes % 60;
 
     return (
       <div className={`${styles.container} mt-4`}>
-        <h2 className="text-center mb-4">Total Hours Report</h2>
-        <p className="text-center mb-3">
-          {`Report for: ${formatDate(startDate)} - ${formatDate(endDate)}`}
-        </p>
-        <div className="text-center mb-4">
-          <button className="btn btn-primary mx-2" onClick={handlePrint}>Print Report</button>
-          <button className="btn btn-secondary mx-2" onClick={handleSaveCSV}>Save as CSV</button>
-          <button className="btn btn-dark mx-2" onClick={() => navigate(-1)}>Back</button>
-        </div>
-        <table className="table table-striped table-bordered text-center">
-          <thead>
-            <tr>
-              <th>Employee ID</th>
-              <th>First Name</th>
-              <th>Last Name</th>
-              <th>Total Hours</th>
-            </tr>
-          </thead>
-          <tbody>
-            {reportData.map((record) => (
-              <tr key={record.employee_id}>
-                <td>{record.employee_id}</td>
-                <td>{record.first_name}</td>
-                <td>{record.last_name}</td>
-                <td>
-                  {record.total_hours
-                    ? `${record.total_hours.hours} hours ${record.total_hours.minutes}`
-                    : "0 Hours 0 Minutes"}
-                </td>
-              </tr>
-            ))}
-            <tr>
-              <td colSpan="3" style={{ textAlign: 'right' }}><strong>Total</strong></td>
-              <td><strong>{totalHours} hours {totalMinutes} minutes</strong></td>
-            </tr>
-          </tbody>
-        </table>
+          <h2 className="text-center mb-4">Total Hours Report</h2>
+          <p className="text-center mb-3">
+              {`Report for: ${formatDate(startDate)} - ${formatDate(endDate)}`}
+          </p>
+          <div className="text-center mb-4">
+              <button className="btn btn-primary mx-2" onClick={handlePrint}>Print Report</button>
+              <button className="btn btn-secondary mx-2" onClick={handleSaveCSV}>Save as CSV</button>
+              <button className="btn btn-dark mx-2" onClick={() => navigate(-1)}>Back</button>
+          </div>
+          <table className="table table-striped table-bordered text-center">
+              <thead>
+                  <tr>
+                      <th>Employee ID</th>
+                      <th>First Name</th>
+                      <th>Last Name</th>
+                      <th>Facility Total Hours</th>
+                      <th>Driving Total Hours</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {reportData.map((record) => (
+                      <tr key={record.employee_id}>
+                          <td>{record.employee_id}</td>
+                          <td>{record.first_name}</td>
+                          <td>{record.last_name}</td>
+                          <td>
+                              {record.facility_total_hours
+                                  ? `${record.facility_total_hours.hours} hours ${record.facility_total_hours.minutes} minutes`
+                                  : "0 Hours 0 Minutes"}
+                          </td>
+                          <td>
+                              {record.driving_total_hours
+                                  ? `${record.driving_total_hours.hours} hours ${record.driving_total_hours.minutes} minutes`
+                                  : "0 Hours 0 Minutes"}
+                          </td>
+                      </tr>
+                  ))}
+                  <tr>
+                      <td colSpan="3" style={{ textAlign: 'right' }}><strong>Total</strong></td>
+                      <td><strong>{facilityTotalHours} hours {facilityTotalMinutes} minutes</strong></td>
+                      <td><strong>{drivingTotalHours} hours {drivingTotalMinutes} minutes</strong></td>
+                  </tr>
+              </tbody>
+          </table>
       </div>
-    );
-  };
+  );
+};
 
 
   const renderMonthlySummary = () => {
