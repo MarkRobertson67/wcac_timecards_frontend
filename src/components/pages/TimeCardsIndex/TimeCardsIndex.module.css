@@ -23,11 +23,40 @@ See LICENSE.txt file for details. */
 }
 
 /* Media Queries */
+/* Adjust event font size specifically for mobile devices */
 @media (max-width: 768px) {
   .eventContent span {
-    font-size: 0.875rem;
+    font-size: 0.5rem; /* Make the text a bit smaller */
+  }
+
+  /* FullCalendar cell styling for mobile */
+  .fc-daygrid-day-frame {
+    height: 50px; /* Reduce height to avoid overlapping */
+  }
+
+  .fc .fc-daygrid-event {
+    white-space: nowrap; /* Prevent text wrapping */
   }
 }
+
+
+/* Update event font size for smaller screens */
+.eventContent span {
+  font-size: 1rem; /* Regular size */
+}
+
+@media (max-width: 600px) {
+  .eventContent span {
+    font-size: 0.5rem; /* Smaller font for mobile */
+    line-height: 1; /* Reduce line height for better spacing */
+  }
+
+  /* Adjust container padding for smaller screens */
+  .container {
+    padding: 5px;
+  }
+}
+
 
 /* Basic reset */
 body, html {
@@ -44,6 +73,7 @@ body, html {
   flex-direction: column;
   align-items: center;
   padding-bottom: 150px;
+  overflow-y: auto; /* Allows scrolling within the container if content exceeds view */
 }
 
 /* Centering title */
@@ -104,4 +134,9 @@ body, html {
   }
 }
 
-
+/* Media query for mobile devices */
+@media (max-width: 600px) {
+  .container {
+    padding-bottom: 100px; /* Increase padding-bottom only for screens narrower than 600px */
+  }
+}
