@@ -15,6 +15,9 @@ import CreateNewTimeCard from './components/pages/CreateNewTimecard/CreateNewTim
 import TimeCardIndex from './components/pages/TimeCardsIndex/TimeCardsIndex'; 
 import TimeCardReports from './components/pages/reports/TimeCardReports';
 import ReportPage from './components/pages/reports/ReportPage';
+import Employees from './components/pages/Employees/Employees.js'
+import EmployeeDetails from './components/pages/Employees/EmployeeDetails.js';
+
 
 function App() {
   const [isNewTimeCardCreated, setIsNewTimeCardCreated] = useState(false);
@@ -27,7 +30,12 @@ function App() {
   }, []);
 
   return (
-    <Router>
+    <Router
+      future={{
+        v7_startTransition: true,
+        v7_relativeSplatPath: true,
+      }}
+    >
       <NavBar isNewTimeCardCreated={isNewTimeCardCreated} />
       <Routes>
         <Route path="/" element={<Home />} />
@@ -40,6 +48,8 @@ function App() {
         <Route path="/timeCardIndex" element={<TimeCardIndex />} />
         <Route path="/reports" element={<TimeCardReports />} />
         <Route path="/report" element={<ReportPage />} />
+        <Route path="/employees" element={<Employees />} />
+        <Route path="/employee/:id" element={<EmployeeDetails />} />
       </Routes>
       <Footer />
     </Router>
