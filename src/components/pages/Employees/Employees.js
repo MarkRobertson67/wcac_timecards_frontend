@@ -4,6 +4,7 @@
 
    import React, { useEffect, useState } from 'react';
    import { useNavigate } from 'react-router-dom';
+   import { Container, Table, Button, Spinner } from 'react-bootstrap';
    import styles from "./Employee.module.css";
    
    const API = process.env.REACT_APP_API_URL;
@@ -46,9 +47,9 @@
        if (isLoading) {
          return (
            <div className="text-center mt-4">
-             <div className="spinner-border custom-spinner" role="status">
+             <Spinner animation="border" role="status">
                <span className="visually-hidden">Loading employee data...</span>
-             </div>
+             </Spinner>
            </div>
          );
        }
@@ -58,53 +59,44 @@
        }
    
        return (
-         <div className={`${styles.container} mt-4`}>
-           <h2 className="text-center mb-4">All Employees</h2>
-           <table className="table table-striped table-bordered text-center">
+         <div className={`${styles.container} mt-4`} style={{ paddingBottom: '50px', maxWidth: '600px', margin: '0 auto' }}>
+           <h4 className="text-center mb-3" style={{ fontSize: '1rem' }}>All Employees</h4>
+           <Table striped bordered hover responsive="sm" size="sm" className="text-center" style={{ fontSize: '0.8rem' }}>
              <thead>
                <tr>
-                 <th>First Name</th>
-                 <th>Last Name</th>
+                 <th>Name</th>
                  <th>Email</th>
-                 <th>Phone</th>
-                 <th>Position</th>
-                 <th>Admin</th>
                  <th>Actions</th>
                </tr>
              </thead>
              <tbody>
                {employees.map((record) => (
                  <tr key={record.id}>
-                   <td>{record.first_name}</td>
-                   <td>{record.last_name}</td>
+                   <td>{record.first_name} {record.last_name}</td>
                    <td>{record.email}</td>
-                   <td>{record.phone}</td>
-                   <td>{record.position}</td>
-                   <td>{record.is_admin ? 'Yes' : 'No'}</td>
                    <td>
-                     <button
-                       className="btn btn-primary"
+                     <Button
+                       variant="primary"
+                       size="sm"
                        onClick={() => navigate(`/employee/${record.id}`)}
                      >
                        View Details
-                     </button>
+                     </Button>
                    </td>
                  </tr>
                ))}
              </tbody>
-           </table>
+           </Table>
          </div>
        );
      };
    
      return (
-       <div className="container mt-4">
+       <Container className="mt-4">
          {renderEmployeeDetails()}
-       </div>
+       </Container>
      );
    }
    
    export default Employees;
-   
-   
    
