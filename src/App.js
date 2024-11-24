@@ -17,6 +17,7 @@ import TimeCardReports from './components/pages/reports/TimeCardReports';
 import ReportPage from './components/pages/reports/ReportPage';
 import Employees from './components/pages/Employees/Employees.js'
 import EmployeeDetails from './components/pages/Employees/EmployeeDetails.js';
+import ProtectedRoute from './components/ProtectedRoute'; 
 
 
 function App() {
@@ -40,12 +41,15 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/tutorials" element={<Tutorials />} />
+
         <Route
           path="/createNewTimeCard"
           element={<CreateNewTimeCard setIsNewTimeCardCreated={setIsNewTimeCardCreated} />}
         />
+
+        {/* Protected Routes */}
         <Route path="/activeTimeCard" element={<ActiveTimeCard setIsNewTimeCardCreated={setIsNewTimeCardCreated} />} />
-        <Route path="/timeCardIndex" element={<TimeCardIndex />} />
+        <Route path="/timeCardIndex" element={<ProtectedRoute><TimeCardIndex /></ProtectedRoute>} />
         <Route path="/reports" element={<TimeCardReports />} />
         <Route path="/report" element={<ReportPage />} />
         <Route path="/employees" element={<Employees />} />
