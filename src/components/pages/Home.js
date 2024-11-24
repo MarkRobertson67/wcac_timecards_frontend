@@ -30,37 +30,43 @@ function Home() {
   const [currentUser, setCurrentUser] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [firstName, setFirstName] = useState("");
+  const [resendMessage, setResendMessage] = useState("");
+  const [isProfileComplete, setIsProfileComplete] = useState(false);
+  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
+
 
   const navigate = useNavigate();
-
 
   useEffect(() => {
     // Listen for auth state changes
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setCurrentUser(user);
-
-        // Fetch user's profile by Firebase UID
+  
         try {
           const response = await fetch(`${API}/employees/firebase/${user.uid}`);
           if (response.ok) {
             const { data } = await response.json();
             setFirstName(data.first_name);
+            setIsProfileComplete(!!data.first_name); // Check if profile is completed
           } else {
-            console.error("Failed to fetch user profile.");
+            setIsProfileComplete(false); // Profile not found
           }
         } catch (err) {
           console.error("Error fetching user profile:", err.message);
+          setIsProfileComplete(false);
         }
       } else {
         setCurrentUser(null);
         setFirstName("");
+        setIsProfileComplete(false);
       }
+      setIsLoadingAuth(false); // End loading state
     });
-
-    return () => unsubscribe(); // Cleanup listener
+  
+    return () => unsubscribe();
   }, []);
-
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -68,7 +74,6 @@ function Home() {
 
     try {
       if (isLogin) {
-
         // Login user
         console.log("Logging in...");
         const userCredential = await signInWithEmailAndPassword(
@@ -79,9 +84,15 @@ function Home() {
         console.log("Logged in:", userCredential.user);
         setEmail("");
         setPassword("");
-        navigate("/CreateNewTimecard");
+        // navigate("/CreateNewTimecard");
+          // Check if an active timecard exists in localStorage
+  const activeTimecard = localStorage.getItem("startDate");
+  if (activeTimecard) {
+    navigate("/activeTimeCard");
+  } else {
+    navigate("/createNewTimeCard");
+  }
       } else {
-
         // Sign up user
         console.log("Signing up...");
         const userCredential = await createUserWithEmailAndPassword(
@@ -91,10 +102,12 @@ function Home() {
         );
         console.log("User created:", userCredential.user);
 
-         // Send email verification for sign-up only
-         await sendEmailVerification(userCredential.user);
-         alert("A verification email has been sent to your email address. Please verify your email.");
- 
+        // Send email verification for sign-up only
+        await sendEmailVerification(userCredential.user);
+        alert(
+          "A verification email has been sent to your email address. Please verify your email."
+        );
+
         setShowModal(true);
         setEmail("");
         setPassword("");
@@ -124,10 +137,36 @@ function Home() {
     navigate("/CreateNewTimecard");
   };
 
+  useEffect(() => {
+    if (currentUser && !currentUser.emailVerified) {
+      const interval = setInterval(async () => {
+        await currentUser.reload(); // Reload the user's info
+        if (currentUser.emailVerified) {
+          clearInterval(interval);
+          window.location.reload(); // Refresh the page to update state
+        }
+      }, 5000); // Check every 5 seconds
+
+      return () => clearInterval(interval); // Cleanup on unmount
+    }
+  }, [currentUser]);
+
+  const handleResendVerification = async () => {
+    if (currentUser) {
+      try {
+        await sendEmailVerification(currentUser);
+        setResendMessage("Verification email resent. Please check your inbox.");
+      } catch (err) {
+        setError("Failed to resend verification email.");
+      }
+    }
+  };
+
   const handleLogout = async () => {
     try {
       await signOut(auth);
       setCurrentUser(null);
+      setIsProfileComplete(false);
       //alert("You have logged out.");
     } catch (err) {
       console.error("Error logging out:", err.message);
@@ -138,21 +177,55 @@ function Home() {
     setShowPassword((prevState) => !prevState);
   };
 
-
   useEffect(() => {
     console.log("Modal state updated:", showModal);
   }, [showModal]);
 
 
+  const handleProfileSave = () => {
+    setIsProfileComplete(true);
+    setShowModal(false);
+
+    const activeTimecard = localStorage.getItem("startDate");
+    if (activeTimecard) {
+      navigate("/activeTimeCard");
+    } else {
+      navigate("/createNewTimeCard");
+    }
+  };
+
+  if (isLoadingAuth) {
+    return (
+      <div className="text-center mt-5">
+        <p>Loading...</p>
+      </div>
+    );
+  }
+  
+
   return (
     <div className="container mt-5">
       {currentUser ? (
         <div className="text-center">
-          <h1>Welcome Back, {firstName}!</h1>
+          <h1>Welcome Back, {firstName || "User"}!</h1>
+          {!isProfileComplete && (
+            <ProfileModal onClose={handleProfileSave} />
+          )}
           {!currentUser.emailVerified && (
-            <p className="text-warning">
-              Your email is not verified. Please check your inbox.
-            </p>
+            <div className="mb-3">
+              <p className="text-warning">
+                Your email is not verified. Please check your inbox.
+              </p>
+              <button
+                className="btn btn-link"
+                onClick={handleResendVerification}
+              >
+                Didn't get an email? Resend
+              </button>
+              {resendMessage && (
+                <p className="text-success mt-2">{resendMessage}</p>
+              )}
+            </div>
           )}
           <button className="btn btn-danger mt-3" onClick={handleLogout}>
             Logout
@@ -160,7 +233,9 @@ function Home() {
         </div>
       ) : (
         <>
-          <h1 className="text-center mb-4">Please Login to access your account</h1>
+          <h1 className="text-center mb-4">
+            Please Login to access your account
+          </h1>
           <form
             onSubmit={handleSubmit}
             className="card p-3 mx-auto"
