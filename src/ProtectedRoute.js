@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { auth } from '../../firebase/firebaseConfig'; // Adjust path as needed
+import { auth } from '../src/firebase/firebaseConfig';
 
 const ProtectedRoute = ({ children }) => {
   const user = auth.currentUser; // Check if a user is logged in
