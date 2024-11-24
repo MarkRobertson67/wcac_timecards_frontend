@@ -7,7 +7,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 
 import Home from './components/pages/Home';
-import About from './components/pages/about/AboutComponent';
+import Tutorials from './components/pages/tutorials/Tutorials.js';
 import NavBar from './components/nav-bar/Navbar';
 import Footer from './components/Footer/FooterComponent';
 import ActiveTimeCard from './components/pages/presentTimeCard/ActiveTimeCard';
@@ -39,7 +39,7 @@ function App() {
       <NavBar isNewTimeCardCreated={isNewTimeCardCreated} />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
+        <Route path="/tutorials" element={<Tutorials />} />
         <Route
           path="/createNewTimeCard"
           element={<CreateNewTimeCard setIsNewTimeCardCreated={setIsNewTimeCardCreated} />}

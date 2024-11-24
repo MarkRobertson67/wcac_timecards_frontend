@@ -56,10 +56,10 @@ function NavBar({ isNewTimeCardCreated }) {
             </li>
             <li
               className={`nav-item ${
-                location.pathname === "/about" ? "active" : ""
+                location.pathname === "/tutorials" ? "active" : ""
               }`}
             >
-              <Link className="nav-link" to="/about" onClick={closeMenu}>
+              <Link className="nav-link" to="/tutorials" onClick={closeMenu}>
                 Tutorials
               </Link>
             </li>
