@@ -8,19 +8,49 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction'; // Needed for dateClick
 import styles from './TimeCardsIndex.module.css';
+import { auth } from '../../../firebase/firebaseConfig';
 
 const API = process.env.REACT_APP_API_URL;
 
 function TimeCardsIndex() {
   const [timeEntries, setTimeEntries] = useState([]);
   const [employee, setEmployee] = useState(null);
+  const [employeeId, setEmployeeId] = useState(null);
   const [isEmployeeLoading, setIsEmployeeLoading] = useState(true);
   const [isTimecardsLoading, setIsTimecardsLoading] = useState(true);
-  const employeeId = 2;  // currentUser?.employeeId; Replace with actual employee ID from FireBase authentication
-
+  //const employeeId = 2;  // currentUser?.employeeId; Replace with actual employee ID from FireBase authentication
 
 
   useEffect(() => {
+    const fetchEmployeeId = async () => {
+      try {
+        const user = auth.currentUser; // Get the currently logged-in user
+        if (user) {
+          const response = await fetch(`${API}/employees/firebase/${user.uid}`);
+          if (response.ok) {
+            const { data } = await response.json();
+            setEmployeeId((prevId) => {
+              if (prevId !== data.id) {
+                return data.id; // Only update if the value changes
+              }
+              return prevId;
+            });
+          } else {
+            console.error("Failed to fetch employee ID.");
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching employee ID:", error);
+      }
+    };
+
+    fetchEmployeeId();
+  }, []);
+
+
+  useEffect(() => {
+    if (!employeeId) return;
+
     const fetchEmployeeData = async () => {
       try {
         setIsEmployeeLoading(true);
@@ -51,7 +81,7 @@ function TimeCardsIndex() {
 
     fetchEmployeeData();
     fetchTimecardEntries();
-  }, []);
+  }, [employeeId]);
 
   const isLoading = isEmployeeLoading || isTimecardsLoading;
 
