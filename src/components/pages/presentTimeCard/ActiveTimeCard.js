@@ -4,6 +4,7 @@
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { auth } from "../../../firebase/firebaseConfig";
 import styles from "./ActiveTimeCard.module.css";
 import moment from "moment-timezone";
 import Confetti from "react-confetti";
@@ -19,12 +20,45 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [defaultActivity] = useState("Facility");
+  const [employeeId, setEmployeeId] = useState(null);
   const navigate = useNavigate();
-  const employeeId = 2;
+
 
   // Get window size for Confetti
   const { width, height } = useWindowSize();
   //console.log('Window Size:', width, height);
+
+
+
+  useEffect(() => {
+    const fetchEmployeeId = async () => {
+      try {
+        const user = auth.currentUser; // Get current logged-in user
+        if (user) {
+          const response = await fetch(`${API}/employees/firebase/${user.uid}`);
+          if (response.ok) {
+            const { data } = await response.json();
+            setEmployeeId((prevId) => {
+              if (prevId !== data.id) {
+                return data.id; // Only update if it's different
+              }
+              return prevId; // No re-render if unchanged
+            });
+          } else {
+            console.error("Failed to fetch employee details.");
+          }
+        } else {
+          console.error("No authenticated user found.");
+        }
+      } catch (error) {
+        console.error("Error fetching employee ID:", error);
+      }
+    };
+
+    fetchEmployeeId();
+  }, []);
+
+
 
   const [entryToUpdate, setEntryToUpdate] = useState(null);
 
@@ -71,6 +105,9 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
       try {
         // Set loading state
         setIsLoading(true);
+        console.log("Fetching timecard data for employee:", employeeId);
+        console.log("Start date:", startDate);
+
         const timestamp = new Date().toLocaleString(); // Get the current timestamp
         console.log(
           `[${timestamp}] Fetching timecard data... likely due to page reload from inactivity`
@@ -245,7 +282,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (hasFetched.current) return; // Exit early if already fetched
+      if (hasFetched.current || !employeeId) return; // Exit early if already fetched
 
       try {
         hasFetched.current = true; // Set the flag to prevent multiple fetches
@@ -270,7 +307,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     };
 
     fetchData();
-  }, [fetchTimeCardData]);
+  }, [fetchTimeCardData, employeeId]);
 
 
   const calculateTotalTime = (start, lunchStart, lunchEnd, end) => {
@@ -365,6 +402,8 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
   // Helper function to parse and check AM/PM
   const validateAMPM = (time, field) => {
     const parsedTime = moment(time, "HH:mm");
+
+    if (!time || time.length < 5) return;
 
     if (field === "startTime" || field === "lunchStart") {
       // Alert if the start or lunch start time is entered as PM (past 12:00 PM)
@@ -660,7 +699,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     updateEntry(); // Call the function to perform the API update
 
     setEntryToUpdate(null); // Reset after update
-  }, [entryToUpdate, defaultActivity]); // Run this effect whenever entryToUpdate changes
+  }, [employeeId, entryToUpdate, defaultActivity]); // Run this effect whenever entryToUpdate changes
 
   const handleSubmit = async () => {
     const twoWeekPeriod = timeCard.entries;
