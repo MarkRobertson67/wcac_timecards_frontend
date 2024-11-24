@@ -19,6 +19,7 @@ import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 
+const API = process.env.REACT_APP_API_URL;
 
 function Home() {
   const [email, setEmail] = useState("");
@@ -28,22 +29,36 @@ function Home() {
   const [showModal, setShowModal] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
-
+  const [firstName, setFirstName] = useState("");
 
   const navigate = useNavigate();
 
 
   useEffect(() => {
     // Listen for auth state changes
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setCurrentUser(user);
+
+        // Fetch user's profile by Firebase UID
+        try {
+          const response = await fetch(`${API}/employees/firebase/${user.uid}`);
+          if (response.ok) {
+            const { data } = await response.json();
+            setFirstName(data.first_name);
+          } else {
+            console.error("Failed to fetch user profile.");
+          }
+        } catch (err) {
+          console.error("Error fetching user profile:", err.message);
+        }
       } else {
         setCurrentUser(null);
+        setFirstName("");
       }
     });
 
-    return () => unsubscribe(); // Clean up listener
+    return () => unsubscribe(); // Cleanup listener
   }, []);
 
 
@@ -91,7 +106,7 @@ function Home() {
 
   const handleForgotPassword = async () => {
     if (!email) {
-      alert("Please enter your email and click reset your password.");
+      alert("Please enter your email and click forgot password.");
       return;
     }
     try {
@@ -133,7 +148,7 @@ function Home() {
     <div className="container mt-5">
       {currentUser ? (
         <div className="text-center">
-          <h1>Welcome Back, {currentUser.email}!</h1>
+          <h1>Welcome Back, {firstName}!</h1>
           {!currentUser.emailVerified && (
             <p className="text-warning">
               Your email is not verified. Please check your inbox.
