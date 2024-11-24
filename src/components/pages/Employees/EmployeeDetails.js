@@ -209,7 +209,16 @@ function EmployeeDetails() {
           </Form>
           <div className="text-center mt-3">
             <Button variant="primary" size="sm" className="mx-1" onClick={handleSave}>Save Changes</Button>
-            <Button variant="danger" size="sm" className="mx-1" onClick={handleDelete}>Delete Employee</Button>
+            <Button
+  variant="danger"
+  size="sm"
+  className="mx-1"
+  onClick={handleDelete}
+  disabled={employee.firebase_uid === '7Yyz3S2X2iU5drTdZE65r8bxoCB2'} // Disable button for your account
+>
+  Delete Employee
+</Button>
+
             <Button variant="dark" size="sm" className="mx-1" onClick={() => navigate(-1)}>Back</Button>
           </div>
         </Card.Body>
