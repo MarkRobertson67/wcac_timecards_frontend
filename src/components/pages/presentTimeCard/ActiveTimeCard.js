@@ -21,6 +21,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
   const [showConfetti, setShowConfetti] = useState(false);
   const [defaultActivity] = useState("Facility");
   const [employeeId, setEmployeeId] = useState(null);
+  const [validationMessages, setValidationMessages] = useState({});
   const navigate = useNavigate();
 
 
@@ -108,10 +109,10 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
         console.log("Fetching timecard data for employee:", employeeId);
         console.log("Start date:", startDate);
 
-        const timestamp = new Date().toLocaleString(); // Get the current timestamp
-        console.log(
-          `[${timestamp}] Fetching timecard data... likely due to page reload from inactivity`
-        );
+        // const timestamp = new Date().toLocaleString(); // Get the current timestamp
+        // console.log(
+        //   `[${timestamp}] Fetching timecard data... likely due to page reload from inactivity`
+        // );
 
         const adjustedStartDate = getPreviousMonday(startDate);
         const endDate = getEndDate(adjustedStartDate);
@@ -166,6 +167,20 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
           });
           console.log(`Setting fetched entry for date: ${date}`);
         });
+
+              // Convert map values to an array of entries
+      const fetchedEntries = Array.from(fetchedEntriesMap.values());
+
+      // Initialize validation messages for each entry
+      setValidationMessages(
+        fetchedEntries.reduce(
+          (acc, _, idx) => ({
+            ...acc,
+            [idx]: {}, // Initialize empty messages for each index
+          }),
+          {}
+        )
+      );
 
         // Create entries for missing dates
         const allWeekdays = [];
@@ -269,6 +284,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
           ...Array.from(fetchedEntriesMap.values()),
           ...successfulCreatedEntries,
         ];
+        // Update timeCard state
         setTimeCard({ entries: allEntries, isSubmitted: false });
       } catch (error) {
         console.error("Error fetching timecard data:", error);
@@ -399,32 +415,48 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     return `${facilityTotalTime} / ${drivingTotalTime}`;
   };
 
-  // Helper function to parse and check AM/PM
-  const validateAMPM = (time, field) => {
+
+  const validateAMPM = (index, time, field) => {
+    if (!time || time.length < 5) {
+      // Clear message if input is invalid or empty
+      setValidationMessages((prev) => ({
+        ...prev,
+        [index]: {
+          ...prev[index],
+          [field]: "", // Clear any previous message for this field
+        },
+      }));
+      return;
+    }
+  
     const parsedTime = moment(time, "HH:mm");
-
-    if (!time || time.length < 5) return;
-
+    let message = "";
+  
     if (field === "startTime" || field === "lunchStart") {
-      // Alert if the start or lunch start time is entered as PM (past 12:00 PM)
       if (parsedTime.isAfter(moment("12:00", "HH:mm"))) {
-        alert(
-          `${
-            field === "startTime" ? "Start time" : "Lunch start time"
-          } seems to be in the PM. Should it be AM?`
-        );
+        message =
+          field === "startTime"
+            ? "Start time seems to be PM. Should it be AM?"
+            : "Lunch start time seems to be PM. Should it be AM?";
       }
     } else if (field === "lunchEnd" || field === "endTime") {
-      // Alert if lunch end or end time is entered as AM (before 12:00 PM)
       if (parsedTime.isBefore(moment("12:00", "HH:mm"))) {
-        alert(
-          `${
-            field === "lunchEnd" ? "Lunch end time" : "End time"
-          } seems to be in the AM. Should it be PM?`
-        );
+        message =
+          field === "lunchEnd"
+            ? "Lunch end time seems to be AM. Should it be PM?"
+            : "End time seems to be AM. Should it be PM?";
       }
     }
+  
+    setValidationMessages((prev) => ({
+      ...prev,
+      [index]: {
+        ...prev[index],
+        [field]: message, // Update message for this field
+      },
+    }));
   };
+  
 
   const isValidTimeOrder = (start, lunchStart, lunchEnd, end) => {
     if (
@@ -467,6 +499,15 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
       const entry = updatedEntries[index];
 
       console.log("Current entry before update:", entry);
+
+            // Call validateAMPM when changing time fields
+            if (
+              ["startTime", "lunchStart", "lunchEnd", "endTime"].includes(field) &&
+              value.length >= 5 // Validate only when input is likely complete
+            ) {
+              validateAMPM(index, value, field);
+            }
+            
 
       // Set default activity if none is selected or provided
       if (
@@ -992,8 +1033,13 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                           e.target.value
                         )
                       }
-                      onBlur={(e) => validateAMPM(e.target.value, "startTime")}
-                    />
+                      onBlur={(e) => validateAMPM(index, e.target.value, "startTime")}
+  />
+  {validationMessages[index]?.startTime && (
+    <div style={{ color: "red", fontSize: "0.85em" }}>
+      {validationMessages[index].startTime}
+    </div>
+                  )}
                   </td>
 
                   {/* Facility or Driving Lunch Start */}
@@ -1016,8 +1062,13 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                           e.target.value
                         )
                       }
-                      onBlur={(e) => validateAMPM(e.target.value, "lunchStart")}
-                    />
+                      onBlur={(e) => validateAMPM(index, e.target.value, "lunchStart")}
+  />
+  {validationMessages[index]?.lunchStart && (
+    <div style={{ color: "red", fontSize: "0.85em" }}>
+      {validationMessages[index].lunchStart}
+    </div>
+                  )}
                   </td>
 
                   {/* Activity (Afternoon) */}
@@ -1054,8 +1105,13 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                           e.target.value
                         )
                       }
-                      onBlur={(e) => validateAMPM(e.target.value, "lunchEnd")}
-                    />
+                      onBlur={(e) => validateAMPM(index, e.target.value, "lunchEnd")}
+  />
+  {validationMessages[index]?.lunchEnd && (
+    <div style={{ color: "red", fontSize: "0.85em" }}>
+      {validationMessages[index].lunchEnd}
+    </div>
+                  )}
                   </td>
 
                   {/* Facility or Driving End Time */}
@@ -1078,8 +1134,13 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                           e.target.value
                         )
                       }
-                      onBlur={(e) => validateAMPM(e.target.value, "endTime")}
-                    />
+                      onBlur={(e) => validateAMPM(index, e.target.value, "endTime")}
+  />
+  {validationMessages[index]?.endTime && (
+    <div style={{ color: "red", fontSize: "0.85em" }}>
+      {validationMessages[index].endTime}
+    </div>
+                  )}
                   </td>
 
                   {/* Facility Total Time */}
