@@ -2,100 +2,109 @@
 // Copyright (c) 2024 Mark Robertson
 // See LICENSE.txt file for details.
 
-
-import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { auth } from "../../../firebase/firebaseConfig";
 
 const API = process.env.REACT_APP_API_URL;
 
 const monthOptions = [
-  { value: '1', label: 'January' },
-  { value: '2', label: 'February' },
-  { value: '3', label: 'March' },
-  { value: '4', label: 'April' },
-  { value: '5', label: 'May' },
-  { value: '6', label: 'June' },
-  { value: '7', label: 'July' },
-  { value: '8', label: 'August' },
-  { value: '9', label: 'September' },
-  { value: '10', label: 'October' },
-  { value: '11', label: 'November' },
-  { value: '12', label: 'December' }
+  { value: "1", label: "January" },
+  { value: "2", label: "February" },
+  { value: "3", label: "March" },
+  { value: "4", label: "April" },
+  { value: "5", label: "May" },
+  { value: "6", label: "June" },
+  { value: "7", label: "July" },
+  { value: "8", label: "August" },
+  { value: "9", label: "September" },
+  { value: "10", label: "October" },
+  { value: "11", label: "November" },
+  { value: "12", label: "December" },
 ];
 
 function TimeCardReports() {
-
   const navigate = useNavigate();
   const timeoutRef = useRef(null);
 
   const [formState, setFormState] = useState({
-    reportType: 'totalHours',
-    startDate: '',
-    endDate: '',
-    employeeId: '',
-    selectedEmployeeName: '',
+    reportType: "totalHours",
+    startDate: "",
+    endDate: "",
+    employeeId: "",
+    selectedEmployeeName: "",
     month: monthOptions[0],
     year: new Date().getFullYear().toString(), // Use the current year
-    period: 'weekly',
-    employees: []
+    period: "weekly",
+    employees: [],
   });
 
   const [isLoading, setIsLoading] = useState(false); // State for loading status
-
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState(null);
 
   useEffect(() => {
     if (formState.employees.length > 0) {
-      console.log("Employees updated after fetch:", formState.employees);  // This log after the state updates
+      console.log("Employees updated after fetch:", formState.employees); // This log after the state updates
     }
   }, [formState.employees]);
 
-
   // Add inactivity tracking and reset timer when user interacts
   useEffect(() => {
-
     console.log("Setting up inactivity event listeners...");
 
     // Set initial timer when component mounts
     resetInactivityTimer();
 
     // Events to track user activity
-    const events = ['mousemove', 'mousedown', 'keypress', 'scroll', 'touchstart'];
-    events.forEach(event => window.addEventListener(event, resetInactivityTimer));
+    const events = [
+      "mousemove",
+      "mousedown",
+      "keypress",
+      "scroll",
+      "touchstart",
+    ];
+    events.forEach((event) =>
+      window.addEventListener(event, resetInactivityTimer)
+    );
 
     // Cleanup event listeners and timer on component unmount
     return () => {
       console.log("Cleaning up inactivity event listeners...");
-      events.forEach(event => window.removeEventListener(event, resetInactivityTimer));
+      events.forEach((event) =>
+        window.removeEventListener(event, resetInactivityTimer)
+      );
       clearTimeout(timeoutRef.current);
     };
   }, []); // Empty dependency array to run only once
-
 
   const handleChange = (e) => {
     const { id, value, type } = e.target;
     console.log(`Handling change for ${id} with value ${value}`);
 
     // Handle employee selection
-    if (id === 'selectedEmployeeName') {
-      console.log(`Updating selectedEmployeeName to ${value}`);  // Add a log for debugging
-      setFormState(prevState => ({
+    if (id === "selectedEmployeeName") {
+      console.log(`Updating selectedEmployeeName to ${value}`); // Add a log for debugging
+      setFormState((prevState) => ({
         ...prevState,
-        selectedEmployeeName: value  // Update the form state
+        selectedEmployeeName: value, // Update the form state
       }));
-    } else if (id === 'month') {
+    } else if (id === "month") {
       // Handle month selection
-      const selectedMonth = monthOptions.find(option => option.value === value);
+      const selectedMonth = monthOptions.find(
+        (option) => option.value === value
+      );
       console.log(`Updating month to ${selectedMonth.label}`);
-      setFormState(prevState => ({
+      setFormState((prevState) => ({
         ...prevState,
-        [id]: selectedMonth
+        [id]: selectedMonth,
       }));
     } else {
       // Handle other fields
       console.log(`Updating ${id} to ${value}`);
-      setFormState(prevState => ({
+      setFormState((prevState) => ({
         ...prevState,
-        [id]: type === 'checkbox' ? value === 'on' : value
+        [id]: type === "checkbox" ? value === "on" : value,
       }));
     }
     // Reset inactivity timer on user interaction
@@ -103,44 +112,84 @@ function TimeCardReports() {
   };
 
   const resetForm = () => {
-
     setFormState({
-      reportType: 'totalHours',
-      startDate: '',
-      endDate: '',
-      employeeId: '',
-      selectedEmployeeName: '',
+      reportType: "totalHours",
+      startDate: "",
+      endDate: "",
+      employeeId: "",
+      selectedEmployeeName: "",
       month: monthOptions[0],
       year: new Date().getFullYear().toString(), // Reset to the current year,
-      period: 'weekly',
-      employees: []
+      period: "weekly",
+      employees: [],
     });
     resetInactivityTimer(); // Reset inactivity timer
   };
 
+  // const fetchEmployees = async () => {
+  //   const timestamp = new Date().toLocaleString(); // Get the current timestamp
+  //   console.log(
+  //     `[${timestamp}] Fetching employee data... likely due to page reload from inactivity`
+  //   );
+
+  //   setIsLoading(true); // Set loading to true before fetching
+  //   try {
+  //     const response = await fetch(
+  //       `${API}/employees?ts=${new Date().getTime()}`
+  //     );
+
+  //     if (!response.ok) {
+  //       throw new Error("Failed to fetch employees");
+  //     }
+  //     const data = await response.json();
+  //     if (data && data.data) {
+  //       setFormState((prevState) => ({ ...prevState, employees: data.data }));
+  //       console.log("Fetched employees:", data.data); // Log the fetched employees
+  //     } else {
+  //       console.error("Unexpected response data:", data);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching employees:", error);
+  //   } finally {
+  //     setIsLoading(false); // Set loading to false after fetching completes
+  //   }
+  // };
+
   const fetchEmployees = async () => {
-    const timestamp = new Date().toLocaleString(); // Get the current timestamp
-    console.log(`[${timestamp}] Fetching employee data... likely due to page reload from inactivity`);
-
-    setIsLoading(true); // Set loading to true before fetching
+    setIsLoading(true);
     try {
-      const response = await fetch(`${API}/employees?ts=${new Date().getTime()}`);
+      const user = auth.currentUser;
+      if (!user) throw new Error("User not authenticated.");
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch employees');
+      // Fetch the logged-in user's details
+      const userResponse = await fetch(`${API}/employees/firebase/${user.uid}`);
+      const userData = await userResponse.json();
+      if (userData?.data) {
+        setIsAdmin(userData.data.is_admin);
+        setCurrentUserId(userData.data.id); // Save the current user's ID
       }
-      const data = await response.json();
-      if (data && data.data) {
 
-        setFormState(prevState => ({ ...prevState, employees: data.data }));
-        console.log("Fetched employees:", data.data);  // Log the fetched employees
+      // Fetch all employees if the user is an admin
+      if (userData.data.is_admin) {
+        const allEmployeesResponse = await fetch(`${API}/employees`);
+        const allEmployeesData = await allEmployeesResponse.json();
+        setFormState((prevState) => ({
+          ...prevState,
+          employees: allEmployeesData.data || [],
+        }));
       } else {
-        console.error('Unexpected response data:', data);
+        // Set only the current user in employees for non-admins
+        setFormState((prevState) => ({
+          ...prevState,
+          employees: [userData.data],
+          selectedEmployeeName: `${userData.data.first_name} ${userData.data.last_name}`,
+          employeeId: userData.data.id, // Automatically set the current user's ID
+        }));
       }
     } catch (error) {
-      console.error('Error fetching employees:', error);
+      console.error("Error fetching employees:", error);
     } finally {
-      setIsLoading(false); // Set loading to false after fetching completes
+      setIsLoading(false);
     }
   };
 
@@ -155,34 +204,41 @@ function TimeCardReports() {
 
   const resetInactivityTimer = () => {
     const timestamp = new Date().toLocaleString(); // Get the current timestamp
-  
+
     // Log when resetting the timer
     console.log(`[${timestamp}] Resetting inactivity timer...`);
-  
-    // Clear the existing timer, if any  
+
+    // Clear the existing timer, if any
     clearTimeout(timeoutRef.current); // Clear existing timer if any
-  
+
     // Set a new timer
     timeoutRef.current = setTimeout(() => {
       // Reload page after a specific period of inactivity (e.g., 5 minutes)
       const reloadTimestamp = new Date().toLocaleString();
-      console.log(`[${reloadTimestamp}] Inactivity detected. Timer expired, reloading page and refetching employee data...`);
+      console.log(
+        `[${reloadTimestamp}] Inactivity detected. Timer expired, reloading page and refetching employee data...`
+      );
       window.location.reload();
     }, 5 * 60 * 1000); // 5 minutes in milliseconds
-  
+
     // Log when a new timer is set
     console.log(`[${timestamp}] New inactivity timer set for 5 minutes.`);
   };
-  
-
 
   const handleGenerateReport = async () => {
-    const { reportType, startDate, endDate, selectedEmployeeName, employees, period } = formState;
+    const {
+      reportType,
+      startDate,
+      endDate,
+      selectedEmployeeName,
+      employees,
+      period,
+    } = formState;
 
     // Check if 'ALL' employees is selected
     if (selectedEmployeeName === "ALL") {
       // Route for ALL employees
-      if (reportType === 'employeeSummary') {
+      if (reportType === "employeeSummary") {
         const url = `${API}/reports/all/employee-summary?startDate=${startDate}&endDate=${endDate}&period=${period}`;
         console.log(`Fetching employee summary for ALL employees from: ${url}`);
 
@@ -190,42 +246,52 @@ function TimeCardReports() {
         try {
           const response = await fetch(`${url}`);
           const reportData = await response.json();
-          const reportArray = Array.isArray(reportData.data) ? reportData.data : [];
+          const reportArray = Array.isArray(reportData.data)
+            ? reportData.data
+            : [];
 
           if (reportArray.length === 0) {
-            console.log("No timecards found for ALL employees. Generating default data.");
-            const defaultReportData = [{
-              start_date: startDate,
-              end_date: endDate,
-              employee_id: 'ALL',
-              total_hours: { hours: 0, minutes: 0 }
-            }];
+            console.log(
+              "No timecards found for ALL employees. Generating default data."
+            );
+            const defaultReportData = [
+              {
+                start_date: startDate,
+                end_date: endDate,
+                employee_id: "ALL",
+                total_hours: { hours: 0, minutes: 0 },
+              },
+            ];
 
-            navigate('/report', {
+            navigate("/report", {
               state: {
                 reportType,
                 reportData: defaultReportData,
                 startDate,
                 endDate,
-                employeeId: 'ALL',
-              }
+                employeeId:
+                  isAdmin && selectedEmployeeName === "ALL"
+                    ? "ALL"
+                    : currentUserId, // Use 'ALL' for admins selecting all employees
+                isAdmin,
+                currentUserId,
+              },
             });
           } else {
-            navigate('/report', {
+            navigate("/report", {
               state: {
                 reportType,
                 reportData: reportArray,
                 startDate,
                 endDate,
-                employeeId: 'ALL',
-              }
+                employeeId: "ALL",
+              },
             });
           }
         } catch (error) {
-          console.error('Error fetching report data for ALL employees:', error);
+          console.error("Error fetching report data for ALL employees:", error);
         }
-
-      } else if (reportType === 'totalHours') {
+      } else if (reportType === "totalHours") {
         const url = `${API}/reports/all/range/${startDate}/${endDate}`;
         console.log(`Fetching total hours for ALL employees from: ${url}`);
 
@@ -233,94 +299,110 @@ function TimeCardReports() {
         try {
           const response = await fetch(`${url}`);
           const reportData = await response.json();
-          const reportArray = Array.isArray(reportData.data) ? reportData.data : [];
+          const reportArray = Array.isArray(reportData.data)
+            ? reportData.data
+            : [];
 
           if (reportArray.length === 0) {
-            console.log("No timecards found for ALL employees. Generating default data.");
-            const defaultReportData = [{
-              start_date: startDate,
-              end_date: endDate,
-              employee_id: 'ALL',
-              facility_total_hours: { hours: 0, minutes: 0 },
-              driving_total_hours: { hours: 0, minutes: 0 }
-            }];
+            console.log(
+              "No timecards found for ALL employees. Generating default data."
+            );
+            const defaultReportData = [
+              {
+                start_date: startDate,
+                end_date: endDate,
+                employee_id: "ALL",
+                facility_total_hours: { hours: 0, minutes: 0 },
+                driving_total_hours: { hours: 0, minutes: 0 },
+              },
+            ];
 
-            navigate('/report', {
+            navigate("/report", {
               state: {
                 reportType,
                 reportData: defaultReportData,
                 startDate,
                 endDate,
-                employeeId: 'ALL',
-              }
+                employeeId: "ALL",
+              },
             });
           } else {
-            navigate('/report', {
+            navigate("/report", {
               state: {
                 reportType,
                 reportData: reportArray,
                 startDate,
                 endDate,
-                employeeId: 'ALL',
-              }
+                employeeId: "ALL",
+              },
             });
           }
         } catch (error) {
-          console.error('Error fetching report data for ALL employees:', error);
+          console.error("Error fetching report data for ALL employees:", error);
         }
-
       } else {
-        console.error('Invalid report type for ALL employees');
+        console.error("Invalid report type for ALL employees");
         return;
       }
-
     } else {
       // Validate employee selection and report fields
       if (!selectedEmployeeName || !startDate || !endDate) {
-        alert("Please select an employee, start date, and end date before generating the report.");
+        alert(
+          "Please select an employee, start date, and end date before generating the report."
+        );
         return; // Prevent submission if fields are missing
       }
 
       // Logic for an individual employee
-      const selectedEmployee = employees.find(emp => `${emp.first_name} ${emp.last_name}`.trim() === selectedEmployeeName.trim());
+      const selectedEmployee = employees.find(
+        (emp) =>
+          `${emp.first_name} ${emp.last_name}`.trim() ===
+          selectedEmployeeName.trim()
+      );
       const empId = selectedEmployee ? selectedEmployee.id : null;
 
       if (!empId) {
-        console.error('Invalid employee selected or employee ID not found');
+        console.error("Invalid employee selected or employee ID not found");
         alert("Invalid employee selected. Please select a valid employee.");
         return;
       }
 
       // Set employeeId in the formState
-      setFormState(prevState => ({
+      setFormState((prevState) => ({
         ...prevState,
-        employeeId: empId
+        employeeId: empId,
       }));
 
       let url;
       let queryParams = {};
 
       switch (reportType) {
-        case 'totalHours':
+        case "totalHours":
           url = `${API}/reports/${empId}`;
           queryParams = { startDate, endDate };
-          console.log(`Fetching total hours for employee ID ${empId} from: ${url}?startDate=${startDate}&endDate=${endDate}`);
+          console.log(
+            `Fetching total hours for employee ID ${empId} from: ${url}?startDate=${startDate}&endDate=${endDate}`
+          );
           break;
 
-        case 'detailedTimecards':
+        case "detailedTimecards":
           url = `${API}/reports/detailed/${empId}`;
           queryParams = { startDate, endDate };
-          console.log(`Fetching detailed timecards for employee ID ${empId} from: ${url}?startDate=${startDate}&endDate=${endDate}`);
+          console.log(
+            `Fetching detailed timecards for employee ID ${empId} from: ${url}?startDate=${startDate}&endDate=${endDate}`
+          );
           break;
 
-        case 'employeeSummary':
+        case "employeeSummary":
           url = `${API}/reports/employee-summary/${empId}`;
           queryParams = { startDate, endDate, period };
-          console.log(`Fetching employee summary for employee ID ${empId} from: ${url}?startDate=${startDate}&endDate=${endDate}&period=${period}`);
+          console.log(
+            `Fetching employee summary for employee ID ${empId} from: ${url}?startDate=${startDate}&endDate=${endDate}&period=${period}`
+          );
           break;
 
         default:
-          console.error('Invalid report type for individual employee');
+          console.error("Invalid report type for individual employee");
           return;
       }
 
@@ -334,17 +416,19 @@ function TimeCardReports() {
 
         if (reportArray.length === 0) {
           console.log("No timecards found. Generating default data.");
-          const defaultReportData = [{
-            start_date: startDate,
-            end_date: endDate,
-            employee_id: empId,
-            first_name: selectedEmployee.first_name,
-            last_name: selectedEmployee.last_name,
-            facility_total_hours: { hours: 0, minutes: 0 },
-            driving_total_hours: { hours: 0, minutes: 0 }
-          }];
+          const defaultReportData = [
+            {
+              start_date: startDate,
+              end_date: endDate,
+              employee_id: empId,
+              first_name: selectedEmployee.first_name,
+              last_name: selectedEmployee.last_name,
+              facility_total_hours: { hours: 0, minutes: 0 },
+              driving_total_hours: { hours: 0, minutes: 0 },
+            },
+          ];
 
-          navigate('/report', {
+          navigate("/report", {
             state: {
               reportType,
               reportData: defaultReportData,
@@ -352,11 +436,11 @@ function TimeCardReports() {
               endDate,
               employeeId: empId,
               firstName: selectedEmployee.first_name,
-              lastName: selectedEmployee.last_name
-            }
+              lastName: selectedEmployee.last_name,
+            },
           });
         } else {
-          navigate('/report', {
+          navigate("/report", {
             state: {
               reportType,
               reportData: reportArray,
@@ -365,96 +449,125 @@ function TimeCardReports() {
               employeeId: empId,
               firstName: selectedEmployee.first_name,
               lastName: selectedEmployee.last_name,
-              period
-            }
+              period,
+            },
           });
         }
       } catch (error) {
-        console.error('Error fetching report data for individual employee:', error);
+        console.error(
+          "Error fetching report data for individual employee:",
+          error
+        );
       }
     }
   };
 
-
-
   const renderFormFields = () => {
-    const { reportType, startDate, endDate, month, year, selectedEmployeeName, employees } = formState;
+    const {
+      reportType,
+      startDate,
+      endDate,
+      month,
+      year,
+      selectedEmployeeName,
+      employees,
+    } = formState;
 
     switch (reportType) {
-      case 'totalHours':
-      case 'detailedTimecards':
-      case 'employeeSummary':
+      case "totalHours":
+      case "detailedTimecards":
+      case "employeeSummary":
         return (
           <>
             <div className="row mb-2">
               <div className="col">
-                <label htmlFor="selectedEmployeeName" className="form-label">Employee:</label>
+                <label htmlFor="selectedEmployeeName" className="form-label">
+                  Employee:
+                </label>
                 <select
                   id="selectedEmployeeName"
                   className="form-select"
-                  value={selectedEmployeeName || ''}
+                  value={selectedEmployeeName || ""}
                   onChange={handleChange}
-                  disabled={isLoading}  // Disable input if loading
+                  disabled={isLoading} // Disable input if loading
                   style={{
-                    backgroundColor: isLoading ? '#e9ecef' : '',
-                    cursor: isLoading ? 'not-allowed' : 'pointer',
-                    opacity: isLoading ? 0.7 : 1
+                    backgroundColor: isLoading ? "#e9ecef" : "",
+                    cursor: isLoading ? "not-allowed" : "pointer",
+                    opacity: isLoading ? 0.7 : 1,
                   }}
                 >
                   <option value="">Select Employee</option>
 
-                  {/* Only show "ALL" option if the report type is not detailedTimecards */}
-                  {reportType !== 'detailedTimecards' && (
+                  {/* Only show "ALL" option if the report type is not detailedTimecards and the user is an admin */}
+                  {reportType !== "detailedTimecards" && isAdmin && (
                     <option value="ALL">ALL</option>
                   )}
 
                   {/* Map individual employee names */}
-                  {employees.map(emp => (
-                    <option key={emp.id} value={`${emp.first_name} ${emp.last_name}`}>
+                  {employees.map((emp) => (
+                    <option
+                      key={emp.id}
+                      value={`${emp.first_name} ${emp.last_name}`}
+                    >
                       {emp.first_name} {emp.last_name}
                     </option>
                   ))}
                 </select>
               </div>
               <div className="col">
-                <label htmlFor="startDate" className="form-label">Start Date:</label>
+                <label htmlFor="startDate" className="form-label">
+                  Start Date:
+                </label>
                 <input
                   id="startDate"
                   type="date"
                   className="form-control"
                   value={startDate}
                   onChange={handleChange}
-                  disabled={isLoading}  // Disable input if loading
+                  disabled={isLoading} // Disable input if loading
                 />
               </div>
               <div className="col">
-                <label htmlFor="endDate" className="form-label">End Date:</label>
+                <label htmlFor="endDate" className="form-label">
+                  End Date:
+                </label>
                 <input
                   id="endDate"
                   type="date"
                   className="form-control"
                   value={endDate}
                   onChange={handleChange}
-                  disabled={isLoading}  // Disable input if loading
+                  disabled={isLoading} // Disable input if loading
                 />
               </div>
             </div>
           </>
         );
 
-      case 'monthlySummary':
+      case "monthlySummary":
         return (
           <div className="row mb-2">
             <div className="col">
-              <label htmlFor="month" className="form-label">Month:</label>
-              <select id="month" className="form-select" value={month.value} onChange={handleChange}>
-                {monthOptions.map(option => (
-                  <option key={option.value} value={option.value}>{option.label}</option>
+              <label htmlFor="month" className="form-label">
+                Month:
+              </label>
+              <select
+                id="month"
+                className="form-select"
+                value={month.value}
+                onChange={handleChange}
+              >
+                {monthOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
                 ))}
               </select>
             </div>
             <div className="col">
-              <label htmlFor="year" className="form-label">Year:</label>
+              <label htmlFor="year" className="form-label">
+                Year:
+              </label>
               <input
                 id="year"
                 type="number"
@@ -476,18 +589,25 @@ function TimeCardReports() {
 
       {isLoading ? (
         <div className="text-center mt-4">
-          <div className="spinner-border custom-spinner" role="status">
-          </div>
+          <div className="spinner-border custom-spinner" role="status"></div>
           <div className="mt-2">Loading employee data...</div>
         </div>
       ) : (
         <>
           <div className="mb-3">
-
-            <label htmlFor="reportType" className="form-label">Select Report Type:</label>
-            <select id="reportType" className="form-select" value={formState.reportType} onChange={handleChange}>
+            <label htmlFor="reportType" className="form-label">
+              Select Report Type:
+            </label>
+            <select
+              id="reportType"
+              className="form-select"
+              value={formState.reportType}
+              onChange={handleChange}
+            >
               <option value="totalHours">Total Hours Worked by Employee</option>
-              <option value="detailedTimecards">Detailed Timecards by Employee</option>
+              <option value="detailedTimecards">
+                Detailed Timecards by Employee
+              </option>
               <option value="employeeSummary">Employee Summary Report</option>
             </select>
           </div>
@@ -501,19 +621,18 @@ function TimeCardReports() {
               <button
                 className="btn btn-primary mx-2"
                 onClick={handleGenerateReport}
-                disabled={isLoading}  // Disable the button if loading
+                disabled={isLoading} // Disable the button if loading
               >
-                {isLoading ? 'Loading...' : 'Generate Report'}
+                {isLoading ? "Loading..." : "Generate Report"}
               </button>
               <button
                 className="btn btn-secondary mx-2"
                 onClick={resetForm}
-                disabled={isLoading}  // Disable the button if loading
+                disabled={isLoading} // Disable the button if loading
               >
-                {isLoading ? 'Loading...' : 'Reset'}
+                {isLoading ? "Loading..." : "Reset"}
               </button>
             </div>
-
           </div>
         </>
       )}
