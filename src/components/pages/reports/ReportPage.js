@@ -19,6 +19,7 @@ const ReportPage = () => {
     employeeId,
     firstName,
     lastName,
+    isAdmin,
     reportData: initialReportData,
   } = location.state || {};
   console.log("Initial Report Data:", initialReportData);
@@ -66,7 +67,7 @@ const ReportPage = () => {
       let url = "";
 
       if (reportType === "totalHours") {
-        if (employeeId === "ALL") {
+        if (isAdmin && employeeId === "ALL") {
           url = `${API}/reports/all/range/${startDate}/${endDate}`; // For all employees
         } else {
           url = `${API}/reports/${employeeId}?startDate=${startDate}&endDate=${endDate}`;
@@ -74,7 +75,7 @@ const ReportPage = () => {
       } else if (reportType === "detailedTimecards") {
         url = `${API}/reports/detailed/${employeeId}?startDate=${startDate}&endDate=${endDate}`;
       } else if (reportType === "employeeSummary") {
-        if (employeeId === "ALL") {
+        if (isAdmin && employeeId === "ALL") {
           url = `${API}/reports/all/employee-summary?startDate=${startDate}&endDate=${endDate}&period=${selectedPeriod}`;
         } else {
           url = `${API}/reports/employee-summary/${employeeId}?startDate=${startDate}&endDate=${endDate}&period=${selectedPeriod}`;
@@ -95,7 +96,7 @@ const ReportPage = () => {
         setLoading(false);
       }
     },
-    [reportType, employeeId, startDate, endDate]
+    [reportType, employeeId, startDate, endDate, isAdmin]
   );
 
   // Fetch the initial data on component mount
