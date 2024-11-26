@@ -3,7 +3,6 @@
 // See LICENSE.txt file for details.
 
 import React, { useState, useEffect } from "react";
-
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -12,7 +11,6 @@ import {
   sendPasswordResetEmail,
   sendEmailVerification,
 } from "firebase/auth";
-
 import { auth } from "../../firebase/firebaseConfig";
 import ProfileModal from "./ProfileModal/ProfileModal";
 import { useNavigate } from "react-router-dom";
@@ -33,49 +31,84 @@ function Home() {
   const [resendMessage, setResendMessage] = useState("");
   const [isProfileComplete, setIsProfileComplete] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Listen for auth state changes
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setCurrentUser(user);
-  
-        try {
-          const response = await fetch(`${API}/employees/firebase/${user.uid}`);
-          if (response.ok) {
-            const { data } = await response.json();
-            setFirstName(data.first_name);
-            setIsProfileComplete(!!data.first_name); // Check if profile is completed
-          } else {
-            setIsProfileComplete(false); // Profile not found
+
+        if (user.emailVerified) {
+          try {
+            const response = await fetch(
+              `${API}/employees/firebase/${user.uid}`
+            );
+            if (response.ok) {
+              const { data } = await response.json();
+              setFirstName(data.first_name);
+              setIsProfileComplete(!!data.first_name); // Check if profile is completed
+              setShowModal(!data.first_name); // Show modal if no profile exists
+            } else {
+              setIsProfileComplete(false); // Profile not found
+              setShowModal(true); // Trigger modal
+            }
+          } catch (err) {
+            console.error("Error fetching user profile:", err.message);
+            setIsProfileComplete(false);
+            setShowModal(true); // Trigger modal if error occurs
           }
-        } catch (err) {
-          console.error("Error fetching user profile:", err.message);
-          setIsProfileComplete(false);
         }
       } else {
         setCurrentUser(null);
         setFirstName("");
         setIsProfileComplete(false);
+        setShowModal(false);
       }
       setIsLoadingAuth(false); // End loading state
     });
-  
+
     return () => unsubscribe();
   }, []);
-  
+
+  useEffect(() => {
+    if (currentUser && !currentUser.emailVerified) {
+      const interval = setInterval(async () => {
+        await currentUser.reload(); // Reload the user's info
+        if (currentUser.emailVerified) {
+          clearInterval(interval);
+          try {
+            const response = await fetch(
+              `${API}/employees/firebase/${currentUser.uid}`
+            );
+            if (response.ok) {
+              const { data } = await response.json();
+              setFirstName(data.first_name);
+              setIsProfileComplete(!!data.first_name);
+              setShowModal(!data.first_name); // Show modal if no profile exists
+            } else {
+              setShowModal(true); // Show modal if profile is missing
+            }
+          } catch (err) {
+            console.error("Error fetching user profile:", err.message);
+            setShowModal(true);
+          }
+        }
+      }, 5000); // Check every 5 seconds
+
+      return () => clearInterval(interval); // Cleanup on unmount
+    }
+  }, [currentUser]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setIsSubmitting(true);
 
     try {
       if (isLogin) {
         // Login user
-        console.log("Logging in...");
         const userCredential = await signInWithEmailAndPassword(
           auth,
           email,
@@ -84,17 +117,11 @@ function Home() {
         console.log("Logged in:", userCredential.user);
         setEmail("");
         setPassword("");
-        // navigate("/CreateNewTimecard");
-          // Check if an active timecard exists in localStorage
-  const activeTimecard = localStorage.getItem("startDate");
-  if (activeTimecard) {
-    navigate("/activeTimeCard");
-  } else {
-    navigate("/createNewTimeCard");
-  }
+
+        const activeTimecard = localStorage.getItem("startDate");
+        navigate(activeTimecard ? "/activeTimeCard" : "/createNewTimeCard");
       } else {
         // Sign up user
-        console.log("Signing up...");
         const userCredential = await createUserWithEmailAndPassword(
           auth,
           email,
@@ -102,18 +129,18 @@ function Home() {
         );
         console.log("User created:", userCredential.user);
 
-        // Send email verification for sign-up only
         await sendEmailVerification(userCredential.user);
         alert(
-          "A verification email has been sent to your email address. Please verify your email."
+          "Thank you for signing up! A verification email has been sent to your inbox. Please verify your email before continuing."
         );
 
-        setShowModal(true);
         setEmail("");
         setPassword("");
       }
     } catch (err) {
       setError(err.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -132,24 +159,11 @@ function Home() {
   };
 
   const handleModalClose = () => {
-    console.log("Closing modal...");
     setShowModal(false);
-    navigate("/CreateNewTimecard");
+
+    const activeTimecard = localStorage.getItem("startDate");
+    navigate(activeTimecard ? "/activeTimeCard" : "/createNewTimeCard");
   };
-
-  useEffect(() => {
-    if (currentUser && !currentUser.emailVerified) {
-      const interval = setInterval(async () => {
-        await currentUser.reload(); // Reload the user's info
-        if (currentUser.emailVerified) {
-          clearInterval(interval);
-          window.location.reload(); // Refresh the page to update state
-        }
-      }, 5000); // Check every 5 seconds
-
-      return () => clearInterval(interval); // Cleanup on unmount
-    }
-  }, [currentUser]);
 
   const handleResendVerification = async () => {
     if (currentUser) {
@@ -167,7 +181,6 @@ function Home() {
       await signOut(auth);
       setCurrentUser(null);
       setIsProfileComplete(false);
-      //alert("You have logged out.");
     } catch (err) {
       console.error("Error logging out:", err.message);
     }
@@ -177,23 +190,6 @@ function Home() {
     setShowPassword((prevState) => !prevState);
   };
 
-  useEffect(() => {
-    console.log("Modal state updated:", showModal);
-  }, [showModal]);
-
-
-  const handleProfileSave = () => {
-    setIsProfileComplete(true);
-    setShowModal(false);
-
-    const activeTimecard = localStorage.getItem("startDate");
-    if (activeTimecard) {
-      navigate("/activeTimeCard");
-    } else {
-      navigate("/createNewTimeCard");
-    }
-  };
-
   if (isLoadingAuth) {
     return (
       <div className="text-center mt-5">
@@ -201,15 +197,14 @@ function Home() {
       </div>
     );
   }
-  
 
   return (
     <div className="container mt-5">
       {currentUser ? (
         <div className="text-center">
           <h1>Welcome Back, {firstName || "User"}!</h1>
-          {!isProfileComplete && (
-            <ProfileModal onClose={handleProfileSave} />
+          {showModal && !isProfileComplete && (
+            <ProfileModal onClose={handleModalClose} />
           )}
           {!currentUser.emailVerified && (
             <div className="mb-3">
@@ -227,9 +222,11 @@ function Home() {
               )}
             </div>
           )}
-          <button className="btn btn-danger mt-3" onClick={handleLogout}>
-            Logout
-          </button>
+          {isProfileComplete && (
+            <button className="btn btn-danger mt-3" onClick={handleLogout}>
+              Logout
+            </button>
+          )}
         </div>
       ) : (
         <>
@@ -267,8 +264,12 @@ function Home() {
                 onClick={togglePasswordVisibility}
               />
             </div>
-            <button type="submit" className="btn btn-primary w-100">
-              {isLogin ? "Login" : "Sign Up"}
+            <button
+              type="submit"
+              className="btn btn-primary w-100"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Submitting..." : isLogin ? "Login" : "Sign Up"}
             </button>
             {isLogin && (
               <div className="text-center mt-2">
@@ -293,9 +294,11 @@ function Home() {
           </div>
         </>
       )}
-      {showModal && <ProfileModal onClose={handleModalClose} />}
     </div>
   );
 }
 
 export default Home;
+
+
+
