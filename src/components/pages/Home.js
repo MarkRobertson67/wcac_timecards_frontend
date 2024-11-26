@@ -39,25 +39,24 @@ function Home() {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setCurrentUser(user);
-
+  
         if (user.emailVerified) {
           try {
-            const response = await fetch(
-              `${API}/employees/firebase/${user.uid}`
-            );
+            const response = await fetch(`${API}/employees/firebase/${user.uid}`);
             if (response.ok) {
               const { data } = await response.json();
               setFirstName(data.first_name);
-              setIsProfileComplete(!!data.first_name); // Check if profile is completed
+              setIsProfileComplete(!!data.first_name);
               setShowModal(!data.first_name); // Show modal if no profile exists
+            } else if (response.status === 404) {
+              console.log("No employee found, showing modal to create profile.");
+              setShowModal(true); // Trigger modal to create new employee profile
             } else {
-              setIsProfileComplete(false); // Profile not found
-              setShowModal(true); // Trigger modal
+              throw new Error("Unexpected error fetching profile.");
             }
           } catch (err) {
             console.error("Error fetching user profile:", err.message);
-            setIsProfileComplete(false);
-            setShowModal(true); // Trigger modal if error occurs
+            alert("An error occurred while fetching your profile.");
           }
         }
       } else {
@@ -66,11 +65,12 @@ function Home() {
         setIsProfileComplete(false);
         setShowModal(false);
       }
-      setIsLoadingAuth(false); // End loading state
+      setIsLoadingAuth(false);
     });
-
+  
     return () => unsubscribe();
   }, []);
+  
 
   useEffect(() => {
     if (currentUser && !currentUser.emailVerified) {
