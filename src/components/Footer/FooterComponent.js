@@ -5,6 +5,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './Footer.css';
+import packageJson from '../../../package.json';
 
 function FooterComponent() {
   const [isMenuOpen, setMenuOpen] = useState(false); 
@@ -48,7 +49,9 @@ function FooterComponent() {
         </div>
       </div>
       <div className="text-center py-2 bg-secondary">
-        <span>© 2024 We Care Adult Care Timecards App™. All Rights Reserved.</span>
+        <span>© 2024 We Care Adult Care Timecards App™. by Mark Robertson. All Rights Reserved.</span>
+        <p>Version: {packageJson.version}</p> {/* Display version from package.json */}
+
       </div>
     </footer>
   );
