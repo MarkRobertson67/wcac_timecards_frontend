@@ -27,7 +27,7 @@ function FooterComponent() {
             <div className="col-sm-6 col-md-4 mb-3 mb-md-0">
               <h6 className="text-uppercase mb-3 footer-heading">Company</h6>
               <ul className="list-unstyled mb-0 footer-content">
-                <li><Link to="/about" className="text-white">About</Link></li>
+                <li><Link to="/tutorials" className="text-white">Tutorials</Link></li>
               </ul>
             </div>
             <div className="col-sm-6 col-md-4 mb-3 mb-md-0">
