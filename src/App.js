@@ -31,6 +31,29 @@ function App() {
     } 
   }, []);
 
+
+    // Version check to ensure users get the latest version of the app
+    useEffect(() => {
+      const checkAppVersion = async () => {
+        try {
+          const response = await fetch('/manifest.json');
+          const manifest = await response.json();
+          const currentVersion = manifest.version;
+          const savedVersion = localStorage.getItem('appVersion');
+          
+          if (savedVersion !== currentVersion) {
+            localStorage.setItem('appVersion', currentVersion);
+            window.location.reload(); // Force reload to fetch the latest version
+          }
+        } catch (error) {
+          console.error("Error checking app version:", error);
+        }
+      };
+  
+      checkAppVersion();
+    }, []);
+    
+
   return (
     <Router
       future={{
