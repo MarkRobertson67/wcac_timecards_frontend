@@ -2,13 +2,13 @@
 // Copyright (c) 2024 Mark Robertson
 // See LICENSE.txt file for details.
 
-
-import React, { useState, useEffect } from 'react';
-import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import interactionPlugin from '@fullcalendar/interaction'; // Needed for dateClick
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import interactionPlugin from "@fullcalendar/interaction"; // Needed for dateClick
 import styles from './TimeCardsIndex.module.css';
-import { auth } from '../../../firebase/firebaseConfig';
+import { auth } from "../../../firebase/firebaseConfig";
 
 const API = process.env.REACT_APP_API_URL;
 
@@ -18,8 +18,8 @@ function TimeCardsIndex() {
   const [employeeId, setEmployeeId] = useState(null);
   const [isEmployeeLoading, setIsEmployeeLoading] = useState(true);
   const [isTimecardsLoading, setIsTimecardsLoading] = useState(true);
-  //const employeeId = 2;  // currentUser?.employeeId; Replace with actual employee ID from FireBase authentication
 
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchEmployeeId = async () => {
@@ -47,7 +47,6 @@ function TimeCardsIndex() {
     fetchEmployeeId();
   }, []);
 
-
   useEffect(() => {
     if (!employeeId) return;
 
@@ -55,11 +54,11 @@ function TimeCardsIndex() {
       try {
         setIsEmployeeLoading(true);
         const employeeResponse = await fetch(`${API}/employees/${employeeId}`);
-        const employeeData = await employeeResponse.json(); 
-        console.log('Fetched employee data:', employeeData);
+        const employeeData = await employeeResponse.json();
+        console.log("Fetched employee data:", employeeData);
         setEmployee(employeeData.data);
       } catch (error) {
-        console.error('Error fetching employee data:', error);
+        console.error("Error fetching employee data:", error);
       } finally {
         setIsEmployeeLoading(false);
       }
@@ -68,12 +67,14 @@ function TimeCardsIndex() {
     const fetchTimecardEntries = async () => {
       try {
         setIsTimecardsLoading(true);
-        const timecardsResponse = await fetch(`${API}/timecards/employee/${employeeId}`);
+        const timecardsResponse = await fetch(
+          `${API}/timecards/employee/${employeeId}`
+        );
         const timecardsData = await timecardsResponse.json();
-        console.log('Fetched timecards data:', timecardsData);
+        console.log("Fetched timecards data:", timecardsData);
         setTimeEntries(timecardsData.data);
       } catch (error) {
-        console.error('Error fetching timecards data:', error);
+        console.error("Error fetching timecards data:", error);
       } finally {
         setIsTimecardsLoading(false);
       }
@@ -85,19 +86,17 @@ function TimeCardsIndex() {
 
   const isLoading = isEmployeeLoading || isTimecardsLoading;
 
-  
   const isMobile = () => {
     return window.innerWidth <= 768; // You can adjust the breakpoint as per your requirements
   };
-  
 
   const formatTotalTime = (interval) => {
     if (!interval) {
-      return isMobile() ? '0:00' : '0h 0m'; // Default values for mobile and desktop
+      return isMobile() ? "0:00" : "0h 0m"; // Default values for mobile and desktop
     }
-  
+
     const { hours, minutes } = interval;
-  
+
     if (isMobile()) {
       // Mobile: Format as "5:30"
       const formattedHours = hours || 0;
@@ -109,17 +108,27 @@ function TimeCardsIndex() {
     }
   };
 
+  // const handleDateClick = (info) => {
+  //   const calendarApi = info.view.calendar;
+  //   calendarApi.changeView('dayGridDay', info.dateStr);
+  // };
 
   const handleDateClick = (info) => {
-    const calendarApi = info.view.calendar;
-    calendarApi.changeView('dayGridDay', info.dateStr);
+    navigate(`/timeCardDetails/${info.dateStr}`, {
+      state: { employeeId }, // Pass employeeId
+    });
   };
 
   const renderEventContent = (eventInfo) => {
     return (
       <div
         className={styles.eventContent}
-        onClick={() => handleDateClick({ view: eventInfo.view, dateStr: eventInfo.event.startStr })}
+        onClick={() =>
+          handleDateClick({
+            view: eventInfo.view,
+            dateStr: eventInfo.event.startStr,
+          })
+        }
       >
         <span>{eventInfo.event.extendedProps.time}</span>
       </div>
@@ -129,17 +138,21 @@ function TimeCardsIndex() {
   const events = timeEntries.flatMap((entry) => {
     // Create a Date object from work_date
     const workDate = new Date(entry.work_date); // This should already be in UTC
-    console.log('Processing workDate:', workDate); // Log the processed workDate
+    console.log("Processing workDate:", workDate); // Log the processed workDate
 
     const eventStart = workDate.toISOString(); // Convert to ISO string for UTC
-    console.log('Event Start:', eventStart); // Log the event start time
+    console.log("Event Start:", eventStart); // Log the event start time
 
     const eventsForDay = [];
 
     // Facility work event
-    if (entry.facility_total_hours && (entry.facility_total_hours.hours > 0 || entry.facility_total_hours.minutes > 0)) {
+    if (
+      entry.facility_total_hours &&
+      (entry.facility_total_hours.hours > 0 ||
+        entry.facility_total_hours.minutes > 0)
+    ) {
       eventsForDay.push({
-        title: 'Facility Work',
+        title: "Facility Work",
         start: eventStart,
         end: eventStart,
         extendedProps: {
@@ -149,9 +162,13 @@ function TimeCardsIndex() {
     }
 
     // Driving work event
-    if (entry.driving_total_hours && (entry.driving_total_hours.hours > 0 || entry.driving_total_hours.minutes > 0)) {
+    if (
+      entry.driving_total_hours &&
+      (entry.driving_total_hours.hours > 0 ||
+        entry.driving_total_hours.minutes > 0)
+    ) {
       eventsForDay.push({
-        title: 'Driving Work',
+        title: "Driving Work",
         start: eventStart,
         end: eventStart,
         extendedProps: {
@@ -163,30 +180,30 @@ function TimeCardsIndex() {
     return eventsForDay;
   });
 
-  console.log('Generated events:', events); // Log the generated events
+  console.log("Generated events:", events); // Log the generated events
 
   return (
     <div className={styles.container}>
-      <h2>Total Hours Worked for {employee ? `${employee.first_name} ${employee.last_name}` : '...'}</h2>
-
+      <h2>
+        Total Hours Worked for{" "}
+        {employee ? `${employee.first_name} ${employee.last_name}` : "..."}
+      </h2>
 
       {isLoading ? (
         <div className="text-center">
-          <div className="spinner-border custom-spinner" role="status">
-          </div>
+          <div className="spinner-border custom-spinner" role="status"></div>
           <div className="mt-2">Loading timecard data...</div>
         </div>
       ) : (
-
         <FullCalendar
           timeZone="UTC"
           plugins={[dayGridPlugin, interactionPlugin]}
           initialView="dayGridMonth"
           initialDate={new Date()}
           headerToolbar={{
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth,dayGridDay'
+            left: "prev,next today",
+            center: "title",
+            right: "dayGridMonth,dayGridDay",
           }}
           events={events} // Pass the logged events to FullCalendar
           eventContent={renderEventContent}
@@ -194,12 +211,13 @@ function TimeCardsIndex() {
           height="auto" // height of calendar
         />
       )}
-      <h6>Key:<br></br>D = Driving<br></br>  F = Facility</h6>
-
+      <div style={{ display: "flex", justifyContent: "center", gap: "20px" }}>
+        <span>Key:</span>
+        <span>D = Driving</span>
+        <span>F = Facility</span>
+      </div>
     </div>
   );
 }
 
 export default TimeCardsIndex;
-
-

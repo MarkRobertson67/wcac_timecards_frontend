@@ -1,0 +1,39 @@
+/* Proprietary Software License
+Copyright (c) 2024 Mark Robertson
+See LICENSE.txt file for details. */
+
+
+
+/* TimeCardDetails.css */
+
+/* General table styling */
+.table-responsive {
+    font-size: 16px; /* Default font size for larger screens */
+}
+
+/* Mobile-specific styles */
+@media (max-width: 768px) {
+    .table-responsive {
+        font-size: 0.75rem; /* Reduce font size for mobile screens */
+    }
+
+    .table-responsive th,
+    .table-responsive td {
+        padding: 0.5rem; /* Adjust padding for mobile */
+    }
+
+    h2 {
+        font-size: 1rem; /* Smaller heading for mobile */
+    }
+
+    h3 {
+        font-size: 0.9rem; /* Adjust subheading size */
+    }
+
+    button {
+        font-size: 0.85rem; /* Smaller button text */
+        padding: 0.5rem 1rem; /* Adjust button padding */
+    }
+}
+
+  
