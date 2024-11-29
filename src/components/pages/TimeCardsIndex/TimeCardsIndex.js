@@ -199,7 +199,7 @@ function TimeCardsIndex() {
           timeZone="UTC"
           plugins={[dayGridPlugin, interactionPlugin]}
           initialView="dayGridMonth"
-          initialDate={new Date()}
+          initialDate={new Date().toISOString()} // Force UTC
           headerToolbar={{
             left: "prev,next today",
             center: "title",
@@ -207,6 +207,12 @@ function TimeCardsIndex() {
           }}
           events={events} // Pass the logged events to FullCalendar
           eventContent={renderEventContent}
+          eventTimeFormat={{
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false, // 24-hour format for consistency
+            timeZone: "UTC",
+          }}
           dateClick={handleDateClick}
           height="auto" // height of calendar
         />
