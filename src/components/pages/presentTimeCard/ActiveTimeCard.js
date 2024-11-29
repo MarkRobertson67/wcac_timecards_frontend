@@ -2,6 +2,10 @@
 // Copyright (c) 2024 Mark Robertson
 // See LICENSE.txt file for details.
 
+// Proprietary Software License
+// Copyright (c) 2024 Mark Robertson
+// See LICENSE.txt file for details.
+
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../../firebase/firebaseConfig";
@@ -22,14 +26,12 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
   const [defaultActivity] = useState("Facility");
   const [employeeId, setEmployeeId] = useState(null);
   const [validationMessages, setValidationMessages] = useState({});
+  const [startDateAdjusted, setStartDateAdjusted] = useState(false);
   const navigate = useNavigate();
-
 
   // Get window size for Confetti
   const { width, height } = useWindowSize();
   //console.log('Window Size:', width, height);
-
-
 
   useEffect(() => {
     const fetchEmployeeId = async () => {
@@ -58,8 +60,6 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
     fetchEmployeeId();
   }, []);
-
-
 
   const [entryToUpdate, setEntryToUpdate] = useState(null);
 
@@ -129,7 +129,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
         // Fetch existing timecards from the backend
         const response = await fetch(
-          `${API}/timecards/employee/${employeeId}/range/${formattedStart}/${formattedEnd}`
+          `${API}/timecards/employee/${employeeId}/range/${formattedStart}/${formattedEnd}?timestamp=${Date.now()}`
         );
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -152,35 +152,39 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
             facilityLunchEnd: formatTime(entry.facility_lunch_end) || "",
             facilityEndTime: formatTime(entry.facility_end_time) || "",
             facilityTotalHours: entry.facility_total_hours
-      ? `${entry.facility_total_hours.hours || 0}h ${entry.facility_total_hours.minutes || 0}m`
-      : "0h 0m", // Properly format the total hours if available
+              ? `${entry.facility_total_hours.hours || 0}h ${
+                  entry.facility_total_hours.minutes || 0
+                }m`
+              : "0h 0m", // Properly format the total hours if available
 
             drivingStartTime: formatTime(entry.driving_start_time) || "",
             drivingLunchStart: formatTime(entry.driving_lunch_start) || "",
             drivingLunchEnd: formatTime(entry.driving_lunch_end) || "",
             drivingEndTime: formatTime(entry.driving_end_time) || "",
             drivingTotalHours: entry.driving_total_hours
-      ? `${entry.driving_total_hours.hours || 0}h ${entry.driving_total_hours.minutes || 0}m`
-      : "0h 0m", // Properly format the total hours if available
+              ? `${entry.driving_total_hours.hours || 0}h ${
+                  entry.driving_total_hours.minutes || 0
+                }m`
+              : "0h 0m", // Properly format the total hours if available
 
             status: entry.status || "active",
           });
           console.log(`Setting fetched entry for date: ${date}`);
         });
 
-              // Convert map values to an array of entries
-      const fetchedEntries = Array.from(fetchedEntriesMap.values());
+        // Convert map values to an array of entries
+        const fetchedEntries = Array.from(fetchedEntriesMap.values());
 
-      // Initialize validation messages for each entry
-      setValidationMessages(
-        fetchedEntries.reduce(
-          (acc, _, idx) => ({
-            ...acc,
-            [idx]: {}, // Initialize empty messages for each index
-          }),
-          {}
-        )
-      );
+        // Initialize validation messages for each entry
+        setValidationMessages(
+          fetchedEntries.reduce(
+            (acc, _, idx) => ({
+              ...acc,
+              [idx]: {}, // Initialize empty messages for each index
+            }),
+            {}
+          )
+        );
 
         // Create entries for missing dates
         const allWeekdays = [];
@@ -243,26 +247,33 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
             return {
               id: savedEntry.data.id,
               date: savedEntry.data.work_date,
-              facilityStartTime: formatTime(savedEntry.data.facility_start_time) || "",
-              facilityLunchStart: formatTime(savedEntry.data.facility_lunch_start) || "",
-              facilityLunchEnd: formatTime(savedEntry.data.facility_lunch_end) || "",
-              facilityEndTime: formatTime(savedEntry.data.facility_end_time) || "",
+              facilityStartTime:
+                formatTime(savedEntry.data.facility_start_time) || "",
+              facilityLunchStart:
+                formatTime(savedEntry.data.facility_lunch_start) || "",
+              facilityLunchEnd:
+                formatTime(savedEntry.data.facility_lunch_end) || "",
+              facilityEndTime:
+                formatTime(savedEntry.data.facility_end_time) || "",
               facilityTotalHours:
                 typeof savedEntry.data.facility_total_hours === "string"
                   ? savedEntry.data.facility_total_hours
                   : "0h 0m",
-              drivingStartTime: formatTime(savedEntry.data.driving_start_time) || "",
-              drivingLunchStart: formatTime(savedEntry.data.driving_lunch_start) || "",
-              drivingLunchEnd: formatTime(savedEntry.data.driving_lunch_end) || "",
-              drivingEndTime: formatTime(savedEntry.data.driving_end_time) || "",
+              drivingStartTime:
+                formatTime(savedEntry.data.driving_start_time) || "",
+              drivingLunchStart:
+                formatTime(savedEntry.data.driving_lunch_start) || "",
+              drivingLunchEnd:
+                formatTime(savedEntry.data.driving_lunch_end) || "",
+              drivingEndTime:
+                formatTime(savedEntry.data.driving_end_time) || "",
               drivingTotalHours:
                 typeof savedEntry.data.driving_total_hours === "string"
                   ? savedEntry.data.driving_total_hours
                   : "0h 0m",
               status: savedEntry.data.status || "active",
-              morningActivity: defaultActivity, 
+              morningActivity: defaultActivity,
               afternoonActivity: defaultActivity,
-
             };
           } catch (error) {
             console.error(`Error creating entry for ${date}:`, error);
@@ -298,32 +309,56 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (hasFetched.current || !employeeId) return; // Exit early if already fetched
-
+     
+        if (hasFetched.current) {
+          console.log("Skipping fetch: already fetched.");
+          return;
+        }
+      
+        if (!employeeId) {
+          console.log("Skipping fetch: employeeId is missing.");
+          return;
+        }
+      
+        console.log("Fetching data for employee:", employeeId);
+  
       try {
-        hasFetched.current = true; // Set the flag to prevent multiple fetches
+        hasFetched.current = true;
+  
+        let storedStartDateStr = localStorage.getItem("startDate");
+        let startDate = storedStartDateStr
+          ? moment.utc(new Date(storedStartDateStr))
+          : moment.utc();
 
-        const storedStartDateStr = localStorage.getItem("startDate");
-        const startDate = storedStartDateStr
-          ? new Date(storedStartDateStr)
-          : new Date();
-        console.log("Start Date for fetching:", startDate.toISOString());
-
-        const previousMonday = getPreviousMonday(startDate); // Adjust to previous Monday
+          console.log("Original start date:", startDate.format("YYYY-MM-DD"));
+  
+        if (startDate.day() === 0) {
+          console.log("Adjusting start date from Sunday to Monday");
+          startDate.add(1, "day");
+          localStorage.setItem("startDate", startDate.toISOString());
+          console.log("Adjusted start date saved:", startDate.format("YYYY-MM-DD"));
+          setStartDateAdjusted(true); // Mark adjustment as done
+          return; // Exit to allow re-render
+        }
+  
+        console.log("Adjusted Start Date for fetching:", startDate.format("YYYY-MM-DD"));
+  
+        const previousMonday = getPreviousMonday(startDate.toDate());
         console.log(
           "Previous Monday for fetching:",
           previousMonday.toISOString()
         );
-
+  
         await fetchTimeCardData(previousMonday);
       } catch (error) {
         console.error("Error during initial data fetch:", error);
-        hasFetched.current = false; // Reset if there's an error to allow retrying
+        hasFetched.current = false;
       }
     };
-
+  
     fetchData();
-  }, [fetchTimeCardData, employeeId]);
+  }, [fetchTimeCardData, employeeId, startDateAdjusted]);
+
 
 
   const calculateTotalTime = (start, lunchStart, lunchEnd, end) => {
@@ -415,7 +450,6 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     return `${facilityTotalTime} / ${drivingTotalTime}`;
   };
 
-
   const validateAMPM = (index, time, field) => {
     if (!time || time.length < 5) {
       // Clear message if input is invalid or empty
@@ -428,10 +462,10 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
       }));
       return;
     }
-  
+
     const parsedTime = moment(time, "HH:mm");
     let message = "";
-  
+
     if (field === "startTime" || field === "lunchStart") {
       if (parsedTime.isAfter(moment("12:00", "HH:mm"))) {
         message =
@@ -447,7 +481,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
             : "End time seems to be AM. Should it be PM?";
       }
     }
-  
+
     setValidationMessages((prev) => ({
       ...prev,
       [index]: {
@@ -456,7 +490,6 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
       },
     }));
   };
-  
 
   const isValidTimeOrder = (start, lunchStart, lunchEnd, end) => {
     if (
@@ -490,7 +523,6 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     return true;
   };
 
-
   const handleChange = (index, field, value) => {
     // Log the current arguments received by the function
     console.log("handleChange called with:", { index, field, value });
@@ -500,14 +532,13 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
       console.log("Current entry before update:", entry);
 
-            // Call validateAMPM when changing time fields
-            if (
-              ["startTime", "lunchStart", "lunchEnd", "endTime"].includes(field) &&
-              value.length >= 5 // Validate only when input is likely complete
-            ) {
-              validateAMPM(index, value, field);
-            }
-            
+      // Call validateAMPM when changing time fields
+      if (
+        ["startTime", "lunchStart", "lunchEnd", "endTime"].includes(field) &&
+        value.length >= 5 // Validate only when input is likely complete
+      ) {
+        validateAMPM(index, value, field);
+      }
 
       // Set default activity if none is selected or provided
       if (
@@ -525,7 +556,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
       }
 
       // Log after updating the field value
-    console.log("Updated entry after setting field value:", entry);
+      console.log("Updated entry after setting field value:", entry);
 
       // Check if the entry is already submitted
       if (entry.status === "submitted") {
@@ -556,8 +587,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
           entry.drivingEndTime = null;
 
           // Log after clearing driving fields
-        console.log("Updated entry after clearing driving fields:", entry);
-
+          console.log("Updated entry after clearing driving fields:", entry);
         } else if (value === "Driving") {
           // Clear facility fields if switching to Driving
           entry.facilityStartTime = null;
@@ -565,9 +595,8 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
           entry.facilityLunchEnd = null;
           entry.facilityEndTime = null;
 
-           // Log after clearing facility fields
-        console.log("Updated entry after clearing facility fields:", entry);
-
+          // Log after clearing facility fields
+          console.log("Updated entry after clearing facility fields:", entry);
         }
       } else {
         // Update time fields based on the current activity selection
@@ -587,9 +616,9 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
           }
         }
 
-         // Log after updating activity-based time fields
-      console.log("Updated entry after activity-based time update:", entry);
-      
+        // Log after updating activity-based time fields
+        console.log("Updated entry after activity-based time update:", entry);
+
         // Validate time order and calculate total time after time change
         if (
           isValidTimeOrder(
@@ -642,8 +671,8 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     });
   };
 
-  // Update useEffect to include activity in the payload
 
+  // Update useEffect to include activity in the payload
   useEffect(() => {
     if (!entryToUpdate) return; // Exit if there's no entry to update
 
@@ -651,7 +680,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     const requestPayload = {
       employee_id: employeeId,
       work_date: entryToUpdate.date,
-      morning_activity: entryToUpdate.morningActivity || defaultActivity, 
+      morning_activity: entryToUpdate.morningActivity || defaultActivity,
       afternoon_activity: entryToUpdate.afternoonActivity || defaultActivity,
       facility_start_time: entryToUpdate.facilityStartTime || null,
       facility_lunch_start: entryToUpdate.facilityLunchStart || null,
@@ -701,7 +730,8 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                 return {
                   ...entry,
                   work_date: result.data.work_date,
-                  morning_activity: result.data.morning_activity || defaultActivity,
+                  morning_activity:
+                    result.data.morning_activity || defaultActivity,
                   afternoon_activity:
                     result.data.afternoon_activity || defaultActivity,
                   facility_start_time: result.data.facility_start_time || "",
@@ -891,12 +921,11 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     localStorage.removeItem("startDate");
     setIsNewTimeCardCreated(false);
   };
-  
+
   console.log("Rendering timeCard entries:", timeCard.entries);
-  timeCard.entries.forEach(entry => {
+  timeCard.entries.forEach((entry) => {
     console.log({ facilityTotalHours: entry.facilityTotalHours }); // Log the facilityTotalHours of each entry before rendering
   });
-
 
   return (
     <div className={`container-fluid mt-4 ${styles.container}`}>
@@ -1033,13 +1062,15 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                           e.target.value
                         )
                       }
-                      onBlur={(e) => validateAMPM(index, e.target.value, "startTime")}
-  />
-  {validationMessages[index]?.startTime && (
-    <div style={{ color: "red", fontSize: "0.85em" }}>
-      {validationMessages[index].startTime}
-    </div>
-                  )}
+                      onBlur={(e) =>
+                        validateAMPM(index, e.target.value, "startTime")
+                      }
+                    />
+                    {validationMessages[index]?.startTime && (
+                      <div style={{ color: "red", fontSize: "0.85em" }}>
+                        {validationMessages[index].startTime}
+                      </div>
+                    )}
                   </td>
 
                   {/* Facility or Driving Lunch Start */}
@@ -1062,13 +1093,15 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                           e.target.value
                         )
                       }
-                      onBlur={(e) => validateAMPM(index, e.target.value, "lunchStart")}
-  />
-  {validationMessages[index]?.lunchStart && (
-    <div style={{ color: "red", fontSize: "0.85em" }}>
-      {validationMessages[index].lunchStart}
-    </div>
-                  )}
+                      onBlur={(e) =>
+                        validateAMPM(index, e.target.value, "lunchStart")
+                      }
+                    />
+                    {validationMessages[index]?.lunchStart && (
+                      <div style={{ color: "red", fontSize: "0.85em" }}>
+                        {validationMessages[index].lunchStart}
+                      </div>
+                    )}
                   </td>
 
                   {/* Activity (Afternoon) */}
@@ -1105,13 +1138,15 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                           e.target.value
                         )
                       }
-                      onBlur={(e) => validateAMPM(index, e.target.value, "lunchEnd")}
-  />
-  {validationMessages[index]?.lunchEnd && (
-    <div style={{ color: "red", fontSize: "0.85em" }}>
-      {validationMessages[index].lunchEnd}
-    </div>
-                  )}
+                      onBlur={(e) =>
+                        validateAMPM(index, e.target.value, "lunchEnd")
+                      }
+                    />
+                    {validationMessages[index]?.lunchEnd && (
+                      <div style={{ color: "red", fontSize: "0.85em" }}>
+                        {validationMessages[index].lunchEnd}
+                      </div>
+                    )}
                   </td>
 
                   {/* Facility or Driving End Time */}
@@ -1134,13 +1169,15 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                           e.target.value
                         )
                       }
-                      onBlur={(e) => validateAMPM(index, e.target.value, "endTime")}
-  />
-  {validationMessages[index]?.endTime && (
-    <div style={{ color: "red", fontSize: "0.85em" }}>
-      {validationMessages[index].endTime}
-    </div>
-                  )}
+                      onBlur={(e) =>
+                        validateAMPM(index, e.target.value, "endTime")
+                      }
+                    />
+                    {validationMessages[index]?.endTime && (
+                      <div style={{ color: "red", fontSize: "0.85em" }}>
+                        {validationMessages[index].endTime}
+                      </div>
+                    )}
                   </td>
 
                   {/* Facility Total Time */}
