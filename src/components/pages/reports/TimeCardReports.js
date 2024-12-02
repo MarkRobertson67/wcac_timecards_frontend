@@ -2,7 +2,8 @@
 // Copyright (c) 2024 Mark Robertson
 // See LICENSE.txt file for details.
 
-import React, { useState, useEffect, useRef } from "react";
+
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../../firebase/firebaseConfig";
 
@@ -25,7 +26,8 @@ const monthOptions = [
 
 function TimeCardReports() {
   const navigate = useNavigate();
-  const timeoutRef = useRef(null);
+
+  
 
   const [formState, setFormState] = useState({
     reportType: "totalHours",
@@ -49,34 +51,7 @@ function TimeCardReports() {
     }
   }, [formState.employees]);
 
-  // Add inactivity tracking and reset timer when user interacts
-  useEffect(() => {
-    console.log("Setting up inactivity event listeners...");
 
-    // Set initial timer when component mounts
-    resetInactivityTimer();
-
-    // Events to track user activity
-    const events = [
-      "mousemove",
-      "mousedown",
-      "keypress",
-      "scroll",
-      "touchstart",
-    ];
-    events.forEach((event) =>
-      window.addEventListener(event, resetInactivityTimer)
-    );
-
-    // Cleanup event listeners and timer on component unmount
-    return () => {
-      console.log("Cleaning up inactivity event listeners...");
-      events.forEach((event) =>
-        window.removeEventListener(event, resetInactivityTimer)
-      );
-      clearTimeout(timeoutRef.current);
-    };
-  }, []); // Empty dependency array to run only once
 
   const handleChange = (e) => {
     const { id, value, type } = e.target;
@@ -107,8 +82,6 @@ function TimeCardReports() {
         [id]: type === "checkbox" ? value === "on" : value,
       }));
     }
-    // Reset inactivity timer on user interaction
-    resetInactivityTimer();
   };
 
   const resetForm = () => {
@@ -123,37 +96,8 @@ function TimeCardReports() {
       period: "weekly",
       employees: [],
     });
-    resetInactivityTimer(); // Reset inactivity timer
   };
 
-  // const fetchEmployees = async () => {
-  //   const timestamp = new Date().toLocaleString(); // Get the current timestamp
-  //   console.log(
-  //     `[${timestamp}] Fetching employee data... likely due to page reload from inactivity`
-  //   );
-
-  //   setIsLoading(true); // Set loading to true before fetching
-  //   try {
-  //     const response = await fetch(
-  //       `${API}/employees?ts=${new Date().getTime()}`
-  //     );
-
-  //     if (!response.ok) {
-  //       throw new Error("Failed to fetch employees");
-  //     }
-  //     const data = await response.json();
-  //     if (data && data.data) {
-  //       setFormState((prevState) => ({ ...prevState, employees: data.data }));
-  //       console.log("Fetched employees:", data.data); // Log the fetched employees
-  //     } else {
-  //       console.error("Unexpected response data:", data);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching employees:", error);
-  //   } finally {
-  //     setIsLoading(false); // Set loading to false after fetching completes
-  //   }
-  // };
 
   const fetchEmployees = async () => {
     setIsLoading(true);
@@ -195,35 +139,9 @@ function TimeCardReports() {
 
   useEffect(() => {
     fetchEmployees();
-    resetInactivityTimer(); // Set up initial inactivity timer
-
-    return () => {
-      clearTimeout(timeoutRef.current); // Clear the timer on component unmount
-    };
   }, []);
 
-  const resetInactivityTimer = () => {
-    const timestamp = new Date().toLocaleString(); // Get the current timestamp
 
-    // Log when resetting the timer
-    console.log(`[${timestamp}] Resetting inactivity timer...`);
-
-    // Clear the existing timer, if any
-    clearTimeout(timeoutRef.current); // Clear existing timer if any
-
-    // Set a new timer
-    timeoutRef.current = setTimeout(() => {
-      // Reload page after a specific period of inactivity (e.g., 5 minutes)
-      const reloadTimestamp = new Date().toLocaleString();
-      console.log(
-        `[${reloadTimestamp}] Inactivity detected. Timer expired, reloading page and refetching employee data...`
-      );
-      window.location.reload();
-    }, 5 * 60 * 1000); // 5 minutes in milliseconds
-
-    // Log when a new timer is set
-    console.log(`[${timestamp}] New inactivity timer set for 5 minutes.`);
-  };
 
   const handleGenerateReport = async () => {
     const {
@@ -299,9 +217,7 @@ function TimeCardReports() {
         try {
           const response = await fetch(`${url}`);
           const reportData = await response.json();
-          const reportArray = Array.isArray(reportData.data)
-            ? reportData.data
-            : [];
+          const reportArray = Array.isArray(reportData.data) ? reportData.data : [];
 
           if (reportArray.length === 0) {
             console.log(
@@ -615,8 +531,6 @@ function TimeCardReports() {
           {renderFormFields()}
 
           <div className="text-center">
-            {/* <button className="btn btn-primary mx-2" onClick={handleGenerateReport}>Generate Report</button>
-            <button className="btn btn-secondary mx-2" onClick={resetForm}>Reset</button> */}
             <div className="text-center">
               <button
                 className="btn btn-primary mx-2"
