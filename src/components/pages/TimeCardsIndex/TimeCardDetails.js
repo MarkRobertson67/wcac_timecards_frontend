@@ -2,6 +2,8 @@
 // Copyright (c) 2024 Mark Robertson
 // See LICENSE.txt file for details.
 
+
+
 import React, { useState, useEffect } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import { formatDate, formatTime } from "../utils/TimeAndDateUtils";
@@ -95,25 +97,39 @@ function TimeCardDetails() {
     );
   };
 
-  const drivingEntries = timeEntries
-    .filter((entry) => entry.driving_start_time)
-    .map((entry) => ({
-      start_time: entry.driving_start_time,
-      lunch_start: entry.driving_lunch_start,
-      lunch_end: entry.driving_lunch_end,
-      end_time: entry.driving_end_time,
-      total_hours: entry.driving_total_hours,
-    }));
 
-  const facilityEntries = timeEntries
-    .filter((entry) => entry.facility_start_time)
-    .map((entry) => ({
-      start_time: entry.facility_start_time,
-      lunch_start: entry.facility_lunch_start,
-      lunch_end: entry.facility_lunch_end,
-      end_time: entry.facility_end_time,
-      total_hours: entry.facility_total_hours,
-    }));
+  const drivingEntries = timeEntries
+  .filter(
+    (entry) =>
+      entry.driving_start_time ||
+      entry.driving_lunch_end ||
+      entry.driving_end_time
+  )
+  .map((entry) => ({
+    start_time: entry.driving_start_time,
+    lunch_start: entry.driving_lunch_start,
+    lunch_end: entry.driving_lunch_end,
+    end_time: entry.driving_end_time,
+    total_hours: entry.driving_total_hours,
+  }));
+
+const facilityEntries = timeEntries
+  .filter(
+    (entry) =>
+      entry.facility_start_time ||
+      entry.facility_lunch_end ||
+      entry.facility_end_time
+  )
+  .map((entry) => ({
+    start_time: entry.facility_start_time,
+    lunch_start: entry.facility_lunch_start,
+    lunch_end: entry.facility_lunch_end,
+    end_time: entry.facility_end_time,
+    total_hours: entry.facility_total_hours,
+  }));
+
+
+
 
   return (
     <div className={`container mt-5 ${styles["timecard-details"]}`}>
@@ -163,4 +179,3 @@ function TimeCardDetails() {
 }
 
 export default TimeCardDetails;
-
