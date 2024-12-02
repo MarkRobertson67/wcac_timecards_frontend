@@ -179,4 +179,3 @@ const facilityEntries = timeEntries
 }
 
 export default TimeCardDetails;
-
