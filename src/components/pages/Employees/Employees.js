@@ -92,7 +92,6 @@ function Employees() {
           <thead>
             <tr>
               <th>Name</th>
-              <th>Email</th>
               {isAdmin && <th>Actions</th>}
             </tr>
           </thead>
@@ -102,7 +101,6 @@ function Employees() {
                 <td>
                   {record.first_name} {record.last_name}
                 </td>
-                <td>{record.email}</td>
                 {isAdmin ? (
                   <td>
                     <Button

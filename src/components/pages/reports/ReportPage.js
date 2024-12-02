@@ -7,7 +7,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { formatDate, formatTime } from "../utils/TimeAndDateUtils";
 import styles from "./TimeCardReports.module.css";
 
-const API = process.env.REACT_APP_API_URL;
+// const API = process.env.REACT_APP_API_URL;
 
 const ReportPage = () => {
   const location = useLocation();
@@ -19,16 +19,15 @@ const ReportPage = () => {
     employeeId,
     firstName,
     lastName,
-    isAdmin,
     reportData: initialReportData,
   } = location.state || {};
   console.log("Initial Report Data:", initialReportData);
 
   // State for toggling periods
   const [period, setPeriod] = useState("weekly"); // 'weekly', 'monthly', or 'yearly'
-  const [reportData, setReportData] = useState(initialReportData || []); // Only use the data passed through location.state
-  const [loading, setLoading] = useState(true); // Loading state
-  const [cachedData, setCachedData] = useState({}); // Cache fetched data for each period
+  const [reportData, setReportData] = useState(initialReportData || []); //Use passed datathrough location.state
+  const [loading, setLoading] = useState(false);
+  const [cachedData, setCachedData] = useState({}); // Cache data for periods
 
   // Group the report data by employee_id
   const groupByEmployee = (reportData) => {
@@ -50,59 +49,76 @@ const ReportPage = () => {
 
   // Function to handle period change and fetch data if needed
   const handlePeriodChange = (newPeriod) => {
+    console.log(`Changing period to: ${newPeriod}`);
+    setLoading(true);
     setPeriod(newPeriod);
     if (cachedData[newPeriod]) {
+      console.log(`Using cached data for ${newPeriod}`, cachedData[newPeriod]);
       // Use cached data if available
       setReportData(cachedData[newPeriod]);
+      setLoading(false);
     } else {
-      // Fetch data if not already cached
-      fetchReportData(newPeriod);
+      console.log(`No cached data for period: ${newPeriod}`);
+      setReportData([]); // Clear the data or set a default
+      setLoading(false); // End loading if no data
     }
   };
 
-  // Fetch data based on the period and report type
-  const fetchReportData = useCallback(
-    async (selectedPeriod) => {
-      setLoading(true);
-      let url = "";
-
-      if (reportType === "totalHours") {
-        if (isAdmin && employeeId === "ALL") {
-          url = `${API}/reports/all/range/${startDate}/${endDate}`; // For all employees
-        } else {
-          url = `${API}/reports/${employeeId}?startDate=${startDate}&endDate=${endDate}`;
-        }
-      } else if (reportType === "detailedTimecards") {
-        url = `${API}/reports/detailed/${employeeId}?startDate=${startDate}&endDate=${endDate}`;
-      } else if (reportType === "employeeSummary") {
-        if (isAdmin && employeeId === "ALL") {
-          url = `${API}/reports/all/employee-summary?startDate=${startDate}&endDate=${endDate}&period=${selectedPeriod}`;
-        } else {
-          url = `${API}/reports/employee-summary/${employeeId}?startDate=${startDate}&endDate=${endDate}&period=${selectedPeriod}`;
-        }
+    // Helper function to format period based on weekly, monthly, or yearly
+    const formatPeriodRange = useCallback((summaryPeriod, period) => {
+      const startOfPeriod = new Date(summaryPeriod);
+    
+      if (period === "weekly") {
+        const endOfPeriod = new Date(startOfPeriod);
+        endOfPeriod.setDate(startOfPeriod.getDate() + 6);
+        return `${formatDate(startOfPeriod)} - ${formatDate(endOfPeriod)}`;
       }
-
-      try {
-        const response = await fetch(url);
-        const data = await response.json();
-        setReportData(data.data || data); // 'data' field or is raw data
-        setCachedData((prev) => ({
-          ...prev,
-          [selectedPeriod]: data.data || data,
-        })); // Cache data for the selected period
-      } catch (error) {
-        console.error("Error fetching report data:", error);
-      } finally {
-        setLoading(false);
+    
+      if (period === "monthly") {
+        return `${startOfPeriod.toLocaleString("default", {
+          month: "long",
+        })} ${startOfPeriod.getFullYear()}`;
       }
-    },
-    [reportType, employeeId, startDate, endDate, isAdmin]
-  );
+    
+      if (period === "yearly") {
+        return `${startOfPeriod.getUTCFullYear()}`;
+      }
+    
+      return formatDate(startOfPeriod); // Fallback if no valid period is provided
+    }, []);
 
-  // Fetch the initial data on component mount
+
+
+  // Cache the initial data when the component mounts
   useEffect(() => {
-    fetchReportData(period); // Fetch data for the initial period (weekly by default)
-  }, [fetchReportData, period]);
+    if (initialReportData) {
+      console.log("Initial Report Data before formatting:", initialReportData);
+
+      const formattedData = initialReportData.map((data) => ({
+        ...data,
+        formatted_period: formatPeriodRange(data.summary_period, "weekly"), // Default to weekly
+      }));
+      console.log(
+        "Formatted period (weekly):",
+        formatPeriodRange("2024-11-25T00:00:00.000Z", "weekly")
+      );
+      setCachedData((prevCache) => ({
+        ...prevCache,
+        weekly: formattedData,
+        monthly: formattedData.map((d) => ({
+          ...d,
+          formatted_period: formatPeriodRange(d.summary_period, "monthly"),
+        })),
+        yearly: formattedData.map((d) => ({
+          ...d,
+          formatted_period: formatPeriodRange(d.summary_period, "yearly"),
+        })),
+      }));
+    }
+  }, [initialReportData, formatPeriodRange]);
+  
+  
+  
 
   const handlePrint = () => {
     window.print();
@@ -125,74 +141,59 @@ const ReportPage = () => {
     return <div className="text-center">No report data available</div>;
   }
 
-  // Helper function to format period based on weekly, monthly, or yearly
-  const formatPeriodRange = (summaryPeriod, period) => {
-    const startOfPeriod = new Date(summaryPeriod);
 
-    const startDateObj = new Date(startDate);
-    const year = startDateObj.getFullYear();
-    console.log("The year is:", year);
-
-    if (period === "weekly") {
-      const endOfPeriod = new Date(startOfPeriod);
-      endOfPeriod.setDate(startOfPeriod.getDate() + 6);
-      return `${formatDate(startOfPeriod)} - ${formatDate(endOfPeriod)}`;
-    }
-
-    if (period === "monthly") {
-      return `${startOfPeriod.toLocaleString("default", {
-        month: "long",
-      })} ${startOfPeriod.getFullYear()}`;
-    }
-
-    if (period === "yearly") {
-      return `${startOfPeriod.getUTCFullYear()}`;
-    }
-
-    return formatDate(startOfPeriod); // Fallback if no valid period is provided
-  };
 
   const handleSaveCSV = () => {
-    let headers = ['Employee ID', 'First Name', 'Last Name', 'Facility Hours Worked', 'Driving Hours Worked'];
-    
+    let headers = [
+      "Employee ID",
+      "First Name",
+      "Last Name",
+      "Facility Hours Worked",
+      "Driving Hours Worked",
+    ];
+
     // Ensure correct data mapping and default handling
-    let dataRows = reportData.map(record => {
+    let dataRows = reportData.map((record) => {
       const facilityHours = record.facility_total_hours
         ? `${record.facility_total_hours.hours} hours ${record.facility_total_hours.minutes} minutes`
-        : '0 hours 0 minutes';
-        
+        : "0 hours 0 minutes";
+
       const drivingHours = record.driving_total_hours
         ? `${record.driving_total_hours.hours} hours ${record.driving_total_hours.minutes} minutes`
-        : '0 hours 0 minutes';
-  
+        : "0 hours 0 minutes";
+
       return [
         record.employee_id,
         record.first_name,
         record.last_name,
         facilityHours,
         drivingHours,
-      ].map(field => `"${field}"`).join(","); // Wrap each field in quotes
+      ]
+        .map((field) => `"${field}"`)
+        .join(","); // Wrap each field in quotes
     });
-  
+
     let rows = [
-      ['Total Hours Report'],
+      ["Total Hours Report"],
       [], // Empty row for spacing
-      headers.map(header => `"${header}"`).join(","), // Quote headers
-      ...dataRows
+      headers.map((header) => `"${header}"`).join(","), // Quote headers
+      ...dataRows,
     ];
-  
-    const formattedStartDate = formatDate(startDate, 'YYYY-MM-DD');
-    const formattedEndDate = formatDate(endDate, 'YYYY-MM-DD');
+
+    const formattedStartDate = formatDate(startDate, "YYYY-MM-DD");
+    const formattedEndDate = formatDate(endDate, "YYYY-MM-DD");
     const csvContent = "data:text/csv;charset=utf-8," + rows.join("\n");
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `Paychex_Timecard_Report_${formattedStartDate}_to_${formattedEndDate}.csv`);
+    link.setAttribute(
+      "download",
+      `Paychex_Timecard_Report_${formattedStartDate}_to_${formattedEndDate}.csv`
+    );
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
-  
 
   const renderDetailedTimecards = () => {
     const employeeInfo = reportData.length > 0 ? reportData[0] : {};
@@ -447,6 +448,7 @@ const ReportPage = () => {
   };
 
   const renderEmployeeSummary = () => {
+    console.log("Rendering Employee Summary Report", reportData);
     const groupedData = groupByEmployee(reportData);
 
     return (
