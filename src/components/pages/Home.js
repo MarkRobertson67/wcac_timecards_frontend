@@ -32,6 +32,7 @@ function Home() {
   const [isProfileComplete, setIsProfileComplete] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isWaitingForEmailVerification, setIsWaitingForEmailVerification] = useState(false);
 
   const navigate = useNavigate();
 
@@ -58,6 +59,8 @@ function Home() {
             console.error("Error fetching user profile:", err.message);
             alert("An error occurred while fetching your profile.");
           }
+        } else {
+          setIsWaitingForEmailVerification(true);
         }
       } else {
         setCurrentUser(null);
@@ -78,6 +81,7 @@ function Home() {
         await currentUser.reload(); // Reload the user's info
         if (currentUser.emailVerified) {
           clearInterval(interval);
+          setIsWaitingForEmailVerification(false);
           try {
             const response = await fetch(
               `${API}/employees/firebase/${currentUser.uid}`
@@ -95,11 +99,26 @@ function Home() {
             setShowModal(true);
           }
         }
-      }, 5000); // Check every 5 seconds
+      }, 2000); // Check every 2 seconds
 
       return () => clearInterval(interval); // Cleanup on unmount
     }
   }, [currentUser]);
+
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (!isProfileComplete) {
+        e.preventDefault();
+        e.returnValue = "You cannot navigate away until your profile is saved.";
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [isProfileComplete]);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -118,8 +137,8 @@ function Home() {
         setEmail("");
         setPassword("");
 
-        const activeTimecard = localStorage.getItem("startDate");
-        navigate(activeTimecard ? "/activeTimeCard" : "/createNewTimeCard");
+        //const activeTimecard = localStorage.getItem("startDate");
+        navigate("/createNewTimeCard");
       } else {
         // Sign up user
         const userCredential = await createUserWithEmailAndPassword(
@@ -161,8 +180,8 @@ function Home() {
   const handleModalClose = () => {
     setShowModal(false);
 
-    const activeTimecard = localStorage.getItem("startDate");
-    navigate(activeTimecard ? "/activeTimeCard" : "/createNewTimeCard");
+    //const activeTimecard = localStorage.getItem("startDate");
+    navigate("/createNewTimeCard");  //navigate(activeTimecard ? "/activeTimeCard" : "/createNewTimeCard");
   };
 
   const handleResendVerification = async () => {
@@ -192,35 +211,143 @@ function Home() {
 
   if (isLoadingAuth) {
     return (
-      <div className="text-center mt-5">
-        <p>Loading...</p>
+      <div className="text-center mt-4">
+        <div className="spinner-border custom-spinner" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
       </div>
     );
   }
 
+  // return (
+  //   <div className="container mt-5">
+  //     {currentUser ? (
+  //       <div className="text-center">
+  //         <h1>Welcome Back, {firstName || "User"}!</h1>
+  //         {showModal && !isProfileComplete && (
+  //           <ProfileModal onClose={handleModalClose} />
+  //         )}
+  //         {!currentUser.emailVerified && (
+  //           <div className="mb-3">
+  //             <p className="text-warning">
+  //               Your email is not verified. Please check your inbox.
+  //             </p>
+  //             <button
+  //               className="btn btn-link"
+  //               onClick={handleResendVerification}
+  //             >
+  //               Didn't get an email? Resend
+  //             </button>
+  //             {resendMessage && (
+  //               <p className="text-success mt-2">{resendMessage}</p>
+  //             )}
+  //           </div>
+  //         )}
+  //         {isProfileComplete && (
+  //           <button className="btn btn-danger mt-3" onClick={handleLogout}>
+  //             Logout
+  //           </button>
+  //         )}
+  //       </div>
+  //     ) : (
+  //       <>
+  //         <h1 className="text-center mb-4">
+  //           Please Login to access your account
+  //         </h1>
+  //         <form
+  //           onSubmit={handleSubmit}
+  //           className="card p-3 mx-auto"
+  //           style={{ maxWidth: "400px" }}
+  //         >
+  //           <div className="mb-3">
+  //             <input
+  //               type="email"
+  //               className="form-control"
+  //               placeholder="Email"
+  //               value={email}
+  //               onChange={(e) => setEmail(e.target.value)}
+  //               required
+  //             />
+  //           </div>
+  //           <div className="mb-3 position-relative">
+  //             <input
+  //               type={showPassword ? "text" : "password"}
+  //               className="form-control"
+  //               placeholder="Password"
+  //               value={password}
+  //               onChange={(e) => setPassword(e.target.value)}
+  //               required
+  //             />
+  //             <FontAwesomeIcon
+  //               icon={showPassword ? faEyeSlash : faEye}
+  //               className="position-absolute top-50 end-0 translate-middle-y me-3"
+  //               style={{ cursor: "pointer" }}
+  //               onClick={togglePasswordVisibility}
+  //             />
+  //           </div>
+  //           <button
+  //             type="submit"
+  //             className="btn btn-primary w-100"
+  //             disabled={isSubmitting}
+  //           >
+  //             {isSubmitting ? "Submitting..." : isLogin ? "Login" : "Sign Up"}
+  //           </button>
+  //           {isLogin && (
+  //             <div className="text-center mt-2">
+  //               <button
+  //                 type="button"
+  //                 className="btn btn-link"
+  //                 onClick={handleForgotPassword}
+  //               >
+  //                 Forgot Password?
+  //               </button>
+  //             </div>
+  //           )}
+  //           {error && <p className="text-danger mt-2">{error}</p>}
+  //         </form>
+  //         <div className="text-center mt-3">
+  //           <button
+  //             className="btn btn-secondary"
+  //             onClick={() => setIsLogin(!isLogin)}
+  //           >
+  //             {isLogin ? "Switch to Sign Up" : "Switch to Login"}
+  //           </button>
+  //         </div>
+  //       </>
+  //     )}
+  //   </div>
+  // );
   return (
     <div className="container mt-5">
-      {currentUser ? (
+      {isWaitingForEmailVerification && (
+  <div className="text-center">
+    <div className="spinner-border text-primary" role="status"></div>
+    <p className="mt-3">
+      Waiting for email verification. 
+    </p>
+    <p className="mt-2">
+      An email has been sent to your inbox with a verification link. Please open the email and click on the verification link to confirm your account.
+    </p>
+    <p className="mt-2">
+      Once you verify your email, this page will automatically update, and you can proceed to complete your profile.
+    </p>
+    <p className="mt-2 text-muted">
+      If you didn't receive the email, please check your spam or junk folder. You can also click the button below to resend the verification email.
+    </p>
+    <button className="btn btn-link" onClick={handleResendVerification}>
+      Didn't get an email? Resend Verification Email
+    </button>
+    {resendMessage && (
+      <p className="text-success mt-2">{resendMessage}</p>
+    )}
+  </div>
+)}
+
+      {currentUser && !isWaitingForEmailVerification && (
         <div className="text-center">
           <h1>Welcome Back, {firstName || "User"}!</h1>
           {showModal && !isProfileComplete && (
             <ProfileModal onClose={handleModalClose} />
-          )}
-          {!currentUser.emailVerified && (
-            <div className="mb-3">
-              <p className="text-warning">
-                Your email is not verified. Please check your inbox.
-              </p>
-              <button
-                className="btn btn-link"
-                onClick={handleResendVerification}
-              >
-                Didn't get an email? Resend
-              </button>
-              {resendMessage && (
-                <p className="text-success mt-2">{resendMessage}</p>
-              )}
-            </div>
           )}
           {isProfileComplete && (
             <button className="btn btn-danger mt-3" onClick={handleLogout}>
@@ -228,11 +355,10 @@ function Home() {
             </button>
           )}
         </div>
-      ) : (
+      )}
+      {!currentUser && !isWaitingForEmailVerification && (
         <>
-          <h1 className="text-center mb-4">
-            Please Login to access your account
-          </h1>
+          <h1 className="text-center mb-4">Please Login to access your account</h1>
           <form
             onSubmit={handleSubmit}
             className="card p-3 mx-auto"
