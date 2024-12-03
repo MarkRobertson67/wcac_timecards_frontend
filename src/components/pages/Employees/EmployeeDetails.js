@@ -163,7 +163,7 @@ function EmployeeDetails() {
                     value={employee.first_name}
                     onChange={handleChange}
                     size="sm"
-                    disabled={!isAdmin} // Non-admins can't edit this
+                    disabled={false}
                   />
                 </Form.Group>
               </Col>
@@ -176,7 +176,7 @@ function EmployeeDetails() {
                     value={employee.last_name}
                     onChange={handleChange}
                     size="sm"
-                    disabled={!isAdmin} // Non-admins can't edit this
+                    disabled={false}
                   />
                 </Form.Group>
               </Col>
@@ -267,6 +267,18 @@ function EmployeeDetails() {
                     </Form.Group>
                   </Col>
                 </Row>
+                <Col xs={12} md={6}>
+                    <Form.Group controlId="employee_id">
+                      <Form.Label className="small-text">Employee ID</Form.Label>
+                      <Form.Control
+                        type="text"
+                        name="employee_id"
+                        value={employee.id || ""}
+                        size="sm"
+                        disabled // Employee ID should not be editable
+                      />
+                    </Form.Group>
+                  </Col>
               </>
             )}
           </Form>
@@ -302,8 +314,6 @@ function EmployeeDetails() {
       </Card>
     </Container>
   );
-  
-
 }
 
 export default EmployeeDetails;
