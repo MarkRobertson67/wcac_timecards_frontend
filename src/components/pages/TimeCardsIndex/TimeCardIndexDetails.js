@@ -7,7 +7,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import { formatDate, formatTime } from "../utils/TimeAndDateUtils";
-import styles from "./TimeCardDetails.css";
+import styles from "./TimeCardIndexDetails.css";
 
 const API = process.env.REACT_APP_API_URL;
 

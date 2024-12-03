@@ -114,7 +114,7 @@ function TimeCardsIndex() {
   // };
 
   const handleDateClick = (info) => {
-    navigate(`/timeCardDetails/${info.dateStr}`, {
+    navigate(`/timeCardIndexDetails/${info.dateStr}`, {
       state: { employeeId }, // Pass employeeId
     });
   };
