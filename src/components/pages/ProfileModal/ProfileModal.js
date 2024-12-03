@@ -9,11 +9,12 @@ function ProfileModal({ onClose }) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
+  const [position, setPosition] = useState(""); 
 
   const API = process.env.REACT_APP_API_URL;
 
   const handleSave = async () => {
-    if (!firstName || !lastName || !phone) {
+    if (!firstName || !lastName || !phone || !position) {
       alert("Please complete all fields");
       console.log("Validation failed.");
       return;
@@ -32,7 +33,7 @@ function ProfileModal({ onClose }) {
       first_name: firstName,
       last_name: lastName,
       phone: phone,
-      position: "Employee",
+      position: position,
     };
 
     console.log("Employee Data:", employeeData);
@@ -94,7 +95,9 @@ function ProfileModal({ onClose }) {
             ></button>
           </div>
           <div className="modal-body">
-            <p>Welcome! Please complete your profile.</p>
+            <p>Welcome! Please complete your profile. Select your position based
+              on your role. If you work in the facility only, choose "Facility."
+              If you drive and work in the facility, select "Driver, Facility."</p>
             <div className="mb-3">
               <input
                 type="text"
@@ -121,6 +124,18 @@ function ProfileModal({ onClose }) {
                 value={phone}
                 onChange={handlePhoneChange}
               />
+            </div>
+            <div className="mb-3">
+              <select
+                className="form-select"
+                value={position}
+                onChange={(e) => setPosition(e.target.value)}
+              >
+                <option value="">Select Position</option>
+                <option value="Driver">Driver</option>
+                <option value="Facility">Facility</option>
+                <option value="Driver, Facility">Driver, Facility</option>
+              </select>
             </div>
           </div>
           <div className="modal-footer">
