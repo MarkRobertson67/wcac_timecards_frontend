@@ -57,7 +57,7 @@ function CreateNewTimeCard({ setIsNewTimeCardCreated }) {
                 onClick={handleStartDateSelection} 
                 className={`btn btn-primary ${styles.button}`}
               >
-                Create Time Card
+                View / Create Time Card
               </button>
             </div>
           </div>
