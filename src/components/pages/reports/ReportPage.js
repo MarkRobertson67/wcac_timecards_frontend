@@ -59,41 +59,42 @@ const ReportPage = () => {
       setLoading(false);
     } else {
       console.log(`No cached data for period: ${newPeriod}`);
-      setReportData([]); // Clear the data or set a default
-      setLoading(false); // End loading if no data
+      // Simulate fetching data
+      setTimeout(() => {
+        setReportData([]); // Clear the data or set a default
+        setLoading(false); // Stop loading after timeout
+      }, 500); // Simulate a quick load
     }
   };
 
-    // Helper function to format period based on weekly, monthly, or yearly
-    const formatPeriodRange = useCallback((summaryPeriod, period) => {
-      const startOfPeriod = new Date(summaryPeriod);
-    
-      if (period === "weekly") {
-        const endOfPeriod = new Date(startOfPeriod);
-        endOfPeriod.setDate(startOfPeriod.getDate() + 6);
-        return `${formatDate(startOfPeriod)} - ${formatDate(endOfPeriod)}`;
-      }
-    
-      if (period === "monthly") {
-        return `${startOfPeriod.toLocaleString("default", {
-          month: "long",
-        })} ${startOfPeriod.getFullYear()}`;
-      }
-    
-      if (period === "yearly") {
-        return `${startOfPeriod.getUTCFullYear()}`;
-      }
-    
-      return formatDate(startOfPeriod); // Fallback if no valid period is provided
-    }, []);
+  // Helper function to format period based on weekly, monthly, or yearly
+  const formatPeriodRange = useCallback((summaryPeriod, period) => {
+    const startOfPeriod = new Date(summaryPeriod);
 
+    if (period === "weekly") {
+      const endOfPeriod = new Date(startOfPeriod);
+      endOfPeriod.setDate(startOfPeriod.getDate() + 6);
+      return `${formatDate(startOfPeriod)} - ${formatDate(endOfPeriod)}`;
+    }
 
+    if (period === "monthly") {
+      return `${startOfPeriod.toLocaleString("default", {
+        month: "long",
+      })} ${startOfPeriod.getFullYear()}`;
+    }
+
+    if (period === "yearly") {
+      return `${startOfPeriod.getUTCFullYear()}`;
+    }
+
+    return formatDate(startOfPeriod); // Fallback if no valid period is provided
+  }, []);
 
   // Cache the initial data when the component mounts
   useEffect(() => {
     if (initialReportData) {
       console.log("Initial Report Data before formatting:", initialReportData);
-
+      setLoading(true);
       const formattedData = initialReportData.map((data) => ({
         ...data,
         formatted_period: formatPeriodRange(data.summary_period, "weekly"), // Default to weekly
@@ -114,11 +115,9 @@ const ReportPage = () => {
           formatted_period: formatPeriodRange(d.summary_period, "yearly"),
         })),
       }));
+      setLoading(false);
     }
   }, [initialReportData, formatPeriodRange]);
-  
-  
-  
 
   const handlePrint = () => {
     window.print();
@@ -129,19 +128,24 @@ const ReportPage = () => {
     return (
       <div className="text-center mt-4">
         <div className="spinner-border custom-spinner" role="status">
-          <span className="visually-hidden">Loading report data...</span>
+          <span className="visually-hidden">Preparing report...</span>
         </div>
       </div>
     );
   }
 
-  // If no report data is available, display a message
+  // If no report data is available, display a message with a Back button
   if (!reportType || reportData.length === 0) {
     console.log("No report data or type provided");
-    return <div className="text-center">No report data available</div>;
+    return (
+      <div className="text-center">
+        <p>No report data available</p>
+        <button className="btn btn-dark mx-2" onClick={() => navigate(-1)}>
+          Back
+        </button>
+      </div>
+    );
   }
-
-
 
   const handleSaveCSV = () => {
     let headers = [
