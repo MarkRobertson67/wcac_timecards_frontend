@@ -2,9 +2,7 @@
 // Copyright (c) 2024 Mark Robertson
 // See LICENSE.txt file for details.
 
-// Proprietary Software License
-// Copyright (c) 2024 Mark Robertson
-// See LICENSE.txt file for details.
+
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
