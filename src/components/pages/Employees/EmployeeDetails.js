@@ -63,6 +63,17 @@ function EmployeeDetails() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+      // Prevent changing is_admin to false for the protected admin account
+  if (
+    name === "admin" &&
+    employee.id === 1 && // Check the protected admin account ID
+    value === "false"
+  ) {
+    alert("Admin privileges cannot be removed for this account.");
+    return;
+  }
+
     setEmployee((prevEmployee) => ({
       ...prevEmployee,
       [name]: name === "is_admin" ? value === "true" : value,
@@ -70,37 +81,53 @@ function EmployeeDetails() {
   };
 
   const handleSave = async () => {
-    if (window.confirm("Are you sure you want to save these changes?")) {
-      try {
-        // Send only editable fields for employees
-        const dataToUpdate = isAdmin
-          ? employee
-          : {
-              first_name: employee.first_name,
-              last_name: employee.last_name,
-              phone: employee.phone,
-            };
-
-        const response = await fetch(`${API}/employees/${id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(dataToUpdate),
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to update employee details");
-        }
-        alert("Employee details updated successfully!");
-      } catch (error) {
-        console.error("Error updating employee details:", error);
-        alert("Failed to update employee details.");
+    try {
+      // Check if the protected admin account is being modified
+      if (employee.id === 1 && employee.is_admin === false) {
+        alert("The primary admin account cannot have admin privileges removed.");
+        return;
       }
+  
+      // Confirm the save operation
+      if (!window.confirm("Are you sure you want to save these changes?")) {
+        return;
+      }
+  
+      // Prepare data to update based on admin status
+      const dataToUpdate = isAdmin
+        ? employee
+        : {
+            first_name: employee.first_name,
+            last_name: employee.last_name,
+            phone: employee.phone,
+          };
+  
+      const response = await fetch(`${API}/employees/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(dataToUpdate),
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to update employee details");
+      }
+  
+      alert("Employee details updated successfully!");
+    } catch (error) {
+      console.error("Error updating employee details:", error);
+      alert("Failed to update employee details.");
     }
   };
+  
 
   const handleDelete = async () => {
+      // Prevent deletion of the protected admin account
+  if (employee.id === 1) { // Protected admin account ID
+    alert("The primary admin account cannot be deleted.");
+    return;
+  }
     if (
       window.confirm(
         "Are you sure you want to delete this employee? This action cannot be undone."
@@ -122,6 +149,10 @@ function EmployeeDetails() {
       }
     }
   };
+
+  // Conditional rendering for buttons
+const isProtectedAdminAccount = employee?.id === 1;
+
 
   if (isLoading) {
     return (
@@ -288,6 +319,7 @@ function EmployeeDetails() {
               size="sm"
               className="mx-1"
               onClick={handleSave}
+              disabled={isProtectedAdminAccount} // Disable Delete button for admin account
             >
               Save Changes
             </Button>
@@ -297,6 +329,7 @@ function EmployeeDetails() {
                 size="sm"
                 className="mx-1"
                 onClick={handleDelete}
+                disabled={isProtectedAdminAccount} // Disable Delete button for admin account
               >
                 Delete Employee
               </Button>
