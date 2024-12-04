@@ -2,6 +2,10 @@
 // Copyright (c) 2024 Mark Robertson
 // See LICENSE.txt file for details.
 
+
+
+
+
 import React, { useState, useEffect } from "react";
 import {
   createUserWithEmailAndPassword,
@@ -104,6 +108,7 @@ function Home() {
       return () => clearInterval(interval); // Cleanup on unmount
     }
   }, [currentUser]);
+
 
   useEffect(() => {
     const handleBeforeUnload = (e) => {
@@ -248,7 +253,7 @@ function Home() {
 
       {currentUser && !isWaitingForEmailVerification && (
         <div className="text-center">
-          <h1>Welcome Back, {firstName || "User"}!</h1>
+          <h1>Hello {firstName || "User"}! You are currently logged in</h1>
           {showModal && !isProfileComplete && (
             <ProfileModal onClose={handleModalClose} />
           )}

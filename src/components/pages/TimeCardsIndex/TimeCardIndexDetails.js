@@ -99,6 +99,7 @@ function TimeCardDetails() {
 
 
   const drivingEntries = timeEntries
+  .filter((entry) => entry.driving_total_hours && (entry.driving_total_hours.hours > 0 || entry.driving_total_hours.minutes > 0))
   .map((entry) => ({
     start_time: entry.driving_start_time,
     lunch_start: entry.driving_lunch_start,
@@ -108,6 +109,7 @@ function TimeCardDetails() {
   }));
 
 const facilityEntries = timeEntries
+.filter((entry) => entry.facility_total_hours && (entry.facility_total_hours.hours > 0 || entry.facility_total_hours.minutes > 0))
   .map((entry) => ({
     start_time: entry.facility_start_time,
     lunch_start: entry.facility_lunch_start,

@@ -95,40 +95,51 @@ function Employees() {
               {isAdmin && <th>Actions</th>}
             </tr>
           </thead>
-          <tbody>
-            {employees.map((record) => (
-              <tr key={record.id}>
-                <td>
-                  {record.first_name} {record.last_name}
-                </td>
-                {isAdmin ? (
+        </Table>
+        {/* Scrollable container for the table body */}
+        <div
+          style={{
+            maxHeight: "400px", // Set the maximum height for scrolling
+            overflowY: "auto",
+            border: "1px solid #ddd",
+          }}
+        >
+          <Table striped bordered hover responsive="sm" size="sm" className="text-center">
+            <tbody>
+              {employees.map((record) => (
+                <tr key={record.id}>
                   <td>
-                    <Button
-                      variant="primary"
-                      size="sm"
-                      onClick={() => navigate(`/employee/${record.id}`)}
-                    >
-                      View Details
-                    </Button>
+                    {record.first_name} {record.last_name}
                   </td>
-                ) : (
-                  // If not admin, show a button only for their own profile
-                  record.id === currentUser?.id && (
+                  {isAdmin ? (
                     <td>
                       <Button
                         variant="primary"
                         size="sm"
                         onClick={() => navigate(`/employee/${record.id}`)}
                       >
-                        Edit My Profile
+                        View Details
                       </Button>
                     </td>
-                  )
-                )}
-              </tr>
-            ))}
-          </tbody>
-        </Table>
+                  ) : (
+                    // If not admin, show a button only for their own profile
+                    record.id === currentUser?.id && (
+                      <td>
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          onClick={() => navigate(`/employee/${record.id}`)}
+                        >
+                          Edit My Profile
+                        </Button>
+                      </td>
+                    )
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </div>
       </div>
     );
   };
