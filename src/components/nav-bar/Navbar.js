@@ -82,7 +82,7 @@ function NavBar({ isNewTimeCardCreated }) {
               >
                 {isNewTimeCardCreated
                   ? "Active Time Card"
-                  : "Create New Time Card"}
+                  : "View / Create Time Card"}
               </Link>
             </li>
             <li
