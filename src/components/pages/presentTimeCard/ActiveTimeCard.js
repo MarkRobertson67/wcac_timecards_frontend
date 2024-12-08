@@ -2,8 +2,6 @@
 // Copyright (c) 2024 Mark Robertson
 // See LICENSE.txt file for details.
 
-
-
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../../firebase/firebaseConfig";
@@ -30,6 +28,9 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
   // Get window size for Confetti
   const { width, height } = useWindowSize();
   //console.log('Window Size:', width, height);
+
+    // Check if the screen width is mobile (adjust as needed for your breakpoint)
+    //const isMobile = width <= 768;
 
   useEffect(() => {
     const fetchEmployeeId = async () => {
@@ -307,57 +308,60 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
   useEffect(() => {
     const fetchData = async () => {
-     
-        if (hasFetched.current) {
-          console.log("Skipping fetch: already fetched.");
-          return;
-        }
-      
-        if (!employeeId) {
-          console.log("Skipping fetch: employeeId is missing.");
-          return;
-        }
-      
-        console.log("Fetching data for employee:", employeeId);
-  
+      if (hasFetched.current) {
+        console.log("Skipping fetch: already fetched.");
+        return;
+      }
+
+      if (!employeeId) {
+        console.log("Skipping fetch: employeeId is missing.");
+        return;
+      }
+
+      console.log("Fetching data for employee:", employeeId);
+
       try {
         hasFetched.current = true;
-  
+
         let storedStartDateStr = localStorage.getItem("startDate");
         let startDate = storedStartDateStr
           ? moment.utc(new Date(storedStartDateStr))
           : moment.utc();
 
-          console.log("Original start date:", startDate.format("YYYY-MM-DD"));
-  
+        console.log("Original start date:", startDate.format("YYYY-MM-DD"));
+
         if (startDate.day() === 0) {
           console.log("Adjusting start date from Sunday to Monday");
           startDate.add(1, "day");
           localStorage.setItem("startDate", startDate.toISOString());
-          console.log("Adjusted start date saved:", startDate.format("YYYY-MM-DD"));
+          console.log(
+            "Adjusted start date saved:",
+            startDate.format("YYYY-MM-DD")
+          );
           setStartDateAdjusted(true); // Mark adjustment as done
           return; // Exit to allow re-render
         }
-  
-        console.log("Adjusted Start Date for fetching:", startDate.format("YYYY-MM-DD"));
-  
+
+        console.log(
+          "Adjusted Start Date for fetching:",
+          startDate.format("YYYY-MM-DD")
+        );
+
         const previousMonday = getPreviousMonday(startDate.toDate());
         console.log(
           "Previous Monday for fetching:",
           previousMonday.toISOString()
         );
-  
+
         await fetchTimeCardData(previousMonday);
       } catch (error) {
         console.error("Error during initial data fetch:", error);
         hasFetched.current = false;
       }
     };
-  
+
     fetchData();
   }, [fetchTimeCardData, employeeId, startDateAdjusted]);
-
-
 
   const calculateTotalTime = (start, lunchStart, lunchEnd, end) => {
     console.log("Calculating total time with:", {
@@ -669,7 +673,6 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     });
   };
 
-
   // Update useEffect to include activity in the payload
   useEffect(() => {
     if (!entryToUpdate) return; // Exit if there's no entry to update
@@ -925,6 +928,10 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     console.log({ facilityTotalHours: entry.facilityTotalHours }); // Log the facilityTotalHours of each entry before rendering
   });
 
+
+  
+  // Desktop layout
+  
   return (
     <div className={`container-fluid mt-4 ${styles.container}`}>
       {showConfetti && (
@@ -935,7 +942,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
             position: "fixed",
             top: 0,
             left: 0,
-            zIndex: 9999, // Ensure it's on top of other elements
+            zIndex: 9999,
           }}
         />
       )}
@@ -958,7 +965,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
           ) : isSubmitted ? (
             "Submitted"
           ) : (
-            "Submit"
+            "Turn in your Timecard"
           )}
         </button>
 
@@ -991,40 +998,43 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
       <h2 className="text-center mb-4">Active Timecard</h2>
 
+      {/* Key explanation with delete red dot */}
+      <div className="text-center mb-4">
+        <p>
+          click <span style={{ color: "red" }}>🔴</span>{" "}
+          to delete time.
+        </p>
+      </div>
+
       {isLoading ? (
         <div className="text-center">
           <div className="spinner-border custom-spinner" role="status"></div>
           <div className="mt-2">Loading timecard data...</div>
         </div>
       ) : (
-        <div className="table-responsive">
-          <table className="table table-bordered table-sm">
+        <div className={`table-responsive ${styles.tableWrapper}`}>
+          <table className={`table table-bordered table-sm ${styles.table}`}>
             <thead>
               <tr>
                 <th>Date</th>
-                <th>Activity</th>
-                <th>Start Time</th>
-                <th>Lunch Start</th>
-                <th>Activity</th>
-                <th>Lunch End</th>
-                <th>End Time</th>
-                <th>
-                  Facility
-                  <br />
-                  Total Time
-                </th>
-                <th>
-                  Driving
-                  <br />
-                  Total Time
-                </th>
+                <th className={styles.activityColumn}>Activity</th>
+                <th className={styles.timeColumn}>Start Time</th>
+                <th className={styles.timeColumn}>Lunch Start</th>
+                <th className={styles.activityColumn}>Activity</th>
+                <th className={styles.timeColumn}>Lunch End</th>
+                <th className={styles.timeColumn}>End Time</th>
+                <th className={styles.totalTimeColumn}>Facility Total Time</th>
+                <th className={styles.totalTimeColumn}>Driving Total Time</th>
               </tr>
             </thead>
 
             <tbody>
               {timeCard.entries.map((entry, index) => (
                 <tr key={entry.date}>
-                  <td>{moment.utc(entry.date).format("dddd, MMM D, YYYY")}</td>
+                  <td className={styles.dateColumn}>
+                    <div>{moment.utc(entry.date).format("dddd")}</div>
+                    <div>{moment.utc(entry.date).format("MMM D, YYYY")}</div>
+                  </td>
 
                   {/* Activity (Morning) */}
                   <td>
@@ -1033,7 +1043,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                       onChange={(e) =>
                         handleChange(index, "morningActivity", e.target.value)
                       }
-                      style={{ width: "84px" }}
+                      className="form-select"
                     >
                       <option value="Facility">Facility</option>
                       <option value="Driving">Driving</option>
@@ -1041,29 +1051,51 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                   </td>
 
                   {/* Facility or Driving Start Time */}
-                  <td>
-                    <input
-                      type="time"
-                      value={
-                        entry.morningActivity === "Facility"
-                          ? entry.facilityStartTime || ""
-                          : entry.morningActivity === "Driving"
-                          ? entry.drivingStartTime || ""
-                          : "" // Fallback to an empty value if neither activity is set
-                      }
-                      onChange={(e) =>
-                        handleChange(
-                          index,
+                  <td className={styles.timeColumn}>
+                    <div className="d-flex align-items-center">
+                      <input
+                        type="time"
+                        className="form-control"
+                        value={
                           entry.morningActivity === "Facility"
-                            ? "facilityStartTime"
-                            : "drivingStartTime",
-                          e.target.value
-                        )
-                      }
-                      onBlur={(e) =>
-                        validateAMPM(index, e.target.value, "startTime")
-                      }
-                    />
+                            ? entry.facilityStartTime || ""
+                            : entry.morningActivity === "Driving"
+                            ? entry.drivingStartTime || ""
+                            : "" // Fallback to an empty value if neither activity is set
+                        }
+                        onChange={(e) =>
+                          handleChange(
+                            index,
+                            entry.morningActivity === "Facility"
+                              ? "facilityStartTime"
+                              : "drivingStartTime",
+                            e.target.value
+                          )
+                        }
+                        onBlur={(e) =>
+                          validateAMPM(index, e.target.value, "startTime")
+                        }
+                      />
+                      <span
+                        style={{
+                          color: "red",
+                          marginLeft: "5px",
+                          cursor: "pointer",
+                        }}
+                        onClick={() =>
+                          handleChange(
+                            index,
+                            entry.morningActivity === "Facility"
+                              ? "facilityStartTime"
+                              : "drivingStartTime",
+                            null
+                          )
+                        }
+                      >
+                        🔴
+                      </span>
+                    </div>
+
                     {validationMessages[index]?.startTime && (
                       <div style={{ color: "red", fontSize: "0.85em" }}>
                         {validationMessages[index].startTime}
@@ -1072,29 +1104,48 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                   </td>
 
                   {/* Facility or Driving Lunch Start */}
-                  <td>
-                    <input
-                      type="time"
-                      value={
-                        entry.morningActivity === "Facility"
-                          ? entry.facilityLunchStart || ""
-                          : entry.morningActivity === "Driving"
-                          ? entry.drivingLunchStart || ""
-                          : "" // Fallback to an empty value if neither activity is set
-                      }
-                      onChange={(e) =>
-                        handleChange(
-                          index,
+                  <td className={styles.timeColumn}>
+                    <div className="d-flex align-items-center">
+                      <input
+                        type="time"
+                        className="form-control"
+                        value={
                           entry.morningActivity === "Facility"
-                            ? "facilityLunchStart"
-                            : "drivingLunchStart",
-                          e.target.value
-                        )
-                      }
-                      onBlur={(e) =>
-                        validateAMPM(index, e.target.value, "lunchStart")
-                      }
-                    />
+                            ? entry.facilityLunchStart || ""
+                            : entry.morningActivity === "Driving"
+                            ? entry.drivingLunchStart || ""
+                            : "" // Fallback to an empty value if neither activity is set
+                        }
+                        onChange={(e) =>
+                          handleChange(
+                            index,
+                            entry.morningActivity === "Facility"
+                              ? "facilityLunchStart"
+                              : "drivingLunchStart",
+                            e.target.value
+                          )
+                        }
+                      />
+                      <span
+                        style={{
+                          color: "red",
+                          marginLeft: "5px",
+                          cursor: "pointer",
+                        }}
+                        onClick={() =>
+                          handleChange(
+                            index,
+                            entry.morningActivity === "Facility"
+                              ? "facilityLunchStart"
+                              : "drivingLunchStart",
+                            null
+                          )
+                        }
+                      >
+                        🔴
+                      </span>
+                    </div>
+
                     {validationMessages[index]?.lunchStart && (
                       <div style={{ color: "red", fontSize: "0.85em" }}>
                         {validationMessages[index].lunchStart}
@@ -1109,7 +1160,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                       onChange={(e) =>
                         handleChange(index, "afternoonActivity", e.target.value)
                       }
-                      style={{ width: "84px" }}
+                      className="form-select"
                     >
                       <option value="Facility">Facility</option>
                       <option value="Driving">Driving</option>
@@ -1117,29 +1168,48 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                   </td>
 
                   {/* Facility or Driving Lunch End */}
-                  <td>
-                    <input
-                      type="time"
-                      value={
-                        entry.afternoonActivity === "Facility"
-                          ? entry.facilityLunchEnd || ""
-                          : entry.afternoonActivity === "Driving"
-                          ? entry.drivingLunchEnd || ""
-                          : "" // Fallback to an empty value if neither activity is set
-                      }
-                      onChange={(e) =>
-                        handleChange(
-                          index,
-                          entry.afternoonActivity === "Facility"
-                            ? "facilityLunchEnd"
-                            : "drivingLunchEnd",
-                          e.target.value
-                        )
-                      }
-                      onBlur={(e) =>
-                        validateAMPM(index, e.target.value, "lunchEnd")
-                      }
-                    />
+                  <td className={styles.timeColumn}>
+                    <div className="d-flex align-items-center">
+                      <input
+                        type="time"
+                        className="form-control"
+                        value={
+                          entry.morningActivity === "Facility"
+                            ? entry.facilityLunchEnd || ""
+                            : entry.morningActivity === "Driving"
+                            ? entry.drivingLunchEnd || ""
+                            : "" // Fallback to an empty value if neither activity is set
+                        }
+                        onChange={(e) =>
+                          handleChange(
+                            index,
+                            entry.morningActivity === "Facility"
+                              ? "facilityLunchEnd"
+                              : "drivingLunchEnd",
+                            e.target.value
+                          )
+                        }
+                      />
+                      <span
+                        style={{
+                          color: "red",
+                          marginLeft: "5px",
+                          cursor: "pointer",
+                        }}
+                        onClick={() =>
+                          handleChange(
+                            index,
+                            entry.morningActivity === "Facility"
+                              ? "facilityLunchEnd"
+                              : "drivingLunchEnd",
+                            null
+                          )
+                        }
+                      >
+                        🔴
+                      </span>
+                    </div>
+
                     {validationMessages[index]?.lunchEnd && (
                       <div style={{ color: "red", fontSize: "0.85em" }}>
                         {validationMessages[index].lunchEnd}
@@ -1148,29 +1218,48 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                   </td>
 
                   {/* Facility or Driving End Time */}
-                  <td>
-                    <input
-                      type="time"
-                      value={
-                        entry.afternoonActivity === "Facility"
-                          ? entry.facilityEndTime || ""
-                          : entry.afternoonActivity === "Driving"
-                          ? entry.drivingEndTime || ""
-                          : "" // Fallback to an empty value if neither activity is set
-                      }
-                      onChange={(e) =>
-                        handleChange(
-                          index,
-                          entry.afternoonActivity === "Facility"
-                            ? "facilityEndTime"
-                            : "drivingEndTime",
-                          e.target.value
-                        )
-                      }
-                      onBlur={(e) =>
-                        validateAMPM(index, e.target.value, "endTime")
-                      }
-                    />
+                  <td className={styles.timeColumn}>
+                    <div className="d-flex align-items-center">
+                      <input
+                        type="time"
+                        className="form-control"
+                        value={
+                          entry.morningActivity === "Facility"
+                            ? entry.facilityEndTime || ""
+                            : entry.morningActivity === "Driving"
+                            ? entry.drivingEndTime || ""
+                            : "" // Fallback to an empty value if neither activity is set
+                        }
+                        onChange={(e) =>
+                          handleChange(
+                            index,
+                            entry.morningActivity === "Facility"
+                              ? "facilityEndTime"
+                              : "drivingEndTime",
+                            e.target.value
+                          )
+                        }
+                      />
+                      <span
+                        style={{
+                          color: "red",
+                          marginLeft: "5px",
+                          cursor: "pointer",
+                        }}
+                        onClick={() =>
+                          handleChange(
+                            index,
+                            entry.morningActivity === "Facility"
+                              ? "facilityEndTime"
+                              : "drivingEndTime",
+                            null
+                          )
+                        }
+                      >
+                        🔴
+                      </span>
+                    </div>
+
                     {validationMessages[index]?.endTime && (
                       <div style={{ color: "red", fontSize: "0.85em" }}>
                         {validationMessages[index].endTime}
