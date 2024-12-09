@@ -1103,17 +1103,23 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                         style={{
                           color: "red",
                           marginLeft: "5px",
-                          cursor: "pointer",
+                          cursor: entry.status === "active" ? "pointer" : "not-allowed", // Change cursor if not active
                         }}
-                        onClick={() =>
-                          handleChange(
-                            index,
-                            entry.morningActivity === "Facility"
-                              ? "facilityStartTime"
-                              : "drivingStartTime",
-                            null
-                          )
-                        }
+                        onClick={() => {
+                          if (entry.status === "active") {
+                            handleChange(
+                              index,
+                              entry.morningActivity === "Facility"
+                                ? "facilityStartTime"
+                                : "drivingStartTime",
+                              null
+                            );
+                          } else {
+                            alert(
+                              "You cannot delete this timecard entry because it has already been submitted."
+                            );
+                          }
+                        }}
                       >
                         🔴
                       </span>
@@ -1137,7 +1143,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                             ? entry.facilityLunchStart || ""
                             : entry.morningActivity === "Driving"
                             ? entry.drivingLunchStart || ""
-                            : "" // Fallback to an empty value if neither activity is set
+                            : ""
                         }
                         onChange={(e) =>
                           handleChange(
@@ -1153,17 +1159,23 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                         style={{
                           color: "red",
                           marginLeft: "5px",
-                          cursor: "pointer",
+                          cursor: entry.status === "active" ? "pointer" : "not-allowed",
                         }}
-                        onClick={() =>
-                          handleChange(
-                            index,
-                            entry.morningActivity === "Facility"
-                              ? "facilityLunchStart"
-                              : "drivingLunchStart",
-                            null
-                          )
-                        }
+                        onClick={() => {
+                          if (entry.status === "active") {
+                            handleChange(
+                              index,
+                              entry.morningActivity === "Facility"
+                                ? "facilityLunchStart"
+                                : "drivingLunchStart",
+                              null
+                            );
+                          } else {
+                            alert(
+                              "You cannot delete this timecard entry because it has already been submitted."
+                            );
+                          }
+                        }}
                       >
                         🔴
                       </span>
@@ -1197,16 +1209,16 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                         type="time"
                         className="form-control"
                         value={
-                          entry.morningActivity === "Facility"
+                          entry.afternoonActivity === "Facility"
                             ? entry.facilityLunchEnd || ""
-                            : entry.morningActivity === "Driving"
+                            : entry.afternoonActivity === "Driving"
                             ? entry.drivingLunchEnd || ""
-                            : "" // Fallback to an empty value if neither activity is set
+                            : ""
                         }
                         onChange={(e) =>
                           handleChange(
                             index,
-                            entry.morningActivity === "Facility"
+                            entry.afternoonActivity === "Facility"
                               ? "facilityLunchEnd"
                               : "drivingLunchEnd",
                             e.target.value
@@ -1217,17 +1229,23 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                         style={{
                           color: "red",
                           marginLeft: "5px",
-                          cursor: "pointer",
+                          cursor: entry.status === "active" ? "pointer" : "not-allowed",
                         }}
-                        onClick={() =>
-                          handleChange(
-                            index,
-                            entry.morningActivity === "Facility"
-                              ? "facilityLunchEnd"
-                              : "drivingLunchEnd",
-                            null
-                          )
-                        }
+                        onClick={() => {
+                          if (entry.status === "active") {
+                            handleChange(
+                              index,
+                              entry.afternoonActivity === "Facility"
+                                ? "facilityLunchEnd"
+                                : "drivingLunchEnd",
+                              null
+                            );
+                          } else {
+                            alert(
+                              "You cannot delete this timecard entry because it has already been submitted."
+                            );
+                          }
+                        }}
                       >
                         🔴
                       </span>
@@ -1247,16 +1265,16 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                         type="time"
                         className="form-control"
                         value={
-                          entry.morningActivity === "Facility"
+                          entry.afternoonActivity === "Facility"
                             ? entry.facilityEndTime || ""
-                            : entry.morningActivity === "Driving"
+                            : entry.afternoonActivity === "Driving"
                             ? entry.drivingEndTime || ""
-                            : "" // Fallback to an empty value if neither activity is set
+                            : ""
                         }
                         onChange={(e) =>
                           handleChange(
                             index,
-                            entry.morningActivity === "Facility"
+                            entry.afternoonActivity === "Facility"
                               ? "facilityEndTime"
                               : "drivingEndTime",
                             e.target.value
@@ -1267,17 +1285,23 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                         style={{
                           color: "red",
                           marginLeft: "5px",
-                          cursor: "pointer",
+                          cursor: entry.status === "active" ? "pointer" : "not-allowed",
                         }}
-                        onClick={() =>
-                          handleChange(
-                            index,
-                            entry.morningActivity === "Facility"
-                              ? "facilityEndTime"
-                              : "drivingEndTime",
-                            null
-                          )
-                        }
+                        onClick={() => {
+                          if (entry.status === "active") {
+                            handleChange(
+                              index,
+                              entry.afternoonActivity === "Facility"
+                                ? "facilityEndTime"
+                                : "drivingEndTime",
+                              null
+                            );
+                          } else {
+                            alert(
+                              "You cannot delete this timecard entry because it has already been submitted."
+                            );
+                          }
+                        }}
                       >
                         🔴
                       </span>
@@ -1312,5 +1336,4 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
   );
   
 }
-
 export default ActiveTimeCard;
