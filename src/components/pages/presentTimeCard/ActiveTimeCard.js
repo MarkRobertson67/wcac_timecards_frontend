@@ -10,6 +10,7 @@ import moment from "moment-timezone";
 import Confetti from "react-confetti";
 import { useWindowSize } from "react-use";
 
+
 const API = process.env.REACT_APP_API_URL;
 
 function ActiveTimeCard({ setIsNewTimeCardCreated }) {
@@ -29,8 +30,8 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
   const { width, height } = useWindowSize();
   //console.log('Window Size:', width, height);
 
-    // Check if the screen width is mobile (adjust as needed for your breakpoint)
-    //const isMobile = width <= 768;
+  // Check if the screen width is mobile (adjust as needed for your breakpoint)
+  //const isMobile = width <= 768;
 
   useEffect(() => {
     const fetchEmployeeId = async () => {
@@ -61,6 +62,8 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
   }, []);
 
   const [entryToUpdate, setEntryToUpdate] = useState(null);
+
+  
 
   const getPreviousMonday = (date) => {
     const utcDate = moment.utc(date); // Convert the input date to UTC
@@ -99,6 +102,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     const parsedTime = moment(time, "HH:mm:ss");
     return parsedTime.isValid() ? parsedTime.format("HH:mm") : "";
   };
+  
 
   const fetchTimeCardData = useCallback(
     async (startDate) => {
@@ -363,6 +367,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     fetchData();
   }, [fetchTimeCardData, employeeId, startDateAdjusted]);
 
+
   const calculateTotalTime = (start, lunchStart, lunchEnd, end) => {
     console.log("Calculating total time with:", {
       start,
@@ -410,6 +415,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     return day !== 0 && day !== 6; // Not Sunday (0) or Saturday (6)
   };
 
+
   const calculateTotalTimeForAllEntries = () => {
     let facilityTotalMinutes = 0;
     let drivingTotalMinutes = 0;
@@ -452,6 +458,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     return `${facilityTotalTime} / ${drivingTotalTime}`;
   };
 
+
   const validateAMPM = (index, time, field) => {
     if (!time || time.length < 5) {
       // Clear message if input is invalid or empty
@@ -484,6 +491,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
       }
     }
 
+
     setValidationMessages((prev) => ({
       ...prev,
       [index]: {
@@ -492,6 +500,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
       },
     }));
   };
+
 
   const isValidTimeOrder = (start, lunchStart, lunchEnd, end) => {
     if (
@@ -524,6 +533,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     }
     return true;
   };
+
 
   const handleChange = (index, field, value) => {
     // Log the current arguments received by the function
@@ -673,6 +683,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     });
   };
 
+
   // Update useEffect to include activity in the payload
   useEffect(() => {
     if (!entryToUpdate) return; // Exit if there's no entry to update
@@ -773,6 +784,8 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     setEntryToUpdate(null); // Reset after update
   }, [employeeId, entryToUpdate, defaultActivity]); // Run this effect whenever entryToUpdate changes
 
+
+
   const handleSubmit = async () => {
     const twoWeekPeriod = timeCard.entries;
     console.log("Entries before submission:", twoWeekPeriod);
@@ -790,18 +803,31 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
       return;
     }
 
-    const requiredFields = ["startTime", "lunchStart", "lunchEnd", "endTime"];
+    const requiredFields = [
+      "facility_start_time",
+      "facility_lunch_start",
+      "facility_lunch_end",
+      "facility_end_time",
+      "driving_start_time",
+      "driving_lunch_start",
+      "driving_lunch_end",
+      "driving_end_time",
+    ];
 
     const incompleteEntries = twoWeekPeriod.filter((entry) =>
-      requiredFields.some(
-        (field) => !entry[field] || entry[field].trim() === ""
-      )
+      requiredFields.some((field) => {
+        const value = entry[field];
+        // Check if value is null, undefined, or an empty string
+        return value === null || value === undefined || value.trim() === "";
+      })
     );
+
     console.log("Incomplete entries:", incompleteEntries);
 
+    // If there are incomplete days, prompt the user
     if (incompleteEntries.length > 0) {
       const confirmation = window.confirm(
-        `There are ${incompleteEntries.length} incomplete entries. Do you still want to proceed with submission?`
+        `There are ${incompleteEntries.length} incomplete days. Do you still want to proceed with submission?`
       );
       if (!confirmation) {
         console.log("User canceled submission due to incomplete entries.");
@@ -925,13 +951,11 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
   console.log("Rendering timeCard entries:", timeCard.entries);
   timeCard.entries.forEach((entry) => {
-    console.log({ facilityTotalHours: entry.facilityTotalHours }); // Log the facilityTotalHours of each entry before rendering
+    //console.log({ facilityTotalHours: entry.facilityTotalHours }); // Log the facilityTotalHours of each entry before rendering
   });
 
-
-  
   // Desktop layout
-  
+
   return (
     <div className={`container-fluid mt-4 ${styles.container}`}>
       {showConfetti && (
@@ -946,7 +970,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
           }}
         />
       )}
-
+  
       <div className="text-center mb-3">
         <button
           className="btn btn-primary me-3"
@@ -968,7 +992,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
             "Turn in your Timecard"
           )}
         </button>
-
+  
         <button
           className="btn btn-danger me-3"
           onClick={handleReset}
@@ -987,7 +1011,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
             "Reset"
           )}
         </button>
-
+  
         <button
           className="btn btn-secondary"
           onClick={() => navigate("/createNewTimecard")}
@@ -995,17 +1019,16 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
           Back to Calendar
         </button>
       </div>
-
+  
       <h2 className="text-center mb-4">Active Timecard</h2>
-
+  
       {/* Key explanation with delete red dot */}
       <div className="text-center mb-4">
         <p>
-          click <span style={{ color: "red" }}>🔴</span>{" "}
-          to delete time.
+          click <span style={{ color: "red" }}>🔴</span> to delete time.
         </p>
       </div>
-
+  
       {isLoading ? (
         <div className="text-center">
           <div className="spinner-border custom-spinner" role="status"></div>
@@ -1017,17 +1040,17 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
             <thead>
               <tr>
                 <th>Date</th>
-                <th className={styles.activityColumn}>Activity</th>
+                <th className={styles.activityColumn}>Morning Activity</th>
                 <th className={styles.timeColumn}>Start Time</th>
                 <th className={styles.timeColumn}>Lunch Start</th>
-                <th className={styles.activityColumn}>Activity</th>
+                <th className={styles.activityColumn}>Afternoon Activity</th>
                 <th className={styles.timeColumn}>Lunch End</th>
                 <th className={styles.timeColumn}>End Time</th>
                 <th className={styles.totalTimeColumn}>Facility Total Time</th>
                 <th className={styles.totalTimeColumn}>Driving Total Time</th>
               </tr>
             </thead>
-
+  
             <tbody>
               {timeCard.entries.map((entry, index) => (
                 <tr key={entry.date}>
@@ -1035,21 +1058,21 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                     <div>{moment.utc(entry.date).format("dddd")}</div>
                     <div>{moment.utc(entry.date).format("MMM D, YYYY")}</div>
                   </td>
-
-                  {/* Activity (Morning) */}
+  
+                  {/* Morning Activity */}
                   <td>
                     <select
                       value={entry.morningActivity || defaultActivity}
                       onChange={(e) =>
                         handleChange(index, "morningActivity", e.target.value)
                       }
-                      className="form-select"
+                      className="form-select w-180"
                     >
                       <option value="Facility">Facility</option>
                       <option value="Driving">Driving</option>
                     </select>
                   </td>
-
+  
                   {/* Facility or Driving Start Time */}
                   <td className={styles.timeColumn}>
                     <div className="d-flex align-items-center">
@@ -1095,14 +1118,14 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                         🔴
                       </span>
                     </div>
-
+  
                     {validationMessages[index]?.startTime && (
                       <div style={{ color: "red", fontSize: "0.85em" }}>
                         {validationMessages[index].startTime}
                       </div>
                     )}
                   </td>
-
+  
                   {/* Facility or Driving Lunch Start */}
                   <td className={styles.timeColumn}>
                     <div className="d-flex align-items-center">
@@ -1145,15 +1168,15 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                         🔴
                       </span>
                     </div>
-
+  
                     {validationMessages[index]?.lunchStart && (
                       <div style={{ color: "red", fontSize: "0.85em" }}>
                         {validationMessages[index].lunchStart}
                       </div>
                     )}
                   </td>
-
-                  {/* Activity (Afternoon) */}
+  
+                  {/* Afternoon Activity */}
                   <td>
                     <select
                       value={entry.afternoonActivity || defaultActivity}
@@ -1166,7 +1189,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                       <option value="Driving">Driving</option>
                     </select>
                   </td>
-
+  
                   {/* Facility or Driving Lunch End */}
                   <td className={styles.timeColumn}>
                     <div className="d-flex align-items-center">
@@ -1209,14 +1232,14 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                         🔴
                       </span>
                     </div>
-
+  
                     {validationMessages[index]?.lunchEnd && (
                       <div style={{ color: "red", fontSize: "0.85em" }}>
                         {validationMessages[index].lunchEnd}
                       </div>
                     )}
                   </td>
-
+  
                   {/* Facility or Driving End Time */}
                   <td className={styles.timeColumn}>
                     <div className="d-flex align-items-center">
@@ -1259,17 +1282,17 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                         🔴
                       </span>
                     </div>
-
+  
                     {validationMessages[index]?.endTime && (
                       <div style={{ color: "red", fontSize: "0.85em" }}>
                         {validationMessages[index].endTime}
                       </div>
                     )}
                   </td>
-
+  
                   {/* Facility Total Time */}
                   <td>{entry.facilityTotalHours}</td>
-
+  
                   {/* Driving Total Time */}
                   <td>{entry.drivingTotalHours}</td>
                 </tr>
@@ -1287,6 +1310,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
       )}
     </div>
   );
+  
 }
 
 export default ActiveTimeCard;

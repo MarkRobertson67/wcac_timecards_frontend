@@ -94,3 +94,19 @@ html, body {
   width: 3rem;
   height: 3rem;
 }
+
+@media (max-width: 768px) {
+  /* Ensure the activity column is wider on mobile */
+  .activityColumn, .table th.activityColumn, .table td.activityColumn {
+    width: 200px !important; /* Set width for both header and cells */
+    font-size: 14.75px !important; /* Ensure consistent font size for mobile */
+    text-align: left !important; /* Align text in dropdown to the left */
+  }
+
+  /* Make sure the dropdown shows the full text */
+  .form-select {
+    font-size: 14px; /* Ensure consistent font size for the dropdown */
+    text-align: left; /* Align text in the dropdown to the left */
+  }
+}
+

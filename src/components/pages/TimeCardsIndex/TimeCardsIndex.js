@@ -108,10 +108,6 @@ function TimeCardsIndex() {
     }
   };
 
-  // const handleDateClick = (info) => {
-  //   const calendarApi = info.view.calendar;
-  //   calendarApi.changeView('dayGridDay', info.dateStr);
-  // };
 
   const handleDateClick = (info) => {
     navigate(`/timeCardIndexDetails/${info.dateStr}`, {
@@ -182,6 +178,16 @@ function TimeCardsIndex() {
 
   console.log("Generated events:", events); // Log the generated events
 
+  const handleOnMount = (calendarApi) => {
+    // Force UTC on the "Today" button
+    const todayDate = new Date(Date.UTC(
+      new Date().getUTCFullYear(),
+      new Date().getUTCMonth(),
+      new Date().getUTCDate()
+    ));
+    calendarApi.gotoDate(todayDate);  // Go to UTC date when "Today" is clicked
+  };
+
   return (
     <div className={styles.container}>
       <h2>
@@ -199,23 +205,33 @@ function TimeCardsIndex() {
           timeZone="UTC"
           plugins={[dayGridPlugin, interactionPlugin]}
           initialView="dayGridMonth"
-          initialDate={new Date().toISOString()} // Force UTC
+          initialDate={new Date(Date.UTC(
+            new Date().getUTCFullYear(),
+            new Date().getUTCMonth(),
+            new Date().getUTCDate()
+          )).toISOString()} // Force UTC for the calendar's initial date
+          now={new Date().toISOString()} // Set FullCalendar's "now" to UTC date and time
           headerToolbar={{
             left: "prev,next today",
             center: "title",
             right: "dayGridMonth,dayGridDay",
           }}
-          events={events} // Pass the logged events to FullCalendar
+          events={events}
           eventContent={renderEventContent}
           eventTimeFormat={{
             hour: '2-digit',
             minute: '2-digit',
-            hour12: false, // 24-hour format for consistency
+            hour12: false,
             timeZone: "UTC",
           }}
           dateClick={handleDateClick}
-          height="auto" // height of calendar
+          height="auto"
+          onMount={handleOnMount}  // Ensure UTC handling when the calendar is mounted
+          buttonText={{
+            today: 'Today' // Override button label to ensure it's correctly displayed
+          }}
         />
+
       )}
       <div style={{ display: "flex", justifyContent: "center", gap: "20px" }}>
         <span>Key:</span>
