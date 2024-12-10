@@ -10,7 +10,6 @@ import moment from "moment-timezone";
 import Confetti from "react-confetti";
 import { useWindowSize } from "react-use";
 
-
 const API = process.env.REACT_APP_API_URL;
 
 function ActiveTimeCard({ setIsNewTimeCardCreated }) {
@@ -63,8 +62,6 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
   const [entryToUpdate, setEntryToUpdate] = useState(null);
 
-  
-
   const getPreviousMonday = (date) => {
     const utcDate = moment.utc(date); // Convert the input date to UTC
     const day = utcDate.day();
@@ -102,7 +99,6 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     const parsedTime = moment(time, "HH:mm:ss");
     return parsedTime.isValid() ? parsedTime.format("HH:mm") : "";
   };
-  
 
   const fetchTimeCardData = useCallback(
     async (startDate) => {
@@ -410,6 +406,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     return totalTime || "00:00";
   };
 
+
   const isWeekday = (date) => {
     const day = moment(date).day();
     return day !== 0 && day !== 6; // Not Sunday (0) or Saturday (6)
@@ -460,6 +457,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
 
   const validateAMPM = (index, time, field) => {
+  
     if (!time || time.length < 5) {
       // Clear message if input is invalid or empty
       setValidationMessages((prev) => ({
@@ -471,27 +469,21 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
       }));
       return;
     }
-
+  
     const parsedTime = moment(time, "HH:mm");
     let message = "";
-
-    if (field === "startTime" || field === "lunchStart") {
-      if (parsedTime.isAfter(moment("12:00", "HH:mm"))) {
-        message =
-          field === "startTime"
-            ? "Start time seems to be PM. Should it be AM?"
-            : "Lunch start time seems to be PM. Should it be AM?";
-      }
-    } else if (field === "lunchEnd" || field === "endTime") {
-      if (parsedTime.isBefore(moment("12:00", "HH:mm"))) {
-        message =
-          field === "lunchEnd"
-            ? "Lunch end time seems to be AM. Should it be PM?"
-            : "End time seems to be AM. Should it be PM?";
-      }
+  
+    // Validate start time (should be AM)
+    if (field === "startTime" && parsedTime.isAfter(moment("12:00", "HH:mm"))) {
+      message = "Start time should be in AM.";
     }
-
-
+  
+    // Validate end time (should be PM)
+    if (field === "endTime" && parsedTime.isBefore(moment("12:00", "HH:mm"))) {
+      message = "End time should be in PM.";
+    }
+  
+    // Update validation messages
     setValidationMessages((prev) => ({
       ...prev,
       [index]: {
@@ -500,7 +492,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
       },
     }));
   };
-
+  
 
   const isValidTimeOrder = (start, lunchStart, lunchEnd, end) => {
     if (
@@ -538,20 +530,21 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
   const handleChange = (index, field, value) => {
     // Log the current arguments received by the function
     console.log("handleChange called with:", { index, field, value });
+  
     setTimeCard((prevState) => {
       const updatedEntries = [...prevState.entries];
       const entry = updatedEntries[index];
-
+  
       console.log("Current entry before update:", entry);
-
-      // Call validateAMPM when changing time fields
+  
+      // Call validateAMPM only for startTime and endTime (since lunch times are not validated)
       if (
-        ["startTime", "lunchStart", "lunchEnd", "endTime"].includes(field) &&
+        ["startTime", "endTime"].includes(field) && 
         value.length >= 5 // Validate only when input is likely complete
       ) {
-        validateAMPM(index, value, field);
+        validateAMPM(index, value, field); // Validate AM/PM for start and end times
       }
-
+  
       // Set default activity if none is selected or provided
       if (
         field === "morning_activity" &&
@@ -566,10 +559,10 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
       } else {
         entry[field] = value;
       }
-
+  
       // Log after updating the field value
       console.log("Updated entry after setting field value:", entry);
-
+  
       // Check if the entry is already submitted
       if (entry.status === "submitted") {
         console.log(
@@ -582,14 +575,14 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
         );
         return prevState; // Return unchanged state if the entry is submitted
       }
-
+  
       // Update the specified field with the new value
       entry[field] = value;
-
+  
       // Update activity dropdown (morning or afternoon)
       if (field === "morning_activity" || field === "afternoon_activity") {
         entry[field] = value;
-
+  
         // Clear related fields when switching activities
         if (value === "Facility") {
           // Clear driving fields if switching to Facility
@@ -597,7 +590,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
           entry.drivingLunchStart = null;
           entry.drivingLunchEnd = null;
           entry.drivingEndTime = null;
-
+  
           // Log after clearing driving fields
           console.log("Updated entry after clearing driving fields:", entry);
         } else if (value === "Driving") {
@@ -606,7 +599,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
           entry.facilityLunchStart = null;
           entry.facilityLunchEnd = null;
           entry.facilityEndTime = null;
-
+  
           // Log after clearing facility fields
           console.log("Updated entry after clearing facility fields:", entry);
         }
@@ -627,10 +620,10 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
             entry[field] = value;
           }
         }
-
+  
         // Log after updating activity-based time fields
         console.log("Updated entry after activity-based time update:", entry);
-
+  
         // Validate time order and calculate total time after time change
         if (
           isValidTimeOrder(
@@ -649,7 +642,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
         } else {
           entry.facilityTotalHours = "0h 0m";
         }
-
+  
         if (
           isValidTimeOrder(
             entry.drivingStartTime,
@@ -668,20 +661,22 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
           entry.drivingTotalHours = "0h 0m";
         }
       }
-
+  
       console.log("Updated entry after calculation:", entry);
-
+  
       // Ensure status is active if it is not submitted
       if (entry.status !== "submitted") {
         entry.status = "active";
       }
-
+  
       // Set the entry to update for the API call
       setEntryToUpdate(entry);
-
+  
       return { ...prevState, entries: updatedEntries };
     });
   };
+  
+
 
 
   // Update useEffect to include activity in the payload
@@ -783,8 +778,6 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
     setEntryToUpdate(null); // Reset after update
   }, [employeeId, entryToUpdate, defaultActivity]); // Run this effect whenever entryToUpdate changes
-
-
 
   const handleSubmit = async () => {
     const twoWeekPeriod = timeCard.entries;
@@ -970,7 +963,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
           }}
         />
       )}
-  
+
       <div className="text-center mb-3">
         <button
           className="btn btn-primary me-3"
@@ -992,7 +985,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
             "Turn in your Timecard"
           )}
         </button>
-  
+
         <button
           className="btn btn-danger me-3"
           onClick={handleReset}
@@ -1011,7 +1004,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
             "Reset"
           )}
         </button>
-  
+
         <button
           className="btn btn-secondary"
           onClick={() => navigate("/createNewTimecard")}
@@ -1019,16 +1012,16 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
           Back to Calendar
         </button>
       </div>
-  
+
       <h2 className="text-center mb-4">Active Timecard</h2>
-  
+
       {/* Key explanation with delete red dot */}
       <div className="text-center mb-4">
         <p>
           click <span style={{ color: "red" }}>🔴</span> to delete time.
         </p>
       </div>
-  
+
       {isLoading ? (
         <div className="text-center">
           <div className="spinner-border custom-spinner" role="status"></div>
@@ -1050,7 +1043,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                 <th className={styles.totalTimeColumn}>Driving Total Time</th>
               </tr>
             </thead>
-  
+
             <tbody>
               {timeCard.entries.map((entry, index) => (
                 <tr key={entry.date}>
@@ -1058,7 +1051,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                     <div>{moment.utc(entry.date).format("dddd")}</div>
                     <div>{moment.utc(entry.date).format("MMM D, YYYY")}</div>
                   </td>
-  
+
                   {/* Morning Activity */}
                   <td>
                     <select
@@ -1072,7 +1065,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                       <option value="Driving">Driving</option>
                     </select>
                   </td>
-  
+
                   {/* Facility or Driving Start Time */}
                   <td className={styles.timeColumn}>
                     <div className="d-flex align-items-center">
@@ -1103,7 +1096,10 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                         style={{
                           color: "red",
                           marginLeft: "5px",
-                          cursor: entry.status === "active" ? "pointer" : "not-allowed", // Change cursor if not active
+                          cursor:
+                            entry.status === "active"
+                              ? "pointer"
+                              : "not-allowed", // Change cursor if not active
                         }}
                         onClick={() => {
                           if (entry.status === "active") {
@@ -1124,14 +1120,14 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                         🔴
                       </span>
                     </div>
-  
+
                     {validationMessages[index]?.startTime && (
                       <div style={{ color: "red", fontSize: "0.85em" }}>
                         {validationMessages[index].startTime}
                       </div>
                     )}
                   </td>
-  
+
                   {/* Facility or Driving Lunch Start */}
                   <td className={styles.timeColumn}>
                     <div className="d-flex align-items-center">
@@ -1154,12 +1150,18 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                             e.target.value
                           )
                         }
+                        onBlur={(e) =>
+                          validateAMPM(index, e.target.value, "LunchStart")
+                        }
                       />
                       <span
                         style={{
                           color: "red",
                           marginLeft: "5px",
-                          cursor: entry.status === "active" ? "pointer" : "not-allowed",
+                          cursor:
+                            entry.status === "active"
+                              ? "pointer"
+                              : "not-allowed",
                         }}
                         onClick={() => {
                           if (entry.status === "active") {
@@ -1180,14 +1182,14 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                         🔴
                       </span>
                     </div>
-  
+
                     {validationMessages[index]?.lunchStart && (
                       <div style={{ color: "red", fontSize: "0.85em" }}>
                         {validationMessages[index].lunchStart}
                       </div>
                     )}
                   </td>
-  
+
                   {/* Afternoon Activity */}
                   <td>
                     <select
@@ -1201,7 +1203,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                       <option value="Driving">Driving</option>
                     </select>
                   </td>
-  
+
                   {/* Facility or Driving Lunch End */}
                   <td className={styles.timeColumn}>
                     <div className="d-flex align-items-center">
@@ -1224,12 +1226,18 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                             e.target.value
                           )
                         }
+                        onBlur={(e) =>
+                          validateAMPM(index, e.target.value, "LunchEnd")
+                        }
                       />
                       <span
                         style={{
                           color: "red",
                           marginLeft: "5px",
-                          cursor: entry.status === "active" ? "pointer" : "not-allowed",
+                          cursor:
+                            entry.status === "active"
+                              ? "pointer"
+                              : "not-allowed",
                         }}
                         onClick={() => {
                           if (entry.status === "active") {
@@ -1250,14 +1258,14 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                         🔴
                       </span>
                     </div>
-  
+
                     {validationMessages[index]?.lunchEnd && (
                       <div style={{ color: "red", fontSize: "0.85em" }}>
                         {validationMessages[index].lunchEnd}
                       </div>
                     )}
                   </td>
-  
+
                   {/* Facility or Driving End Time */}
                   <td className={styles.timeColumn}>
                     <div className="d-flex align-items-center">
@@ -1280,12 +1288,18 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                             e.target.value
                           )
                         }
+                        onBlur={(e) =>
+                          validateAMPM(index, e.target.value, "EndTime")
+                        }
                       />
                       <span
                         style={{
                           color: "red",
                           marginLeft: "5px",
-                          cursor: entry.status === "active" ? "pointer" : "not-allowed",
+                          cursor:
+                            entry.status === "active"
+                              ? "pointer"
+                              : "not-allowed",
                         }}
                         onClick={() => {
                           if (entry.status === "active") {
@@ -1306,17 +1320,17 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                         🔴
                       </span>
                     </div>
-  
+
                     {validationMessages[index]?.endTime && (
                       <div style={{ color: "red", fontSize: "0.85em" }}>
                         {validationMessages[index].endTime}
                       </div>
                     )}
                   </td>
-  
+
                   {/* Facility Total Time */}
                   <td>{entry.facilityTotalHours}</td>
-  
+
                   {/* Driving Total Time */}
                   <td>{entry.drivingTotalHours}</td>
                 </tr>
@@ -1334,6 +1348,5 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
       )}
     </div>
   );
-  
 }
 export default ActiveTimeCard;
