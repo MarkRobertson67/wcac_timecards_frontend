@@ -178,15 +178,6 @@ function TimeCardsIndex() {
 
   console.log("Generated events:", events); // Log the generated events
 
-  const handleOnMount = (calendarApi) => {
-    // Force UTC on the "Today" button
-    const todayDate = new Date(Date.UTC(
-      new Date().getUTCFullYear(),
-      new Date().getUTCMonth(),
-      new Date().getUTCDate()
-    ));
-    calendarApi.gotoDate(todayDate);  // Go to UTC date when "Today" is clicked
-  };
 
   return (
     <div className={styles.container}>
@@ -226,7 +217,6 @@ function TimeCardsIndex() {
           }}
           dateClick={handleDateClick}
           height="auto"
-          onMount={handleOnMount}  // Ensure UTC handling when the calendar is mounted
           buttonText={{
             today: 'Today' // Override button label to ensure it's correctly displayed
           }}
