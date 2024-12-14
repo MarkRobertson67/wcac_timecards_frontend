@@ -100,7 +100,7 @@ function TimeCardsIndex() {
     if (isMobile()) {
       // Mobile: Format as "5:30"
       const formattedHours = hours || 0;
-      const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes; // Add leading zero for single-digit minutes
+      const formattedMinutes = minutes !== undefined && minutes < 10 ? `0${minutes}` : minutes; // Add leading zero for single-digit minutes
       return `${formattedHours}:${formattedMinutes}`;
     } else {
       // Desktop: Format as "5h 30m"
