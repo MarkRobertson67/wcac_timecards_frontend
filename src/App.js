@@ -19,10 +19,17 @@ import Employees from './components/pages/Employees/Employees.js'
 import EmployeeDetails from './components/pages/Employees/EmployeeDetails.js';
 import ProtectedRoute from './ProtectedRoute.js';
 import TimeCardIndexDetails from './components/pages/TimeCardsIndex/TimeCardIndexDetails.js';
+import FAQ from './components/pages/FAQ/FAQ.js';
+import ContactUs from './components/pages/ContactUs/ContactUs.js';
+import PrivacyPolicy from './components/pages/PrivacyPolicy/PrivacyPolicy.js';
+import TermsAndConditions from './components/pages/TermsAndConditions/TermsAndConditions.js';
+ 
+
 
 
 function App() {
   const [isNewTimeCardCreated, setIsNewTimeCardCreated] = useState(false);
+
 
   useEffect(() => {
     const currentTimeCard = localStorage.getItem('startDate');
@@ -54,6 +61,7 @@ function App() {
     }, []);
     
 
+
   return (
     <Router
       future={{
@@ -65,7 +73,11 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/tutorials" element={<Tutorials />} />
-
+        <Route path="/faq" element={<FAQ />} />
+        <Route path="/contactus" element={<ContactUs />} />
+        <Route path="/termsandconditions" element={<TermsAndConditions />} />
+        <Route path="/privacypolicy" element={<PrivacyPolicy />} />
+ 
         <Route
           path="/createNewTimeCard"
           element={<ProtectedRoute><CreateNewTimeCard setIsNewTimeCardCreated={setIsNewTimeCardCreated} /></ProtectedRoute>}
