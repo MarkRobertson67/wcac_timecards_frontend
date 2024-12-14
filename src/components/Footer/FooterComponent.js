@@ -34,15 +34,15 @@ function FooterComponent() {
             <div className="col-sm-6 col-md-4 mb-3 mb-md-0">
               <h6 className="text-uppercase mb-3 footer-heading">Help center</h6>
               <ul className="list-unstyled mb-0 footer-content">
-                <li><Link to="#" className="text-white">FAQs</Link></li>
-                <li><Link to="#" className="text-white">Contact Us</Link></li>
+              <li><Link to="/faq" className="text-white">FAQs</Link></li>
+                <li><Link to="/contactus" className="text-white">Contact Us</Link></li>
               </ul>
             </div>
             <div className="col-sm-6 col-md-4 mb-3 mb-md-0">
               <h6 className="text-uppercase mb-3 footer-heading">Legal</h6>
               <ul className="list-unstyled mb-0 footer-content">
-                <li><Link to="#" className="text-white">Privacy Policy</Link></li>
-                <li><Link to="#" className="text-white">Terms & Conditions</Link></li>
+                <li><Link to="/privacypolicy" className="text-white">Privacy Policy</Link></li>
+                <li><Link to="/termsandconditions" className="text-white">Terms & Conditions</Link></li>
               </ul>
             </div>
           </div>

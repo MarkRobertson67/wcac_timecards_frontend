@@ -1,0 +1,87 @@
+/* Proprietary Software License
+Copyright (c) 2024 Mark Robertson
+See LICENSE.txt file for details. */
+
+
+/* Set background gradient for the whole page */
+
+
+body {
+    background: linear-gradient(135deg, #d3d8dd, #3c4650); /* Gradient from blue to yellow */
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* FAQ.module.css */
+.faq-page {
+    overflow: auto;  /* Allow scrolling */
+    height: auto;  /* Ensure it takes the full height */
+  }
+  
+  
+  /* FAQ Container */
+  .faq-container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #ffffff;  /* White background for the FAQ container */
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .faq-title {
+    text-align: center;
+    font-size: 2rem;
+    color: #4a90e2;
+    margin-bottom: 20px;
+  }
+  
+  .faq-list {
+    padding: 0;
+    margin: 0;
+  }
+  
+  .faq-item {
+    margin-bottom: 15px;
+  }
+  
+  .faq-question {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background-color: #4a90e2;  /* Bright blue background */
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .faq-question:hover {
+    background-color: #357ab7;  /* Darker blue on hover */
+  }
+  
+  .faq-question.active {
+    background-color: #357ab7;
+  }
+  
+  .faq-toggle-icon {
+    font-size: 1.5rem;
+    font-weight: bold;
+    padding-left: 10px;
+  }
+  
+  .faq-answer {
+    padding: 10px 15px;
+    background-color: #e1f0ff;  /* Light blue background for answers */
+    border-radius: 5px;
+    margin-top: 5px;
+    font-size: 1rem;
+    color: #333;
+  }
+  
+
+

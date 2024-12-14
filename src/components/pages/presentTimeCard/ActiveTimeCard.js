@@ -774,6 +774,8 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
     setEntryToUpdate(null); // Reset after update
   }, [employeeId, entryToUpdate, defaultActivity]); // Run this effect whenever entryToUpdate changes
+
+  
   // const handleChange = (index, field, value) => {
   //   // Log the current arguments received by the function
   //   console.log("handleChange called with:", { index, field, value });
