@@ -4,6 +4,7 @@ See LICENSE.txt file for details. */
 
 
 /* Set background gradient for the whole page */
+/*background: linear-gradient(135deg, #4a90e2, #ffcc00);  Gradient from blue to yellow */
 
 
 body {
