@@ -86,27 +86,21 @@ function TimeCardsIndex() {
 
   const isLoading = isEmployeeLoading || isTimecardsLoading;
 
-  const isMobile = () => {
-    return window.innerWidth <= 768; // You can adjust the breakpoint as per your requirements
-  };
+  // const isMobile = () => {
+  //   return window.innerWidth <= 768; // You can adjust the breakpoint as per your requirements
+  // };
 
   const formatTotalTime = (interval) => {
     if (!interval) {
-      return isMobile() ? "0:00" : "0h 0m"; // Default values for mobile and desktop
+      return "0h 0m"; // Default for both mobile and desktop
     }
-
+  
     const { hours, minutes } = interval;
-
-    if (isMobile()) {
-      // Mobile: Format as "5:30"
-      const formattedHours = hours || 0;
-      const formattedMinutes = minutes !== undefined && minutes < 10 ? `0${minutes}` : minutes; // Add leading zero for single-digit minutes
-      return `${formattedHours}:${formattedMinutes}`;
-    } else {
-      // Desktop: Format as "5h 30m"
-      return `${hours || 0}h ${minutes || 0}m`;
-    }
+  
+    // Use the same format for both mobile and desktop
+    return `${hours || 0}h ${minutes || 0}m`; // Always return "5h 30m" or "5h 0m"
   };
+  
 
 
   const handleDateClick = (info) => {
@@ -144,8 +138,7 @@ function TimeCardsIndex() {
     // Facility work event
     if (
       entry.facility_total_hours &&
-      (entry.facility_total_hours.hours > 0 ||
-        entry.facility_total_hours.minutes > 0)
+      (entry.facility_total_hours.hours >= 0 || entry.facility_total_hours.minutes >= 0) // Check for valid hours or minutes
     ) {
       eventsForDay.push({
         title: "Facility Work",
@@ -160,8 +153,7 @@ function TimeCardsIndex() {
     // Driving work event
     if (
       entry.driving_total_hours &&
-      (entry.driving_total_hours.hours > 0 ||
-        entry.driving_total_hours.minutes > 0)
+      (entry.driving_total_hours.hours >= 0 || entry.driving_total_hours.minutes >= 0) // Check for valid hours or minutes
     ) {
       eventsForDay.push({
         title: "Driving Work",
