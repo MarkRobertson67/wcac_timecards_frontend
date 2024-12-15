@@ -14,43 +14,34 @@ See LICENSE.txt file for details. */
   box-sizing: border-box; /* Include padding in the element's total width and height */
 }
 
-/* Ensure the page container fills the screen, and allow scrolling */
 .pageContainer {
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
     font-family: Arial, sans-serif;
     color: #333;
-    min-height: 100vh; /* Ensure it fills the full height of the screen */
-    padding-bottom: 120px; /* Space for the footer */
-    box-sizing: border-box; /* Include padding in total height */
-    overflow-y: auto; /* Allow vertical scrolling */
-    text-align: center; /* Center the text */
+    min-height: 100vh; /* Ensure full height */
+    padding-bottom: 130px; /* Space for footer (if fixed footer exists) */
+    box-sizing: border-box; /* Make sure padding is included in total height */
   }
   
-  /* Header styles */
   h1 {
+    text-align: center;
     color: #0073e6;
-    font-size: 2rem;
-    margin-bottom: 20px;
   }
   
-  /* Section headers */
   h2 {
     margin-top: 30px;
     font-size: 1.5rem;
     color: #333;
   }
   
-  /* Paragraph styling */
   p {
     line-height: 1.6;
     font-size: 1rem;
     margin-bottom: 20px;
-    text-align: left; /* Align text to the left for paragraphs */
   }
   
-  /* Link styling */
   a {
     color: #0073e6;
     text-decoration: none;
@@ -60,12 +51,10 @@ See LICENSE.txt file for details. */
     text-decoration: underline;
   }
   
-  /* Section styling */
   .section {
     margin-bottom: 30px;
   }
   
-  /* Responsive Design */
   @media (max-width: 768px) {
     .pageContainer {
       padding: 10px;
@@ -83,5 +72,3 @@ See LICENSE.txt file for details. */
       font-size: 0.9rem;
     }
   }
-  
-  

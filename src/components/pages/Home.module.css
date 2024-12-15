@@ -1,0 +1,31 @@
+/* Proprietary Software License
+Copyright (c) 2024 Mark Robertson
+See LICENSE.txt file for details. */
+
+/* Home.module.css */
+
+.hPage {
+    overflow: auto; /* Allow scrolling */
+    min-height: 90vh; /* Ensure it takes full height of the screen */
+    background: linear-gradient(135deg, #d3d8dd, #3c4650); /* Gradient background */
+    padding: 20px;
+    font-family: 'Arial', sans-serif;
+    padding-bottom: 120px; /* Space for the footer */
+    box-sizing: border-box; /* Include padding in the element's total width and height */
+  }
+  
+  /* Optional: Adding some padding and margin styles for better content alignment */
+.hPage .container {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #ffffff; /* Optional: adding white background to the form area */
+    border-radius: 8px; /* Optional: rounding the corners of the form area */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: adding shadow for better visibility */
+  }
+  
+  /* Button styles (adjust to your needs) */
+  .btn {
+    padding: 0.8rem 1.5rem;
+    border-radius: 5px;
+    font-size: 1rem;
+  }
