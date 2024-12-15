@@ -8,6 +8,7 @@ import styles from "./TermsAndConditions.module.css";
 
 const TermsAndConditions = () => {
   return (
+    <div className={styles.TaCPage}>
     <div className={styles.pageContainer}>
       <h1>Terms and Conditions</h1>
       <p>
@@ -144,6 +145,7 @@ const TermsAndConditions = () => {
         By using this app, you acknowledge that you have read, understood, and
         agreed to these Terms and Conditions.
       </p>
+    </div>
     </div>
   );
 };

@@ -4,7 +4,15 @@ See LICENSE.txt file for details. */
 
 /* PrivacyPolicy.module.css */
 
-/* PrivacyPolicy.module.css */
+.ppPage {
+  overflow: auto; /* Allow scrolling */
+  min-height: 100vh; /* Ensure it takes full height of the screen */
+  background: linear-gradient(135deg, #d3d8dd, #3c4650); /* Gradient background */
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
+  padding-bottom: 120px; /* Space for the footer */
+  box-sizing: border-box; /* Include padding in the element's total width and height */
+}
 
 /* Ensure the page container fills the screen, and allow scrolling */
 .pageContainer {

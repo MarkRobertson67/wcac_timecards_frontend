@@ -9,7 +9,8 @@ import styles from "./PrivacyPolicy.module.css"; // Import the CSS module
 
 const PrivacyPolicy = () => {
   return (
-    <div className={styles.pageContainer}> {/* Use styles.pageContainer here */}
+    <div className={styles.ppPage}>
+    <div className={styles.pageContainer}>
       <h1>Privacy Policy</h1>
       <p>
         Your privacy is important to us. This privacy policy explains what personal information we collect and how we use it.
@@ -52,6 +53,7 @@ const PrivacyPolicy = () => {
       <p>
         If you have any questions or concerns regarding this Privacy Policy, please reach out to us through our <a href="/contactus">Contact Us</a> page.
       </p>
+    </div>
     </div>
   );
 };
