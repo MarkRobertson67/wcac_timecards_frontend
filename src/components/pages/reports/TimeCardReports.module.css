@@ -4,10 +4,21 @@ Copyright (c) 2024 Mark Robertson
 See LICENSE.txt file for details. */
 
 
-/* Component-Specific Styles */
+/* TimeCardReports.module.css */
 
-.container {
-  padding: 1rem;
+.tcrPage {
+  overflow: hidden;
+  min-height: 90vh; /* Ensure it takes full height of the screen */
+  background: linear-gradient(135deg, #d3d8dd, #3c4650); /* Gradient background */
+  font-family: 'Arial', sans-serif;
+  padding-bottom: 120px; /* Space for the footer */
+  box-sizing: border-box; /* Include padding in the element's total width and height */
+  flex-direction: column;
+  align-items: center; /* Center content horizontally */
+}
+
+.pageContainer {
+
   margin-top: 5rem;
   padding-bottom: 100px;
 }

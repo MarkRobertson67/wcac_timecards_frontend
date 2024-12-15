@@ -6,6 +6,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../../firebase/firebaseConfig";
+import styles from "./TimeCardReports.module.css"
 
 const API = process.env.REACT_APP_API_URL;
 
@@ -500,6 +501,7 @@ function TimeCardReports() {
   };
 
   return (
+    <div className={styles.tcrPage}>
     <div className="container mt-4">
       <h2 className="text-center mb-4">Time Card Reports</h2>
 
@@ -550,6 +552,7 @@ function TimeCardReports() {
           </div>
         </>
       )}
+    </div>
     </div>
   );
 }

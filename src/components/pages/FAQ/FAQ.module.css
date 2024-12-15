@@ -29,6 +29,7 @@ See LICENSE.txt file for details. */
 }
 
 .faqTitle {
+  font-weight: bold;
   text-align: center;
   font-size: 2rem;
   color: #4a90e2;
@@ -41,22 +42,26 @@ See LICENSE.txt file for details. */
 }
 
 .faqItem {
-  margin-bottom: 15px;
+  margin-bottom: 1rem; /* Reduce space between items */
+  background-color: #f7f7f7; /* Light background color */
+  border: 1px solid #ddd; /* Border for the box */
+  border-radius: 5px;
+  padding: 0.25rem; /* Reduce the padding to make the boxes smaller */
 }
 
 .faqQuestion {
+  font-size: 1rem; /* Reduce the font size */
+  font-weight: bold;
+  padding: 0.5rem; /* Adjust padding to control the box height */
+  cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  border-radius: 3px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px;
-  background-color: #4a90e2; /* Bright blue background */
-  color: #fff;
-  font-size: 1.1rem;
-  font-weight: bold;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
 }
+
 
 .faqQuestion:hover {
   background-color: #357ab7; /* Darker blue on hover */
@@ -67,7 +72,7 @@ See LICENSE.txt file for details. */
 }
 
 .faqToggleIcon {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: bold;
   padding-left: 10px;
 }

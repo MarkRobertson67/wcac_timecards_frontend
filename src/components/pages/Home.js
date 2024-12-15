@@ -18,6 +18,7 @@ import ProfileModal from "./ProfileModal/ProfileModal";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import styles from "./Home.module.css"
 
 const API = process.env.REACT_APP_API_URL;
 
@@ -224,6 +225,7 @@ function Home() {
 
 
   return (
+    <div className={styles.hPage}>
     <div className="container mt-5">
       {isWaitingForEmailVerification && (
   <div className="text-center">
@@ -327,10 +329,8 @@ function Home() {
         </>
       )}
     </div>
+    </div>
   );
 }
 
 export default Home;
-
-
-

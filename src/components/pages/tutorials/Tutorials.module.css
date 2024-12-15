@@ -1,0 +1,63 @@
+/* Proprietary Software License
+Copyright (c) 2024 Mark Robertson
+See LICENSE.txt file for details. */
+
+/* Styling for the AboutComponent page */
+.acPage {
+    overflow: auto; /* Allow scrolling */
+    min-height: 100vh; /* Ensure it takes full height of the screen */
+    background: linear-gradient(135deg, #d3d8dd, #3c4650); /* Gradient background */
+    padding: 20px;
+    font-family: 'Arial', sans-serif;
+    padding-bottom: 120px; /* Space for the footer */
+    box-sizing: border-box; /* Include padding in the element's total width and height */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center content horizontally */
+  }
+  
+  .title {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333; /* Darker text color for better readability */
+    margin-top: 40px;
+  }
+  
+  .description {
+    text-align: center;
+    font-size: 1rem;
+    color: #444;
+    margin-top: 20px;
+  }
+  
+  .linkText {
+    text-align: center;
+    margin-top: 10px;
+  }
+  
+  .linkText a {
+    color: #007bff; /* Blue color for the links */
+    text-decoration: underline;
+    font-weight: bold;
+  }
+  
+  .linkText a:hover {
+    color: #0056b3; /* Darker blue on hover */
+    text-decoration: none; /* Remove underline on hover */
+  }
+  
+  @media (max-width: 768px) {
+    .title {
+      font-size: 1.5rem; /* Adjust title size for smaller screens */
+    }
+  
+    .description {
+      font-size: 0.9rem; /* Adjust description font size */
+    }
+  
+    .linkText a {
+      font-size: 0.9rem; /* Adjust link size */
+    }
+  }
+  
