@@ -5,8 +5,6 @@
 
 /* Employees.module.css */
 
-
-
 /* Container Styles */
 .container {
   max-width: 1200px;
@@ -14,7 +12,6 @@
   padding: 1rem;
 }
 
-/* Heading styles */
 h2 {
   font-size: 1.8rem;
   text-align: center;
@@ -36,9 +33,9 @@ h2 {
 
 .table th,
 .table td {
+  border: 1px solid #ddd;
   padding: 8px;
   text-align: center;
-  vertical-align: middle;
 }
 
 .table tr:nth-child(even) {
@@ -49,11 +46,30 @@ h2 {
   background-color: #e9e9e9;
 }
 
-/* Scrollable Table */
 .scrollable-table {
   max-height: 400px;
   overflow-y: auto;
   border: 1px solid #ddd;
+}
+
+
+
+@media (max-width: 768px) {
+  .table {
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+  }
+
+  .table th,
+  .table td {
+    padding: 6px;
+  }
+
+  .btn {
+    margin-top: 1rem;
+    display: block;
+    width: 100%;
+  }
 }
 
 /* Button Styles */
@@ -91,16 +107,6 @@ h2 {
 .actions {
   display: flex;
   justify-content: center;
-}
-
-.text-left {
-  text-align: left;
-}
-
-/* Prevent extra white space in profile area */
-.profile-area {
-  padding: 0;
-  margin: 0;
 }
 
   
