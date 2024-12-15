@@ -2,16 +2,47 @@
    Copyright (c) 2024 Mark Robertson
    See LICENSE.txt file for details. */
 
-body {
+/* Apply background to html */
+html {
+  height: 3000px; /* Ensure html takes up the full height */
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  padding: 0;
+  background-color: #888888;
+  background-size: cover; /* Ensure the background covers the entire page */
+
 }
 
+/* Apply to body */
+body {
+  height: 3000px; /* Ensure body takes up the full height */
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  box-sizing: border-box; /* Ensure padding and borders are included in total width and height */
+}
+
+/* Ensure page container takes full height */
+.pageContainer {
+  min-height: 3000px; /* Ensure it covers the full viewport height */
+  padding-bottom: 120px; /* Space for footer */
+  box-sizing: border-box; /* Include padding in height */
+}
+
+/* Apply box-sizing and reset margin/padding */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, .pageContainer {
+  height: 100%;
+  background: linear-gradient(135deg, #d3d8dd, #3c4650); /* Gradient background */
+}
+
+/* Code block styling */
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }

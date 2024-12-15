@@ -1,0 +1,68 @@
+/* Proprietary Software License
+Copyright (c) 2024 Mark Robertson
+See LICENSE.txt file for details. */
+
+
+/* TermsAndConditions.module.css */
+
+
+
+.pageContainer {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    color: #333;
+    min-height: 100vh; /* Ensure full height */
+    padding-bottom: 130px; /* Space for footer (if fixed footer exists) */
+    box-sizing: border-box; /* Make sure padding is included in total height */
+  }
+  
+  h1 {
+    text-align: center;
+    color: #0073e6;
+  }
+  
+  h2 {
+    margin-top: 30px;
+    font-size: 1.5rem;
+    color: #333;
+  }
+  
+  p {
+    line-height: 1.6;
+    font-size: 1rem;
+    margin-bottom: 20px;
+  }
+  
+  a {
+    color: #0073e6;
+    text-decoration: none;
+  }
+  
+  a:hover {
+    text-decoration: underline;
+  }
+  
+  .section {
+    margin-bottom: 30px;
+  }
+  
+  @media (max-width: 768px) {
+    .pageContainer {
+      padding: 10px;
+    }
+  
+    h1 {
+      font-size: 1.5rem;
+    }
+  
+    h2 {
+      font-size: 1.25rem;
+    }
+  
+    p {
+      font-size: 0.9rem;
+    }
+  }
+  

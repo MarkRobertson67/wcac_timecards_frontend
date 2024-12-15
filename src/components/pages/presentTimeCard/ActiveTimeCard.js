@@ -363,7 +363,6 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     fetchData();
   }, [fetchTimeCardData, employeeId, startDateAdjusted]);
 
-
   const calculateTotalTime = (start, lunchStart, lunchEnd, end) => {
     console.log("Calculating total time with:", {
       start,
@@ -406,12 +405,10 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     return totalTime || "00:00";
   };
 
-
   const isWeekday = (date) => {
     const day = moment(date).day();
     return day !== 0 && day !== 6; // Not Sunday (0) or Saturday (6)
   };
-
 
   const calculateTotalTimeForAllEntries = () => {
     let facilityTotalMinutes = 0;
@@ -455,9 +452,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     return `${facilityTotalTime} / ${drivingTotalTime}`;
   };
 
-
   const validateAMPM = (index, time, field) => {
-  
     if (!time || time.length < 5) {
       // Clear message if input is invalid or empty
       setValidationMessages((prev) => ({
@@ -469,20 +464,20 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
       }));
       return;
     }
-  
+
     const parsedTime = moment(time, "HH:mm");
     let message = "";
-  
+
     // Validate start time (should be AM)
     if (field === "startTime" && parsedTime.isAfter(moment("12:00", "HH:mm"))) {
       message = "Start time should be in AM.";
     }
-  
+
     // Validate end time (should be PM)
     if (field === "endTime" && parsedTime.isBefore(moment("12:00", "HH:mm"))) {
       message = "End time should be in PM.";
     }
-  
+
     // Update validation messages
     setValidationMessages((prev) => ({
       ...prev,
@@ -492,7 +487,6 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
       },
     }));
   };
-  
 
   const isValidTimeOrder = (start, lunchStart, lunchEnd, end) => {
     if (
@@ -674,7 +668,6 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     });
   };
 
-
   // Update useEffect to include activity in the payload
   useEffect(() => {
     if (!entryToUpdate) return; // Exit if there's no entry to update
@@ -774,262 +767,6 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
     setEntryToUpdate(null); // Reset after update
   }, [employeeId, entryToUpdate, defaultActivity]); // Run this effect whenever entryToUpdate changes
-
-  
-  // const handleChange = (index, field, value) => {
-  //   // Log the current arguments received by the function
-  //   console.log("handleChange called with:", { index, field, value });
-  
-  //   setTimeCard((prevState) => {
-  //     const updatedEntries = [...prevState.entries];
-  //     const entry = updatedEntries[index];
-  
-  //     console.log("Current entry before update:", entry);
-  
-  //     // Call validateAMPM only for startTime and endTime (since lunch times are not validated)
-  //     if (
-  //       ["startTime", "endTime"].includes(field) && 
-  //       value.length >= 5 // Validate only when input is likely complete
-  //     ) {
-  //       validateAMPM(index, value, field); // Validate AM/PM for start and end times
-  //     }
-  
-  //     // Set default activity if none is selected or provided
-  //     if (
-  //       field === "morning_activity" &&
-  //       (value === undefined || value === null || value === "")
-  //     ) {
-  //       entry.morning_activity = defaultActivity;
-  //     } else if (
-  //       field === "afternoon_activity" &&
-  //       (value === undefined || value === null || value === "")
-  //     ) {
-  //       entry.afternoon_activity = defaultActivity;
-  //     } else {
-  //       entry[field] = value;
-  //     }
-  
-  //     // Log after updating the field value
-  //     console.log("Updated entry after setting field value:", entry);
-  
-  //     // Check if the entry is already submitted
-  //     if (entry.status === "submitted") {
-  //       console.log(
-  //         `Cannot update entry for date ${entry.date} as it is already submitted.`
-  //       );
-  //       alert(
-  //         `You cannot modify the entry for ${moment(entry.date).format(
-  //           "MMMM Do, YYYY"
-  //         )} because it has already been submitted.`
-  //       );
-  //       return prevState; // Return unchanged state if the entry is submitted
-  //     }
-  
-  //     // Update the specified field with the new value
-  //     entry[field] = value;
-  
-  //     // Update activity dropdown (morning or afternoon)
-  //     if (field === "morning_activity" || field === "afternoon_activity") {
-  //       entry[field] = value;
-  
-  //       // Clear related fields when switching activities
-  //       if (value === "Facility") {
-  //         // Clear driving fields if switching to Facility
-  //         entry.drivingStartTime = null;
-  //         entry.drivingLunchStart = null;
-  //         entry.drivingLunchEnd = null;
-  //         entry.drivingEndTime = null;
-  
-  //         // Log after clearing driving fields
-  //         console.log("Updated entry after clearing driving fields:", entry);
-  //       } else if (value === "Driving") {
-  //         // Clear facility fields if switching to Driving
-  //         entry.facilityStartTime = null;
-  //         entry.facilityLunchStart = null;
-  //         entry.facilityLunchEnd = null;
-  //         entry.facilityEndTime = null;
-  
-  //         // Log after clearing facility fields
-  //         console.log("Updated entry after clearing facility fields:", entry);
-  //       }
-  //     } else {
-  //       // Update time fields based on the current activity selection
-  //       if (entry.morning_activity === "Facility") {
-  //         if (field.startsWith("driving")) {
-  //           // Prevent updating driving fields when activity is Facility
-  //           console.warn(`Ignoring driving field update for Facility activity`);
-  //         } else {
-  //           entry[field] = value;
-  //         }
-  //       } else if (entry.morning_activity === "Driving") {
-  //         if (field.startsWith("facility")) {
-  //           // Prevent updating facility fields when activity is Driving
-  //           console.warn(`Ignoring facility field update for Driving activity`);
-  //         } else {
-  //           entry[field] = value;
-  //         }
-  //       }
-  
-  //       // Log after updating activity-based time fields
-  //       console.log("Updated entry after activity-based time update:", entry);
-  
-  //       // Validate time order and calculate total time after time change
-  //       if (
-  //         isValidTimeOrder(
-  //           entry.facilityStartTime,
-  //           entry.facilityLunchStart,
-  //           entry.facilityLunchEnd,
-  //           entry.facilityEndTime
-  //         )
-  //       ) {
-  //         entry.facilityTotalHours = calculateTotalTime(
-  //           entry.facilityStartTime,
-  //           entry.facilityLunchStart,
-  //           entry.facilityLunchEnd,
-  //           entry.facilityEndTime
-  //         );
-  //       } else {
-  //         entry.facilityTotalHours = "0h 0m";
-  //       }
-  
-  //       if (
-  //         isValidTimeOrder(
-  //           entry.drivingStartTime,
-  //           entry.drivingLunchStart,
-  //           entry.drivingLunchEnd,
-  //           entry.drivingEndTime
-  //         )
-  //       ) {
-  //         entry.drivingTotalHours = calculateTotalTime(
-  //           entry.drivingStartTime,
-  //           entry.drivingLunchStart,
-  //           entry.drivingLunchEnd,
-  //           entry.drivingEndTime
-  //         );
-  //       } else {
-  //         entry.drivingTotalHours = "0h 0m";
-  //       }
-  //     }
-  
-  //     console.log("Updated entry after calculation:", entry);
-  
-  //     // Ensure status is active if it is not submitted
-  //     if (entry.status !== "submitted") {
-  //       entry.status = "active";
-  //     }
-  
-  //     // Set the entry to update for the API call
-  //     setEntryToUpdate(entry);
-  
-  //     return { ...prevState, entries: updatedEntries };
-  //   });
-  // };
-  
-
-
-
-  // // Update useEffect to include activity in the payload
-  // useEffect(() => {
-  //   if (!entryToUpdate) return; // Exit if there's no entry to update
-
-  //   // Construct the payload based on the updated entry
-  //   const requestPayload = {
-  //     employee_id: employeeId,
-  //     work_date: entryToUpdate.date,
-  //     morning_activity: entryToUpdate.morningActivity || defaultActivity,
-  //     afternoon_activity: entryToUpdate.afternoonActivity || defaultActivity,
-  //     facility_start_time: entryToUpdate.facilityStartTime || null,
-  //     facility_lunch_start: entryToUpdate.facilityLunchStart || null,
-  //     facility_lunch_end: entryToUpdate.facilityLunchEnd || null,
-  //     facility_end_time: entryToUpdate.facilityEndTime || null,
-  //     facility_total_hours:
-  //       typeof entryToUpdate.facilityTotalHours === "string"
-  //         ? entryToUpdate.facilityTotalHours
-  //         : "0h 0m",
-  //     driving_start_time: entryToUpdate.drivingStartTime || null,
-  //     driving_lunch_start: entryToUpdate.drivingLunchStart || null,
-  //     driving_lunch_end: entryToUpdate.drivingLunchEnd || null,
-  //     driving_end_time: entryToUpdate.drivingEndTime || null,
-  //     driving_total_hours:
-  //       typeof entryToUpdate.drivingTotalHours === "string"
-  //         ? entryToUpdate.drivingTotalHours
-  //         : "0h 0m",
-  //     status: entryToUpdate.status || "active",
-  //   };
-
-  //   console.log("Request payload for update:", requestPayload);
-
-  //   const updateEntry = async () => {
-  //     try {
-  //       const response = await fetch(`${API}/timecards/${entryToUpdate.id}`, {
-  //         method: "PUT",
-  //         headers: { "Content-Type": "application/json" },
-  //         body: JSON.stringify(requestPayload),
-  //       });
-
-  //       console.log("Fetched data:", response);
-
-  //       if (!response.ok) {
-  //         const errorText = await response.text();
-  //         throw new Error(`Failed to save entry: ${errorText}`);
-  //       }
-
-  //       const result = await response.json();
-  //       console.log("Response from server:", result);
-
-  //       // Update local state with the server response
-  //       setTimeCard((prevState) => {
-  //         return {
-  //           ...prevState,
-  //           entries: prevState.entries.map((entry) => {
-  //             if (entry.id === result.data.id) {
-  //               return {
-  //                 ...entry,
-  //                 work_date: result.data.work_date,
-  //                 morning_activity:
-  //                   result.data.morning_activity || defaultActivity,
-  //                 afternoon_activity:
-  //                   result.data.afternoon_activity || defaultActivity,
-  //                 facility_start_time: result.data.facility_start_time || "",
-  //                 facility_lunch_start: result.data.facility_lunch_start || "",
-  //                 facility_lunch_end: result.data.facility_lunch_end || "",
-  //                 facility_end_time: result.data.facility_end_time || "",
-  //                 facility_total_hours:
-  //                   typeof result.data.facility_total_hours === "string"
-  //                     ? result.data.facility_total_hours
-  //                     : "0h 0m",
-  //                 driving_start_time: result.data.driving_start_time || "",
-  //                 driving_lunch_start: result.data.driving_lunch_start || "",
-  //                 driving_lunch_end: result.data.driving_lunch_end || "",
-  //                 driving_end_time: result.data.driving_end_time || "",
-  //                 driving_total_hours:
-  //                   typeof result.data.driving_total_hours === "string"
-  //                     ? result.data.driving_total_hours
-  //                     : "0h 0m",
-  //                 status: result.data.status || "active",
-  //               };
-  //             }
-  //             return entry;
-  //           }),
-  //         };
-  //       });
-
-  //       console.log(
-  //         `Successfully updated timecard with ID ${result.data.id} for date: ${result.data.work_date}`
-  //       );
-  //     } catch (error) {
-  //       console.error(`Error during PUT operation:`, error);
-  //       alert(`Error saving timecard entry: ${error.message}`);
-  //     }
-  //   };
-
-  //   updateEntry(); // Call the function to perform the API update
-
-  //   setEntryToUpdate(null); // Reset after update
-  // }, [employeeId, entryToUpdate, defaultActivity]); // Run this effect whenever entryToUpdate changes
-
-
-
 
   const handleSubmit = async () => {
     const twoWeekPeriod = timeCard.entries;
@@ -1216,6 +953,8 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
         />
       )}
 
+      <h2 className="text-center mb-4">Active Timecard</h2>
+
       <div className="text-center mb-3">
         <button
           className="btn btn-primary me-3"
@@ -1265,11 +1004,9 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
         </button>
       </div>
 
-      <h2 className="text-center mb-4">Active Timecard</h2>
-
       {/* Key explanation with delete red dot */}
       <div className="text-center mb-4">
-        <p>
+        <p style={{ textAlign: "center" }}>
           click <span style={{ color: "red" }}>🔴</span> to delete time.
         </p>
       </div>
