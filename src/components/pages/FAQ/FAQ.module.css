@@ -1,0 +1,98 @@
+/* Proprietary Software License
+Copyright (c) 2024 Mark Robertson
+See LICENSE.txt file for details. */
+
+
+/* Set background gradient for the whole page */
+/*background: linear-gradient(135deg, #4a90e2, #ffcc00);  Gradient from blue to yellow */
+/* FAQ.module.css */
+
+/* Global styles */
+.faqPage {
+  overflow: auto; /* Allow scrolling */
+  min-height: 100vh; /* Ensure it takes full height of the screen */
+  background: linear-gradient(135deg, #d3d8dd, #3c4650); /* Gradient background */
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
+  padding-bottom: 120px; /* Space for the footer */
+  box-sizing: border-box; /* Include padding in the element's total width and height */
+}
+
+/* FAQ Container */
+.faqContainer {
+  max-width: 800px;
+  margin: 50px auto;
+  padding: 20px;
+  background-color: #ffffff; /* White background for the FAQ container */
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.faqTitle {
+  text-align: center;
+  font-size: 2rem;
+  color: #4a90e2;
+  margin-bottom: 20px;
+}
+
+.faqList {
+  padding: 0;
+  margin: 0;
+}
+
+.faqItem {
+  margin-bottom: 15px;
+}
+
+.faqQuestion {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background-color: #4a90e2; /* Bright blue background */
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.faqQuestion:hover {
+  background-color: #357ab7; /* Darker blue on hover */
+}
+
+.faqQuestion.active {
+  background-color: #357ab7; /* Active state color */
+}
+
+.faqToggleIcon {
+  font-size: 1.5rem;
+  font-weight: bold;
+  padding-left: 10px;
+}
+
+.faqAnswer {
+  padding: 10px 15px;
+  background-color: #e1f0ff; /* Light blue background for answers */
+  border-radius: 5px;
+  margin-top: 5px;
+  font-size: 1rem;
+  color: #333;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .faqTitle {
+    font-size: 1.5rem;
+  }
+
+  .faqQuestion {
+    font-size: 1rem;
+    padding: 12px;
+  }
+
+  .faqAnswer {
+    font-size: 0.9rem;
+  }
+}

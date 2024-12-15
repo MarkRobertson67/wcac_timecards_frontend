@@ -5,6 +5,7 @@ See LICENSE.txt file for details. */
 
 /* ActiveTimeCard.module.css */
 
+
 /* Basic CSS reset */
 * {
   margin: 0;
@@ -12,18 +13,12 @@ See LICENSE.txt file for details. */
   box-sizing: border-box;
 }
 
-/* Ensure html and body fill the entire viewport */
-html, body {
-  height: 100%;
-  overflow: hidden; /* Prevent page scrolling */
-}
-
 /* Container: Prevent page from scrolling vertically and make it fill the screen */
 .container {
-  max-width: 1300px;
+  max-width: 1200px;
   margin: 0 auto;
   padding-bottom: 120px; /* Space for footer */
-  height: 100vh;
+  height: 89vh;
   overflow: hidden;
   display: flex;
   flex-direction: column; /* Stack header, table, and footer vertically */
@@ -36,7 +31,6 @@ html, body {
   flex-grow: 1; /* Allow table to take up available space */
   padding-bottom: 120px;
 }
-
 
 /* Ensure table fills the container width */
 .table {
@@ -94,6 +88,7 @@ html, body {
   width: 3rem;
   height: 3rem;
 }
+
 
 @media (max-width: 768px) {
   /* Ensure the activity column is wider on mobile */

@@ -102,7 +102,13 @@ function TimeCardsIndex() {
   };
   
 
+  const adjustTodayDate = (hoursToSubtract) => {
+    const adjustedDate = new Date();
+    adjustedDate.setHours(adjustedDate.getHours() - hoursToSubtract); // Subtract 4 hours
+    return adjustedDate.toISOString(); // Return in ISO string format
+  };
 
+  
   const handleDateClick = (info) => {
     navigate(`/timeCardIndexDetails/${info.dateStr}`, {
       state: { employeeId }, // Pass employeeId
@@ -208,10 +214,21 @@ function TimeCardsIndex() {
             timeZone: "UTC",
           }}
           dateClick={handleDateClick}
-          height="auto"
-          buttonText={{
-            today: 'Today' // Override button label to ensure it's correctly displayed
-          }}
+  height="auto"
+  buttonText={{
+    today: 'Today' // Override button label to ensure it's correctly displayed
+  }}
+  // Adjust 'today' button functionality
+  customButtons={{
+    today: {
+      text: 'Today',
+      click: function() {
+        // Use the adjusted "today" date
+        const todayDate = adjustTodayDate(4); // Subtract 4 hours for the "today" button
+        this.gotoDate(todayDate); // Go to the adjusted "today" date
+      }
+    }
+  }}
         />
 
       )}
