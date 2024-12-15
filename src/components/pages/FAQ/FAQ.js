@@ -2,7 +2,7 @@
 // Copyright (c) 2024 Mark Robertson
 // See LICENSE.txt file for details.
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./FAQ.module.css"; // Import the styles module
 
 const FAQ = () => {
@@ -11,6 +11,11 @@ const FAQ = () => {
   const toggle = (index) => {
     setActiveIndex(activeIndex === index ? null : index);
   };
+
+  // Scroll to top whenever this component is rendered
+  useEffect(() => {
+    window.scrollTo(0, 0); // Scroll to top of the page
+  }, []);
 
   const faqData = [
     {
@@ -42,20 +47,24 @@ const FAQ = () => {
       question: "Does this app use cookies?",
       answer: (
         <>
-          This app, or third-party apps, may use cookies to enhance your experience. By continuing to use the site, you agree to our use of cookies. Please see our{" "}
+          This app, or third-party apps, may use cookies to enhance your
+          experience. By continuing to use the site, you agree to our use of
+          cookies. Please see our{" "}
           <a href="/privacy-policy" target="_blank" rel="noopener noreferrer">
             Privacy Policy
           </a>{" "}
           and{" "}
-          <a href="/terms-and-conditions" target="_blank" rel="noopener noreferrer">
+          <a
+            href="/terms-and-conditions"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             Terms & Conditions
           </a>{" "}
           for more information.
         </>
       ),
-    }
-    
-    
+    },
   ];
 
   return (
@@ -88,4 +97,3 @@ const FAQ = () => {
 };
 
 export default FAQ;
-

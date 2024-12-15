@@ -4,10 +4,16 @@
 
 
 // src/components/pages/PrivacyPolicy.js
-import React from 'react';
+import React, { useEffect } from "react";
 import styles from "./PrivacyPolicy.module.css"; // Import the CSS module
 
 const PrivacyPolicy = () => {
+
+        // Scroll to top whenever this component is rendered
+        useEffect(() => {
+          window.scrollTo(0, 0); // Scroll to top of the page
+        }, []);
+  
   return (
     <div className={styles.ppPage}>
     <div className={styles.pageContainer}>

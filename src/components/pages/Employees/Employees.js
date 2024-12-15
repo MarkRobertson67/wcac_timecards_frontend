@@ -17,6 +17,7 @@
      const [isAdmin, setIsAdmin] = useState(false);
      const [isLoading, setIsLoading] = useState(true);
    
+   
      // Fetch employee data based on `is_admin`
      const fetchEmployeeData = async () => {
        setIsLoading(true);
@@ -28,13 +29,15 @@
          if (!response.ok) throw new Error("Failed to fetch employee data.");
    
          const { data } = await response.json();
+         //setCurrentUser(data);
          setCurrentUser(data);
          setIsAdmin(data.is_admin);
    
          if (data.is_admin) {
            // Fetch all employees if the user is an admin
            const allEmployeesResponse = await fetch(`${API}/employees`);
-           if (!allEmployeesResponse.ok) throw new Error("Failed to fetch all employees.");
+           if (!allEmployeesResponse.ok)
+             throw new Error("Failed to fetch all employees.");
            const allEmployeesData = await allEmployeesResponse.json();
            setEmployees(allEmployeesData.data || []);
          } else {
@@ -53,6 +56,7 @@
        fetchEmployeeData();
      }, []);
    
+   
      const renderEmployeeDetails = () => {
        if (isLoading) {
          return (
@@ -69,7 +73,6 @@
        }
    
        return (
-        // <div className={styles.empPage}>
          <div
            className={`${styles.container} mt-4`}
            style={{ paddingBottom: "50px", maxWidth: "600px", margin: "0 auto" }}
@@ -77,14 +80,35 @@
            <h4 className="text-center mb-3" style={{ fontSize: "1rem" }}>
              {isAdmin ? "All Employees" : "Your Profile"}
            </h4>
-   
-           {/* Remove table styles and use styles.table */}
-           <div className={styles.scrollableTable}>
+           <Table
+             striped
+             bordered
+             hover
+             responsive="sm"
+             size="sm"
+             className="text-center"
+             style={{ fontSize: "0.8rem" }}
+           >
+             <thead>
+               <tr>
+                 <th>Name</th>
+                 {isAdmin && <th>Actions</th>}
+               </tr>
+             </thead>
+           </Table>
+           {/* Scrollable container for the table body */}
+           <div
+             style={{
+               maxHeight: "400px", // Set the maximum height for scrolling
+               overflowY: "auto",
+               border: "1px solid #ddd",
+             }}
+           >
              <Table striped bordered hover responsive="sm" size="sm" className="text-center">
                <tbody>
                  {employees.map((record) => (
                    <tr key={record.id}>
-                     <td className={styles.textLeft}>
+                     <td>
                        {record.first_name} {record.last_name}
                      </td>
                      {isAdmin ? (
@@ -117,13 +141,12 @@
              </Table>
            </div>
          </div>
-        //  </div>
        );
      };
+   
    
      return <Container className="mt-4">{renderEmployeeDetails()}</Container>;
    }
    
    export default Employees;
-   
    

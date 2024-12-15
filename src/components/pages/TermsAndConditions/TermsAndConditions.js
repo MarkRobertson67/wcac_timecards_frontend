@@ -3,10 +3,19 @@
 // See LICENSE.txt file for details.
 
 // src/components/pages/TermsAndConditions.js
-import React from "react";
+import React, { useEffect } from "react";
 import styles from "./TermsAndConditions.module.css";
 
+
+
 const TermsAndConditions = () => {
+
+    // Scroll to top whenever this component is rendered
+    useEffect(() => {
+      window.scrollTo(0, 0); // Scroll to top of the page
+    }, []);
+
+    
   return (
     <div className={styles.TaCPage}>
     <div className={styles.pageContainer}>

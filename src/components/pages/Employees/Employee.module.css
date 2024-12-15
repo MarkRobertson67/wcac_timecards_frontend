@@ -5,8 +5,11 @@
 
 /* Employees.module.css */
 
+
+
 /* Container Styles */
 .container {
+  background: linear-gradient(135deg, #d3d8dd, #3c4650);
   max-width: 1200px;
   margin: 0 auto;
   padding: 1rem;
