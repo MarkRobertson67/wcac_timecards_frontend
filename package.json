@@ -1,6 +1,6 @@
 {
   "name": "wcac_timecards_frontend",
-  "version": "0.6.5 - beta",
+  "version": "0.6.7 - beta",
   "private": true,
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.7.1",

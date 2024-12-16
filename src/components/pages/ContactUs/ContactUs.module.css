@@ -1,0 +1,93 @@
+/* Proprietary Software License
+Copyright (c) 2024 Mark Robertson
+See LICENSE.txt file for details. */
+
+/* ContactUs.module.css */
+
+/* Container for the Contact Us page */
+.cuPage {
+    min-height: 90vh; /* Ensure it takes full height of the screen */
+    background: linear-gradient(135deg, #d3d8dd, #3c4650); /* Gradient background */
+    padding: 20px;
+    font-family: 'Arial', sans-serif;
+    padding-bottom: 120px; /* Space for the footer */
+    box-sizing: border-box; /* Include padding in the element's total width and height */
+  }
+  
+  /* Page background and padding */
+  .contact-page {
+    background-color: #d3d8dd; /* Medium gray background */
+    min-height: 100vh; /* Ensure it takes the full height */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  
+  /* Title styling */
+  .contact-form-container h1 {
+    font-size: 2rem;
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  /* Form field styling */
+  .contact-form-container .form-label {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #555;
+  }
+  
+  /* Input fields and textarea styling */
+  .contact-form-container .form-control {
+    font-size: 1rem;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+  }
+  
+  /* Styling for the submit button */
+  .contact-form-container .btn {
+    font-size: 1.1rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    transition: background-color 0.3s ease;
+  }
+  
+  .contact-form-container .btn:hover {
+    background-color: #0056b3;
+    cursor: pointer;
+  }
+  
+  /* Error message styling */
+  .contact-form-container .text-danger {
+    font-size: 0.9rem;
+    color: #d9534f;
+    text-align: center;
+    margin-top: 10px;
+  }
+  
+  @media (max-width: 768px) {
+    .contact-form-container {
+      padding: 15px;
+    }
+  
+    .contact-form-container h1 {
+      font-size: 1.5rem;
+    }
+  
+    .contact-form-container .form-control {
+      font-size: 0.9rem;
+    }
+  
+    .contact-form-container .btn {
+      font-size: 1rem;
+    }
+  }
+  

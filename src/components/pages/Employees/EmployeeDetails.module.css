@@ -2,7 +2,16 @@
    Copyright (c) 2024 Mark Robertson
    See LICENSE.txt file for details. */
 
+   
 /* EmployeeDetails.module.css */
+
+.edPage {
+  min-height: 80vh; /* Ensure it takes full height of the screen */
+  background: linear-gradient(135deg, #d3d8dd, #3c4650); /* Gradient background */
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
+  box-sizing: border-box; /* Include padding in the element's total width and height */
+}
 
 /* Container Styles */
 .container {

@@ -1022,10 +1022,10 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
             <thead>
               <tr>
                 <th>Date</th>
-                <th className={styles.activityColumn}>Morning Activity</th>
+                <th className={styles.activityColumn}>AM Activity</th>
                 <th className={styles.timeColumn}>Start Time</th>
                 <th className={styles.timeColumn}>Lunch Start</th>
-                <th className={styles.activityColumn}>Afternoon Activity</th>
+                <th className={styles.activityColumn}>PM Activity</th>
                 <th className={styles.timeColumn}>Lunch End</th>
                 <th className={styles.timeColumn}>End Time</th>
                 <th className={styles.totalTimeColumn}>Facility Total Time</th>
@@ -1048,7 +1048,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                       onChange={(e) =>
                         handleChange(index, "morningActivity", e.target.value)
                       }
-                      className="form-select w-180"
+                       className="form-select w-200"
                     >
                       <option value="Facility">Facility</option>
                       <option value="Driving">Driving</option>

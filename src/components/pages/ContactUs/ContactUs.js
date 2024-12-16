@@ -3,8 +3,10 @@
 // See LICENSE.txt file for details.
 
 // src/components/pages/ContactUs.js
+
 import React, { useState } from "react";
 import emailjs from "emailjs-com"; // Import EmailJS library
+import styles from "./ContactUs.module.css"
 
 const ContactUs = () => {
   const [message, setMessage] = useState("");
@@ -24,7 +26,7 @@ const ContactUs = () => {
     // Send the email using EmailJS
     emailjs
       .send(
-        "service_banxgx9",
+        "service_rbo3lcb",
         "template_pkn8xon",
         formData,
         "kyrfTrBDTp5yrt7DC"
@@ -45,6 +47,7 @@ const ContactUs = () => {
   };
 
   return (
+    <div className={styles.cuPage}>
     <div
       className="container my-5 contact-form-container"
       style={{ maxWidth: "600px" }}
@@ -99,6 +102,7 @@ const ContactUs = () => {
           </button>
         </div>
       </form>
+    </div>
     </div>
   );
 };
