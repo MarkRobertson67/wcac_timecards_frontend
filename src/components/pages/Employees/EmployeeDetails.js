@@ -14,6 +14,7 @@ import {
   Card,
 } from "react-bootstrap";
 import { auth } from "../../../firebase/firebaseConfig";
+import styles from "./EmployeeDetails.module.css"
 
 const API = process.env.REACT_APP_API_URL;
 
@@ -169,6 +170,7 @@ const isProtectedAdminAccount = employee?.id === 1;
   }
 
   return (
+    <div className={styles.edPage}>
     <Container
       className="mt-4 d-flex justify-content-center"
       style={{ paddingBottom: "100px" }}
@@ -319,7 +321,7 @@ const isProtectedAdminAccount = employee?.id === 1;
               size="sm"
               className="mx-1"
               onClick={handleSave}
-              disabled={isProtectedAdminAccount} // Disable Delete button for admin account
+              disabled={isProtectedAdminAccount} // Disable Save button for admin account
             >
               Save Changes
             </Button>
@@ -346,6 +348,7 @@ const isProtectedAdminAccount = employee?.id === 1;
         </Card.Body>
       </Card>
     </Container>
+    </div>
   );
 }
 

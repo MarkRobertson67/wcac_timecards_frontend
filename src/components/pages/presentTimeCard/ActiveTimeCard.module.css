@@ -30,6 +30,7 @@ See LICENSE.txt file for details. */
   overflow-y: auto;
   flex-grow: 1; /* Allow table to take up available space */
   padding-bottom: 120px;
+  max-height:80vh
 }
 
 /* Ensure table fills the container width */
@@ -44,14 +45,15 @@ See LICENSE.txt file for details. */
 .table th.dateColumn,
 .table td.dateColumn {
   width: 120px;
-  text-align: left;
+  text-align: center;
   white-space: nowrap;
 }
 
 /* Larger activity column */
-.activityColumn {
-  width: 120px;
-  text-align: left;
+.table th.activityColumn,
+.table td.activityColumn {
+  min-width: 117px;
+  text-align: center;
 }
 
 /* Total Time columns (Facility and Driving) */
@@ -60,10 +62,9 @@ See LICENSE.txt file for details. */
   width: 100px;
 }
 
-/* Reduce the width of time-related columns */
 .table th.timeColumn,
 .table td.timeColumn {
-  width: 120px;
+  min-width: 90px;
 }
 
 /* Style for table cells and headers */
@@ -93,9 +94,8 @@ See LICENSE.txt file for details. */
 @media (max-width: 768px) {
   /* Ensure the activity column is wider on mobile */
   .activityColumn, .table th.activityColumn, .table td.activityColumn {
-    width: 200px !important; /* Set width for both header and cells */
-    font-size: 14.75px !important; /* Ensure consistent font size for mobile */
-    text-align: left !important; /* Align text in dropdown to the left */
+    min-width: 117px;
+    text-align: center !important; /* Align text in dropdown to the left */
   }
 
   /* Make sure the dropdown shows the full text */
@@ -104,4 +104,3 @@ See LICENSE.txt file for details. */
     text-align: left; /* Align text in the dropdown to the left */
   }
 }
-

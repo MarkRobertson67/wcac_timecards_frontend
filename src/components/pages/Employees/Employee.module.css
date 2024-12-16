@@ -6,13 +6,12 @@
 /* Employees.module.css */
 
 
-
-/* Container Styles */
-.container {
-  background: linear-gradient(135deg, #d3d8dd, #3c4650);
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 1rem;
+.ePage {
+  min-height: 100%; /* Ensure it takes full height of the screen */
+  background: linear-gradient(135deg, #d3d8dd, #3c4650); /* Gradient background */
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
+  box-sizing: border-box; /* Include padding in the element's total width and height */
 }
 
 h2 {
@@ -111,5 +110,3 @@ h2 {
   display: flex;
   justify-content: center;
 }
-
-  
