@@ -73,6 +73,7 @@
        }
    
        return (
+        <div className={styles.ePage}>
          <div
            className={`${styles.container} mt-4`}
            style={{ paddingBottom: "50px", maxWidth: "600px", margin: "0 auto" }}
@@ -140,6 +141,7 @@
                </tbody>
              </Table>
            </div>
+         </div>
          </div>
        );
      };
