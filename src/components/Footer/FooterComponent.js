@@ -49,7 +49,7 @@ function FooterComponent() {
         </div>
       </div>
       <div className="text-center py-1 bg-secondary">
-        <span>© 2024 We Care Adult Care Timecards App™ by Mark Robertson.</span>
+        <span>© 2025 We Care Adult Care Timecards App™ by Mark Robertson.</span>
         <br></br>
         <span>All Rights Reserved. Version: {packageJson.version}</span> {/* Display version from package.json */}
 
