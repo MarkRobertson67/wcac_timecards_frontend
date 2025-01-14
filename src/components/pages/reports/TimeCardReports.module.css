@@ -1,6 +1,6 @@
 
 /* Proprietary Software License
-Copyright (c) 2024 Mark Robertson
+Copyright (c) 2025 Mark Robertson
 See LICENSE.txt file for details. */
 
 
@@ -8,52 +8,69 @@ See LICENSE.txt file for details. */
 
 .tcrPage {
   overflow: hidden;
-  min-height: 90vh; /* Ensure it takes full height of the screen */
-  background: linear-gradient(135deg, #d3d8dd, #3c4650); /* Gradient background */
+  min-height: 90vh;
+  background: linear-gradient(135deg, #d3d8dd, #3c4650); 
   font-family: 'Arial', sans-serif;
-  padding-bottom: 120px; /* Space for the footer */
-  box-sizing: border-box; /* Include padding in the element's total width and height */
+  padding-bottom: 120px;
+  box-sizing: border-box;
   flex-direction: column;
-  align-items: center; /* Center content horizontally */
-}
-
-.pageContainer {
-
-  margin-top: 5rem;
-  padding-bottom: 100px;
-}
-
-.row {
+  align-items: center;
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 1rem;
+  justify-content: flex-start;
+}
+
+.container {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
 }
 
 .form-label {
   display: block;
   margin-bottom: 0.5rem;
+  font-weight: bold;
 }
 
 .form-select, .form-control {
   width: 100%;
+  margin-bottom: 1rem;
 }
 
+button {
+  margin: 10px 0;
+}
+
+/* Hide buttons when printing */
 @media print {
   button {
     display: none !important;
   }
 }
 
+/* Disabled inputs look grayed out */
 input:disabled, select:disabled {
   background-color: #e9ecef;
   cursor: not-allowed;
   opacity: 0.7;
 }
 
-
-/* Media Queries */
+/* Media Queries for responsiveness */
 @media (max-width: 768px) {
-  .row {
-    flex-direction: column;
+  .container {
+    padding: 10px;
+  }
+
+  .form-select, .form-control {
+    font-size: 1rem;
+  }
+
+  button {
+    width: 100%;
+    margin: 10px 0;
+  }
+
+  /* Ensure labels are above inputs on smaller screens */
+  .form-label {
+    text-align: left;
   }
 }

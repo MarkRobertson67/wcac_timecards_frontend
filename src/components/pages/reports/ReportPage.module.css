@@ -1,0 +1,99 @@
+/* Proprietary Software License
+Copyright (c) 2025 Mark Robertson
+See LICENSE.txt file for details. */
+
+/* ReportPage.module.css */
+
+.pageContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0px 10px 80px;
+  background-color: white;
+  border-radius: 8px;
+}
+
+.table {
+  width: 100%;
+  margin: 0 auto;
+}
+
+.table th,
+.table td {
+  text-align: center;
+  padding: 10px;
+}
+
+.table th {
+  background-color: #f8f9fa;
+}
+
+.table-striped tbody tr:nth-child(odd) {
+  background-color: #f2f2f2;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .tcrPage {
+    padding: 10px;
+  }
+
+  .table {
+    width: 100%;
+    font-size: 0.47rem;
+  }
+
+  .table th,
+  .table td {
+    padding: 8px;
+  }
+
+  .table th {
+    font-size: 0.7rem;
+  }
+
+  .table td {
+    font-size: 0.7rem;
+  }
+
+  button {
+    width: 50%;
+    margin: 10px 0;
+  }
+}
+
+/* Mobile Responsiveness for max-width 375px */
+@media (max-width: 375px) {
+  .pageContainer {
+    padding: 0px 10px 80px;
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .table {
+    width: 80%;
+    max-width: 100%;
+    font-size: 0.55rem;
+    table-layout: fixed;
+    overflow-x: auto;
+  }
+
+  .table th,
+  .table td {
+    padding: 5px;
+    word-wrap: break-word;
+    white-space: normal;
+  }
+
+  .table th {
+    font-size: 0.55rem;
+  }
+
+  .table td {
+    font-size: 0.55rem;
+  }
+
+  button {
+    width: 100%;
+    margin: 8px 0;
+  }
+}
