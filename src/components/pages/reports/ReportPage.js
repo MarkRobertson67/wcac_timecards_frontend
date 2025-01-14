@@ -1,11 +1,11 @@
 // Proprietary Software License
-// Copyright (c) 2024 Mark Robertson
+// Copyright (c) 2025 Mark Robertson
 // See LICENSE.txt file for details.
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { formatDate, formatTime } from "../utils/TimeAndDateUtils";
-import styles from "./TimeCardReports.module.css";
+import styles from "./ReportPage.module.css";
 
 // const API = process.env.REACT_APP_API_URL;
 
@@ -204,7 +204,7 @@ const ReportPage = () => {
     console.log(employeeInfo);
 
     return (
-      <div className={`${styles.container} mt-4`}>
+      <div className={`${styles.pageContainer} mt-4`}>
         <h2 className="text-center mb-4">Detailed Timecards Report</h2>
         <p className="text-center mb-3">
           {`Report for: ${formatDate(startDate)} - ${formatDate(endDate)}`}
@@ -227,7 +227,7 @@ const ReportPage = () => {
             Back
           </button>
         </div>
-        <table className="table table-striped table-bordered text-center">
+        <table className={`table table-striped table-bordered text-center ${styles.table}`}>
           <thead>
             <tr>
               <th>Work Date</th>
@@ -343,7 +343,7 @@ const ReportPage = () => {
     drivingTotalMinutes = drivingTotalMinutes % 60;
 
     return (
-      <div className={`${styles.container} mt-4`}>
+      <div className={`${styles.pageContainer} mt-4`}>
         <h2 className="text-center mb-4">Total Hours Report</h2>
         <p className="text-center mb-3">
           {`Report for: ${formatDate(startDate)} - ${formatDate(endDate)}`}
@@ -416,7 +416,7 @@ const ReportPage = () => {
 
   const renderMonthlySummary = () => {
     return (
-      <div className={`${styles.container} mt-4`}>
+      <div className={`${styles.pageContainer} mt-4`}>
         <h2 className="text-center mb-4">Monthly Summary Report</h2>
         <div className="text-center mb-4">
           <button className="btn btn-primary mx-2" onClick={handlePrint}>
@@ -456,7 +456,7 @@ const ReportPage = () => {
     const groupedData = groupByEmployee(reportData);
 
     return (
-      <div className={`${styles.container} mt-4`}>
+      <div className={`${styles.pageContainer} mt-4`}>
         <h2 className="text-center mb-4">Employee Summary Report</h2>
 
         {/* Place the period toggle buttons at the top */}
@@ -552,7 +552,7 @@ const ReportPage = () => {
   };
 
   return (
-    <div className={`${styles.container} mt-4`}>
+    <div className={`${styles.pageContainer} mt-4`}>
       {reportType === "detailedTimecards" && renderDetailedTimecards()}
       {reportType === "totalHours" && renderTotalHours()}
       {reportType === "monthlySummary" && renderMonthlySummary()}

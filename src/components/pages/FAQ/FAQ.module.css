@@ -1,21 +1,22 @@
 /* Proprietary Software License
-Copyright (c) 2024 Mark Robertson
+Copyright (c) 2025 Mark Robertson
 See LICENSE.txt file for details. */
 
+/* FAQ.module.css */
 
 /* Set background gradient for the whole page */
 /*background: linear-gradient(135deg, #4a90e2, #ffcc00);  Gradient from blue to yellow */
-/* FAQ.module.css */
+
 
 /* Global styles */
 .faqPage {
-  overflow: auto; /* Allow scrolling */
-  min-height: 100vh; /* Ensure it takes full height of the screen */
-  background: linear-gradient(135deg, #d3d8dd, #3c4650); /* Gradient background */
+  overflow: auto;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #d3d8dd, #3c4650);
   padding: 20px;
   font-family: 'Arial', sans-serif;
   padding-bottom: 120px; /* Space for the footer */
-  box-sizing: border-box; /* Include padding in the element's total width and height */
+  box-sizing: border-box;
 }
 
 /* FAQ Container */
@@ -43,14 +44,14 @@ See LICENSE.txt file for details. */
 
 .faqItem {
   margin-bottom: 1rem; /* Reduce space between items */
-  background-color: #f7f7f7; /* Light background color */
-  border: 1px solid #ddd; /* Border for the box */
+  background-color: #f7f7f7;
+  border: 1px solid #ddd;
   border-radius: 5px;
   padding: 0.25rem; /* Reduce the padding to make the boxes smaller */
 }
 
 .faqQuestion {
-  font-size: 1rem; /* Reduce the font size */
+  font-size: 1rem;
   font-weight: bold;
   padding: 0.5rem; /* Adjust padding to control the box height */
   cursor: pointer;
