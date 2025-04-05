@@ -230,7 +230,6 @@ const calculateTotalsForDetailedTimecards = () => {
   };
 
   const renderDetailedTimecards = () => {
-    const employeeInfo = reportData.length > 0 ? reportData[0] : {};
     const totals = calculateTotalsForDetailedTimecards();
   
     return (
@@ -342,7 +341,7 @@ const calculateTotalsForDetailedTimecards = () => {
               </td>
               <td>
                 <strong>
-                  {totals.facility.hours} hours {totals.facility.minutes} minutes
+                  {totals.facility.hours} hours <br /> {totals.facility.minutes} minutes
                 </strong>
               </td>
               <td colSpan="4" style={{ textAlign: "right" }}>
@@ -350,7 +349,7 @@ const calculateTotalsForDetailedTimecards = () => {
               </td>
               <td>
                 <strong>
-                  {totals.driving.hours} hours {totals.driving.minutes} minutes
+                  {totals.driving.hours} hours <br /> {totals.driving.minutes} minutes
                 </strong>
               </td>
             </tr>
