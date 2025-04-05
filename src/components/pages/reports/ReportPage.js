@@ -29,6 +29,36 @@ const ReportPage = () => {
   const [loading, setLoading] = useState(false);
   const [cachedData, setCachedData] = useState({}); // Cache data for periods
 
+  // Helper function to calculate the overall totals for detailed timecards
+const calculateTotalsForDetailedTimecards = () => {
+  let totalFacilityMinutes = 0;
+  let totalDrivingMinutes = 0;
+
+  reportData.forEach((record) => {
+    if (record.facility_total_hours) {
+      totalFacilityMinutes +=
+        record.facility_total_hours.hours * 60 +
+        record.facility_total_hours.minutes;
+    }
+    if (record.driving_total_hours) {
+      totalDrivingMinutes +=
+        record.driving_total_hours.hours * 60 +
+        record.driving_total_hours.minutes;
+    }
+  });
+
+  const facilityHours = Math.floor(totalFacilityMinutes / 60);
+  const facilityMinutes = totalFacilityMinutes % 60;
+  const drivingHours = Math.floor(totalDrivingMinutes / 60);
+  const drivingMinutes = totalDrivingMinutes % 60;
+
+  return {
+    facility: { hours: facilityHours, minutes: facilityMinutes },
+    driving: { hours: drivingHours, minutes: drivingMinutes },
+  };
+};
+
+
   // Group the report data by employee_id
   const groupByEmployee = (reportData) => {
     return reportData.reduce((acc, record) => {
@@ -201,8 +231,8 @@ const ReportPage = () => {
 
   const renderDetailedTimecards = () => {
     const employeeInfo = reportData.length > 0 ? reportData[0] : {};
-    console.log(employeeInfo);
-
+    const totals = calculateTotalsForDetailedTimecards();
+  
     return (
       <div className={`${styles.pageContainer} mt-4`}>
         <h2 className="text-center mb-4">Detailed Timecards Report</h2>
@@ -211,8 +241,7 @@ const ReportPage = () => {
           <br />
           <strong>Employee ID:</strong> {employeeId || "N/A"}
           <br />
-          <strong>Employee Name:</strong> {firstName || "N/A"}{" "}
-          {lastName || "N/A"}
+          <strong>Employee Name:</strong> {firstName || "N/A"} {lastName || "N/A"}
         </p>
         <div className="text-center mb-4 print-hide">
           <button className="btn btn-primary mx-2" onClick={handlePrint}>
@@ -252,7 +281,6 @@ const ReportPage = () => {
             {reportData.map((record) => (
               <tr key={record.timecard_id}>
                 <td>{formatDate(record.work_date)}</td>
-
                 {/* Facility Activity Columns */}
                 <td>
                   {record.facility_start_time
@@ -279,7 +307,6 @@ const ReportPage = () => {
                     ? `${record.facility_total_hours.hours} hours ${record.facility_total_hours.minutes} minutes`
                     : "0 Hours 0 Minutes"}
                 </td>
-
                 {/* Driving Activity Columns */}
                 <td>
                   {record.driving_start_time
@@ -308,11 +335,31 @@ const ReportPage = () => {
                 </td>
               </tr>
             ))}
+            {/* Totals row */}
+            <tr>
+              <td colSpan="5" style={{ textAlign: "right" }}>
+                <strong>Total</strong>
+              </td>
+              <td>
+                <strong>
+                  {totals.facility.hours} hours {totals.facility.minutes} minutes
+                </strong>
+              </td>
+              <td colSpan="4" style={{ textAlign: "right" }}>
+                <strong>Total</strong>
+              </td>
+              <td>
+                <strong>
+                  {totals.driving.hours} hours {totals.driving.minutes} minutes
+                </strong>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
     );
   };
+  
 
   const renderTotalHours = () => {
     let facilityTotalHours = 0;
