@@ -29,35 +29,144 @@ const ReportPage = () => {
   const [loading, setLoading] = useState(false);
   const [cachedData, setCachedData] = useState({}); // Cache data for periods
 
-  // Helper function to calculate the overall totals for detailed timecards
-const calculateTotalsForDetailedTimecards = () => {
-  let totalFacilityMinutes = 0;
-  let totalDrivingMinutes = 0;
+  // Helper function to format period based on weekly, monthly, or yearly
+  const formatPeriodRange = useCallback((summaryPeriod, period) => {
+    const startOfPeriod = new Date(summaryPeriod);
 
-  reportData.forEach((record) => {
-    if (record.facility_total_hours) {
-      totalFacilityMinutes +=
-        record.facility_total_hours.hours * 60 +
-        record.facility_total_hours.minutes;
+    if (period === "weekly") {
+      const endOfPeriod = new Date(startOfPeriod);
+      endOfPeriod.setDate(startOfPeriod.getDate() + 6);
+      return `${formatDate(startOfPeriod)} - ${formatDate(endOfPeriod)}`;
     }
-    if (record.driving_total_hours) {
-      totalDrivingMinutes +=
-        record.driving_total_hours.hours * 60 +
-        record.driving_total_hours.minutes;
+
+    if (period === "monthly") {
+      return `${startOfPeriod.toLocaleString("default", {
+        month: "long",
+      })} ${startOfPeriod.getFullYear()}`;
     }
-  });
 
-  const facilityHours = Math.floor(totalFacilityMinutes / 60);
-  const facilityMinutes = totalFacilityMinutes % 60;
-  const drivingHours = Math.floor(totalDrivingMinutes / 60);
-  const drivingMinutes = totalDrivingMinutes % 60;
+    if (period === "yearly") {
+      return `${startOfPeriod.getUTCFullYear()}`;
+    }
 
-  return {
-    facility: { hours: facilityHours, minutes: facilityMinutes },
-    driving: { hours: drivingHours, minutes: drivingMinutes },
+    return formatDate(startOfPeriod); // Fallback if no valid period is provided
+  }, []);
+
+  const aggregateDataByPeriod = useCallback(
+    (data, periodType) => {
+      const aggregation = {};
+
+      data.forEach((record) => {
+        // Use the preserved original date for grouping
+        const periodLabel = formatPeriodRange(
+          record.original_summary_period,
+          periodType
+        );
+
+        if (!aggregation[periodLabel]) {
+          aggregation[periodLabel] = {
+            summary_period: periodLabel, // store the computed label
+            facility_total_hours: { hours: 0, minutes: 0 },
+            driving_total_hours: { hours: 0, minutes: 0 },
+            days_worked: 0,
+            absentee_days: 0,
+            employee_id: record.employee_id,
+            first_name: record.first_name,
+            last_name: record.last_name,
+          };
+        }
+
+        aggregation[periodLabel].facility_total_hours.hours +=
+          record.facility_total_hours.hours;
+        aggregation[periodLabel].facility_total_hours.minutes +=
+          record.facility_total_hours.minutes;
+        aggregation[periodLabel].driving_total_hours.hours +=
+          record.driving_total_hours.hours;
+        aggregation[periodLabel].driving_total_hours.minutes +=
+          record.driving_total_hours.minutes;
+        aggregation[periodLabel].days_worked += Number(record.days_worked) || 0;
+        aggregation[periodLabel].absentee_days +=
+          Number(record.absentee_days) || 0;
+      });
+
+      // Normalize minutes to hours for each period
+      Object.values(aggregation).forEach((item) => {
+        const extraFacilityHours = Math.floor(
+          item.facility_total_hours.minutes / 60
+        );
+        item.facility_total_hours.hours += extraFacilityHours;
+        item.facility_total_hours.minutes %= 60;
+
+        const extraDrivingHours = Math.floor(
+          item.driving_total_hours.minutes / 60
+        );
+        item.driving_total_hours.hours += extraDrivingHours;
+        item.driving_total_hours.minutes %= 60;
+      });
+
+      return Object.values(aggregation);
+    },
+    [formatPeriodRange]
+  );
+
+  // Overall totals helper for Employee Summary Report
+  const calculateOverallTotalsForEmployeeSummary = (groupedData) => {
+    let totalFacilityMinutes = 0;
+    let totalDrivingMinutes = 0;
+    let totalDaysWorked = 0;
+    let totalAbsenteeDays = 0;
+    Object.values(groupedData).forEach((employee) => {
+      employee.periods.forEach((record) => {
+        totalFacilityMinutes +=
+          record.facility_total_hours.hours * 60 +
+          record.facility_total_hours.minutes;
+        totalDrivingMinutes +=
+          record.driving_total_hours.hours * 60 +
+          record.driving_total_hours.minutes;
+        totalDaysWorked += Number(record.days_worked) || 0;
+        totalAbsenteeDays += Number(record.absentee_days) || 0;
+      });
+    });
+    const facilityHours = Math.floor(totalFacilityMinutes / 60);
+    const facilityMinutes = totalFacilityMinutes % 60;
+    const drivingHours = Math.floor(totalDrivingMinutes / 60);
+    const drivingMinutes = totalDrivingMinutes % 60;
+    return {
+      facility: { hours: facilityHours, minutes: facilityMinutes },
+      driving: { hours: drivingHours, minutes: drivingMinutes },
+      daysWorked: totalDaysWorked,
+      absenteeDays: totalAbsenteeDays,
+    };
   };
-};
 
+  // Helper function to calculate the overall totals for detailed timecards
+  const calculateTotalsForDetailedTimecards = () => {
+    let totalFacilityMinutes = 0;
+    let totalDrivingMinutes = 0;
+
+    reportData.forEach((record) => {
+      if (record.facility_total_hours) {
+        totalFacilityMinutes +=
+          record.facility_total_hours.hours * 60 +
+          record.facility_total_hours.minutes;
+      }
+      if (record.driving_total_hours) {
+        totalDrivingMinutes +=
+          record.driving_total_hours.hours * 60 +
+          record.driving_total_hours.minutes;
+      }
+    });
+
+    const facilityHours = Math.floor(totalFacilityMinutes / 60);
+    const facilityMinutes = totalFacilityMinutes % 60;
+    const drivingHours = Math.floor(totalDrivingMinutes / 60);
+    const drivingMinutes = totalDrivingMinutes % 60;
+
+    return {
+      facility: { hours: facilityHours, minutes: facilityMinutes },
+      driving: { hours: drivingHours, minutes: drivingMinutes },
+    };
+  };
 
   // Group the report data by employee_id
   const groupByEmployee = (reportData) => {
@@ -97,57 +206,34 @@ const calculateTotalsForDetailedTimecards = () => {
     }
   };
 
-  // Helper function to format period based on weekly, monthly, or yearly
-  const formatPeriodRange = useCallback((summaryPeriod, period) => {
-    const startOfPeriod = new Date(summaryPeriod);
-
-    if (period === "weekly") {
-      const endOfPeriod = new Date(startOfPeriod);
-      endOfPeriod.setDate(startOfPeriod.getDate() + 6);
-      return `${formatDate(startOfPeriod)} - ${formatDate(endOfPeriod)}`;
-    }
-
-    if (period === "monthly") {
-      return `${startOfPeriod.toLocaleString("default", {
-        month: "long",
-      })} ${startOfPeriod.getFullYear()}`;
-    }
-
-    if (period === "yearly") {
-      return `${startOfPeriod.getUTCFullYear()}`;
-    }
-
-    return formatDate(startOfPeriod); // Fallback if no valid period is provided
-  }, []);
-
   // Cache the initial data when the component mounts
   useEffect(() => {
     if (initialReportData) {
-      console.log("Initial Report Data before formatting:", initialReportData);
       setLoading(true);
+      // Preserve the original summary date and add a weekly_period field for display
       const formattedData = initialReportData.map((data) => ({
         ...data,
-        formatted_period: formatPeriodRange(data.summary_period, "weekly"), // Default to weekly
+        original_summary_period: data.summary_period, // keep the raw date
+        weekly_period: formatPeriodRange(data.summary_period, "weekly"), // formatted for weekly view
       }));
-      console.log(
-        "Formatted period (weekly):",
-        formatPeriodRange("2024-11-25T00:00:00.000Z", "weekly")
+      // Set cached data:
+      setCachedData({
+        // For weekly view, use the weekly_period field
+        weekly: formattedData.map((d) => ({
+          ...d,
+          summary_period: d.weekly_period,
+        })),
+        // For monthly/yearly, use the raw date from original_summary_period
+        monthly: aggregateDataByPeriod(formattedData, "monthly"),
+        yearly: aggregateDataByPeriod(formattedData, "yearly"),
+      });
+      // Default view is weekly:
+      setReportData(
+        formattedData.map((d) => ({ ...d, summary_period: d.weekly_period }))
       );
-      setCachedData((prevCache) => ({
-        ...prevCache,
-        weekly: formattedData,
-        monthly: formattedData.map((d) => ({
-          ...d,
-          formatted_period: formatPeriodRange(d.summary_period, "monthly"),
-        })),
-        yearly: formattedData.map((d) => ({
-          ...d,
-          formatted_period: formatPeriodRange(d.summary_period, "yearly"),
-        })),
-      }));
       setLoading(false);
     }
-  }, [initialReportData, formatPeriodRange]);
+  }, [initialReportData, formatPeriodRange, aggregateDataByPeriod]);
 
   const handlePrint = () => {
     window.print();
@@ -231,7 +317,7 @@ const calculateTotalsForDetailedTimecards = () => {
 
   const renderDetailedTimecards = () => {
     const totals = calculateTotalsForDetailedTimecards();
-  
+
     return (
       <div className={`${styles.pageContainer} mt-4`}>
         <h2 className="text-center mb-4">Detailed Timecards Report</h2>
@@ -240,7 +326,8 @@ const calculateTotalsForDetailedTimecards = () => {
           <br />
           <strong>Employee ID:</strong> {employeeId || "N/A"}
           <br />
-          <strong>Employee Name:</strong> {firstName || "N/A"} {lastName || "N/A"}
+          <strong>Employee Name:</strong> {firstName || "N/A"}{" "}
+          {lastName || "N/A"}
         </p>
         <div className="text-center mb-4 print-hide">
           <button className="btn btn-primary mx-2" onClick={handlePrint}>
@@ -255,7 +342,9 @@ const calculateTotalsForDetailedTimecards = () => {
             Back
           </button>
         </div>
-        <table className={`table table-striped table-bordered text-center ${styles.table}`}>
+        <table
+          className={`table table-striped table-bordered text-center ${styles.table}`}
+        >
           <thead>
             <tr>
               <th>Work Date</th>
@@ -341,7 +430,8 @@ const calculateTotalsForDetailedTimecards = () => {
               </td>
               <td>
                 <strong>
-                  {totals.facility.hours} hours <br /> {totals.facility.minutes} minutes
+                  {totals.facility.hours} hours <br /> {totals.facility.minutes}{" "}
+                  minutes
                 </strong>
               </td>
               <td colSpan="4" style={{ textAlign: "right" }}>
@@ -349,7 +439,8 @@ const calculateTotalsForDetailedTimecards = () => {
               </td>
               <td>
                 <strong>
-                  {totals.driving.hours} hours <br /> {totals.driving.minutes} minutes
+                  {totals.driving.hours} hours <br /> {totals.driving.minutes}{" "}
+                  minutes
                 </strong>
               </td>
             </tr>
@@ -358,7 +449,6 @@ const calculateTotalsForDetailedTimecards = () => {
       </div>
     );
   };
-  
 
   const renderTotalHours = () => {
     let facilityTotalHours = 0;
@@ -498,14 +588,34 @@ const calculateTotalsForDetailedTimecards = () => {
   };
 
   const renderEmployeeSummary = () => {
-    console.log("Rendering Employee Summary Report", reportData);
-    const groupedData = groupByEmployee(reportData);
+    // Use grouped data only for weekly view (if multiple employees)
+    // For aggregated monthly/yearly, reportData is already aggregated for one employee
+    let displayData = reportData;
+    let titlePrefix = "";
+    if (period === "weekly") {
+      titlePrefix = "Weekly";
+    } else if (period === "monthly") {
+      titlePrefix = "Monthly";
+    } else if (period === "yearly") {
+      titlePrefix = "Yearly";
+    }
+
+    // If grouping by employee is needed (if more than one employee in the reportData)
+    const groupedData = groupByEmployee(displayData);
+    const overallTotals = calculateOverallTotalsForEmployeeSummary(groupedData);
 
     return (
       <div className={`${styles.pageContainer} mt-4`}>
-        <h2 className="text-center mb-4">Employee Summary Report</h2>
+        {Object.values(groupedData).map((employee) => (
+          <div key={employee.employee_id}>
+            <h2 className="text-center mb-4">
+              {titlePrefix} Employee Summary Report For <br />{" "}
+              {employee.first_name} {employee.last_name}
+            </h2>
+            {/* Rest of the employee-specific report */}
+          </div>
+        ))}
 
-        {/* Place the period toggle buttons at the top */}
         <div className="text-center mb-4">
           <button
             className={`btn btn-sm mx-2 ${
@@ -542,13 +652,8 @@ const calculateTotalsForDetailedTimecards = () => {
           </button>
         </div>
 
-        {/* Iterate through each employee */}
         {Object.values(groupedData).map((employee) => (
           <div key={employee.employee_id}>
-            <h3>
-              {employee.first_name} {employee.last_name}
-            </h3>
-
             <table className="table table-striped table-bordered text-center">
               <thead>
                 <tr>
@@ -567,28 +672,46 @@ const calculateTotalsForDetailedTimecards = () => {
               </thead>
               <tbody>
                 {employee.periods.map((record, index) => (
-                  <tr key={`${record.employee_id}-${index}`}>
-                    <td>{formatPeriodRange(record.summary_period, period)}</td>
+                  <tr key={`${employee.employee_id}-${index}`}>
+                    <td>{record.summary_period}</td>
                     <td>
-                      {record.facility_total_hours &&
-                      typeof record.facility_total_hours === "object"
-                        ? `${record.facility_total_hours.hours || 0} hours ${
-                            record.facility_total_hours.minutes || 0
-                          } minutes`
+                      {record.facility_total_hours
+                        ? `${record.facility_total_hours.hours} hours ${record.facility_total_hours.minutes} minutes`
                         : "0 hours 0 minutes"}
                     </td>
                     <td>
-                      {record.driving_total_hours &&
-                      typeof record.driving_total_hours === "object"
-                        ? `${record.driving_total_hours.hours || 0} hours ${
-                            record.driving_total_hours.minutes || 0
-                          } minutes`
+                      {record.driving_total_hours
+                        ? `${record.driving_total_hours.hours} hours ${record.driving_total_hours.minutes} minutes`
                         : "0 hours 0 minutes"}
                     </td>
                     <td>{record.days_worked}</td>
                     <td>{record.absentee_days}</td>
                   </tr>
                 ))}
+                {/* Overall Totals Row */}
+                <tr>
+                  <td style={{ textAlign: "right" }}>
+                    <strong>Overall Totals</strong>
+                  </td>
+                  <td>
+                    <strong>
+                      {overallTotals.facility.hours} hours{" "}
+                      {overallTotals.facility.minutes} minutes
+                    </strong>
+                  </td>
+                  <td>
+                    <strong>
+                      {overallTotals.driving.hours} hours{" "}
+                      {overallTotals.driving.minutes} minutes
+                    </strong>
+                  </td>
+                  <td>
+                    <strong>{overallTotals.daysWorked}</strong>
+                  </td>
+                  <td>
+                    <strong>{overallTotals.absenteeDays}</strong>
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>
