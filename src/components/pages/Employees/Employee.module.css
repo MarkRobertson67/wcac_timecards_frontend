@@ -7,11 +7,12 @@
 
 
 .ePage {
-  min-height: 100%; /* Ensure it takes full height of the screen */
-  background: linear-gradient(135deg, #d3d8dd, #3c4650); /* Gradient background */
+  min-height: 100vh;
+  background: linear-gradient(135deg, #d3d8dd, #3c4650);
+  margin: 0;
   padding: 20px;
   font-family: 'Arial', sans-serif;
-  box-sizing: border-box; /* Include padding in the element's total width and height */
+  box-sizing: border-box;
 }
 
 h2 {
@@ -22,6 +23,7 @@ h2 {
 
 /* Table Styles */
 .table {
+  background-color: transparent;
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 2rem;

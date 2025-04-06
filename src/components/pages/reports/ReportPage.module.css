@@ -6,20 +6,26 @@ See LICENSE.txt file for details. */
 
 .pageContainer {
   max-width: 1200px;
-  margin: 0 auto;
+  margin: 0 auto 120px;
   padding: 0px 10px 80px;
   background-color: white;
   border-radius: 8px;
 }
+.reportTableContainer {
+  max-width: 1500px;
+  margin: 0 auto 20px;
+  padding: 170px;
+}
 
 .table {
-  width: 100%;
+  width: 1000px;
   margin: 0 auto;
 }
 
 .table th,
 .table td {
   text-align: center;
+  vertical-align: middle;
   padding: 10px;
 }
 
@@ -35,6 +41,11 @@ See LICENSE.txt file for details. */
 @media (max-width: 768px) {
   .tcrPage {
     padding: 10px;
+  }
+
+  .reportTableContainer {
+    max-width: 100%;
+    padding: 0 60px;
   }
 
   .table {
@@ -67,6 +78,12 @@ See LICENSE.txt file for details. */
     padding: 0px 10px 80px;
     width: 100%;
     overflow-x: auto;
+  }
+
+  .reportTableContainer {
+    margin-top: 10px;
+    max-width: 100%;
+    padding: 0 50px; 
   }
 
   .table {

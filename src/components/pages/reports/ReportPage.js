@@ -8,7 +8,6 @@ import { formatDate, formatTime } from "../utils/TimeAndDateUtils";
 import styles from "./ReportPage.module.css";
 
 // const API = process.env.REACT_APP_API_URL;
-
 const ReportPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -28,6 +27,101 @@ const ReportPage = () => {
   const [reportData, setReportData] = useState(initialReportData || []); //Use passed datathrough location.state
   const [loading, setLoading] = useState(false);
   const [cachedData, setCachedData] = useState({}); // Cache data for periods
+
+
+  // Helper function to calculate the overall totals for detailed timecards
+const calculateTotalsForDetailedTimecards = () => {
+  let totalFacilityMinutes = 0;
+  let totalDrivingMinutes = 0;
+
+  reportData.forEach((record) => {
+    if (record.facility_total_hours) {
+      totalFacilityMinutes +=
+        record.facility_total_hours.hours * 60 +
+        record.facility_total_hours.minutes;
+    }
+    if (record.driving_total_hours) {
+      totalDrivingMinutes +=
+        record.driving_total_hours.hours * 60 +
+        record.driving_total_hours.minutes;
+    }
+  });
+
+  const facilityHours = Math.floor(totalFacilityMinutes / 60);
+  const facilityMinutes = totalFacilityMinutes % 60;
+  const drivingHours = Math.floor(totalDrivingMinutes / 60);
+  const drivingMinutes = totalDrivingMinutes % 60;
+
+  return {
+    facility: { hours: facilityHours, minutes: facilityMinutes },
+    driving: { hours: drivingHours, minutes: drivingMinutes },
+  };
+};
+
+
+    // Helper function to format period based on weekly, monthly, or yearly
+    const formatPeriodRange = useCallback((summaryPeriod, period) => {
+      const startOfPeriod = new Date(summaryPeriod);
+  
+      if (period === "weekly") {
+        const endOfPeriod = new Date(startOfPeriod);
+        endOfPeriod.setDate(startOfPeriod.getDate() + 6);
+        return `${formatDate(startOfPeriod)} - ${formatDate(endOfPeriod)}`;
+      }
+  
+      if (period === "monthly") {
+        return `${startOfPeriod.toLocaleString("default", {
+          month: "long",
+        })} ${startOfPeriod.getFullYear()}`;
+      }
+  
+      if (period === "yearly") {
+        return `${startOfPeriod.getUTCFullYear()}`;
+      }
+  
+      return formatDate(startOfPeriod); // Fallback if no valid period is provided
+    }, []);
+
+  const aggregateDataByPeriod = useCallback((data, period) => {
+    const aggregation = {};
+    data.forEach((record) => {
+      // Use the preserved original date for grouping (if available) or fallback to summary_period
+      const originalDate = record.original_summary_period || record.summary_period;
+      const periodLabel = formatPeriodRange(originalDate, period);
+      if (!aggregation[periodLabel]) {
+        aggregation[periodLabel] = {
+          summary_period: periodLabel,
+          facility_total_hours: { hours: 0, minutes: 0 },
+          driving_total_hours: { hours: 0, minutes: 0 },
+          days_worked: 0,
+          absentee_days: 0,
+          employee_id: record.employee_id,
+          first_name: record.first_name,
+          last_name: record.last_name,
+        };
+      }
+      aggregation[periodLabel].facility_total_hours.hours += record.facility_total_hours.hours;
+      aggregation[periodLabel].facility_total_hours.minutes += record.facility_total_hours.minutes;
+      aggregation[periodLabel].driving_total_hours.hours += record.driving_total_hours.hours;
+      aggregation[periodLabel].driving_total_hours.minutes += record.driving_total_hours.minutes;
+      aggregation[periodLabel].days_worked += Number(record.days_worked) || 0;
+      aggregation[periodLabel].absentee_days += Number(record.absentee_days) || 0;
+    });
+  
+    // Normalize minutes into hours for each period
+    Object.values(aggregation).forEach((item) => {
+      const extraFacilityHours = Math.floor(item.facility_total_hours.minutes / 60);
+      item.facility_total_hours.hours += extraFacilityHours;
+      item.facility_total_hours.minutes %= 60;
+  
+      const extraDrivingHours = Math.floor(item.driving_total_hours.minutes / 60);
+      item.driving_total_hours.hours += extraDrivingHours;
+      item.driving_total_hours.minutes %= 60;
+    });
+  
+    return Object.values(aggregation);
+  }, [formatPeriodRange]);
+  
 
   // Group the report data by employee_id
   const groupByEmployee = (reportData) => {
@@ -67,28 +161,7 @@ const ReportPage = () => {
     }
   };
 
-  // Helper function to format period based on weekly, monthly, or yearly
-  const formatPeriodRange = useCallback((summaryPeriod, period) => {
-    const startOfPeriod = new Date(summaryPeriod);
 
-    if (period === "weekly") {
-      const endOfPeriod = new Date(startOfPeriod);
-      endOfPeriod.setDate(startOfPeriod.getDate() + 6);
-      return `${formatDate(startOfPeriod)} - ${formatDate(endOfPeriod)}`;
-    }
-
-    if (period === "monthly") {
-      return `${startOfPeriod.toLocaleString("default", {
-        month: "long",
-      })} ${startOfPeriod.getFullYear()}`;
-    }
-
-    if (period === "yearly") {
-      return `${startOfPeriod.getUTCFullYear()}`;
-    }
-
-    return formatDate(startOfPeriod); // Fallback if no valid period is provided
-  }, []);
 
   // Cache the initial data when the component mounts
   useEffect(() => {
@@ -200,6 +273,7 @@ const ReportPage = () => {
   };
 
   const renderDetailedTimecards = () => {
+    const totals = calculateTotalsForDetailedTimecards();
     const employeeInfo = reportData.length > 0 ? reportData[0] : {};
     console.log(employeeInfo);
 
@@ -227,7 +301,9 @@ const ReportPage = () => {
             Back
           </button>
         </div>
-        <table className={`table table-striped table-bordered text-center ${styles.table}`}>
+        <table className={`table table-striped table-bordered text-center ${styles.table}`}
+        style={{ width: "1200px" }}
+>
           <thead>
             <tr>
               <th>Work Date</th>
@@ -235,17 +311,17 @@ const ReportPage = () => {
               <th colSpan="5">Driving Activity</th>
             </tr>
             <tr>
-              <th></th>
+            <th style={{ width: "160px" }}></th>
               <th>Start Time</th>
               <th>Lunch Start</th>
               <th>Lunch End</th>
               <th>End Time</th>
-              <th>Total Hours</th>
+              <th style={{ width: "140px" }}>Total Hours</th>
               <th>Start Time</th>
               <th>Lunch Start</th>
               <th>Lunch End</th>
               <th>End Time</th>
-              <th>Total Hours</th>
+              <th style={{ width: "140px" }}>Total Hours</th>
             </tr>
           </thead>
           <tbody>
@@ -276,7 +352,7 @@ const ReportPage = () => {
                 </td>
                 <td>
                   {record.facility_total_hours
-                    ? `${record.facility_total_hours.hours} hours ${record.facility_total_hours.minutes} minutes`
+                    ? `${record.facility_total_hours.hours} h ${record.facility_total_hours.minutes} min`
                     : "0 Hours 0 Minutes"}
                 </td>
 
@@ -303,11 +379,31 @@ const ReportPage = () => {
                 </td>
                 <td>
                   {record.driving_total_hours
-                    ? `${record.driving_total_hours.hours} hours ${record.driving_total_hours.minutes} minutes`
+                    ? `${record.driving_total_hours.hours} h ${record.driving_total_hours.minutes} min`
                     : "0 Hours 0 Minutes"}
                 </td>
               </tr>
             ))}
+            {/* Overall Totals Row */}
+            {/* Totals row */}
+            <tr>
+              <td colSpan="5" style={{ textAlign: "right" }}>
+                <strong>Total</strong>
+              </td>
+              <td>
+                <strong>
+                  {totals.facility.hours} h {totals.facility.minutes} min
+                </strong>
+              </td>
+              <td colSpan="4" style={{ textAlign: "right" }}>
+                <strong>Total</strong>
+              </td>
+              <td>
+                <strong>
+                  {totals.driving.hours} h {totals.driving.minutes} min
+                </strong>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -343,12 +439,12 @@ const ReportPage = () => {
     drivingTotalMinutes = drivingTotalMinutes % 60;
 
     return (
-      <div className={`${styles.pageContainer} mt-4`}>
-        <h2 className="text-center mb-4">Total Hours Report</h2>
-        <p className="text-center mb-3">
+      <div className={`${styles.reportpageContainer} mt-4`}>
+        <h2 className="text-center">Total Hours Report</h2>
+        <p className="text-center">
           {`Report for: ${formatDate(startDate)} - ${formatDate(endDate)}`}
         </p>
-        <div className="text-center mb-4">
+        <div className="text-center">
           <button className="btn btn-primary mx-2" onClick={handlePrint}>
             Print Report
           </button>
@@ -359,6 +455,9 @@ const ReportPage = () => {
             Back
           </button>
         </div>
+        <div className={styles.reportTableContainer}
+        style={{ marginTop: "-100px" }}
+        >
         <table className="table table-striped table-bordered text-center">
           <thead>
             <tr>
@@ -410,13 +509,14 @@ const ReportPage = () => {
             </tr>
           </tbody>
         </table>
+        </div>
       </div>
     );
   };
 
   const renderMonthlySummary = () => {
     return (
-      <div className={`${styles.pageContainer} mt-4`}>
+      <div className={`${styles.reportpageContainer} mt-4`}>
         <h2 className="text-center mb-4">Monthly Summary Report</h2>
         <div className="text-center mb-4">
           <button className="btn btn-primary mx-2" onClick={handlePrint}>
@@ -451,108 +551,308 @@ const ReportPage = () => {
     );
   };
 
-  const renderEmployeeSummary = () => {
-    console.log("Rendering Employee Summary Report", reportData);
+
+const renderEmployeeSummary = () => {
+  // Determine title prefix based on period
+  let titlePrefix = "";
+  if (period === "weekly") {
+    titlePrefix = "Weekly";
+  } else if (period === "monthly") {
+    titlePrefix = "Monthly";
+  } else if (period === "yearly") {
+    titlePrefix = "Yearly";
+  }
+
+  // ALL employees branch
+  if (employeeId === "ALL") {
     const groupedData = groupByEmployee(reportData);
 
     return (
       <div className={`${styles.pageContainer} mt-4`}>
-        <h2 className="text-center mb-4">Employee Summary Report</h2>
-
-        {/* Place the period toggle buttons at the top */}
+        <h2 className="text-center mb-4">
+          {titlePrefix} Employee Summary Report For ALL
+        </h2>
+        {/* Buttons Block */}
         <div className="text-center mb-4">
           <button
-            className={`btn btn-sm mx-2 ${
-              period === "weekly" ? "btn-primary" : "btn-secondary"
-            }`}
+            className={`btn btn-sm mx-2 ${period === "weekly" ? "btn-primary" : "btn-secondary"}`}
             onClick={() => handlePeriodChange("weekly")}
           >
             Weekly
           </button>
           <button
-            className={`btn btn-sm mx-2 ${
-              period === "monthly" ? "btn-primary" : "btn-secondary"
-            }`}
+            className={`btn btn-sm mx-2 ${period === "monthly" ? "btn-primary" : "btn-secondary"}`}
             onClick={() => handlePeriodChange("monthly")}
           >
             Monthly
           </button>
           <button
-            className={`btn btn-sm mx-2 ${
-              period === "yearly" ? "btn-primary" : "btn-secondary"
-            }`}
+            className={`btn btn-sm mx-2 ${period === "yearly" ? "btn-primary" : "btn-secondary"}`}
             onClick={() => handlePeriodChange("yearly")}
           >
             Yearly
           </button>
-        </div>
-
-        <div className="text-center mb-4">
-          <button className="btn btn-primary mx-2" onClick={handlePrint}>
-            Print Report
-          </button>
-          <button className="btn btn-dark mx-2" onClick={() => navigate(-1)}>
-            Back
-          </button>
-        </div>
-
-        {/* Iterate through each employee */}
-        {Object.values(groupedData).map((employee) => (
-          <div key={employee.employee_id}>
-            <h3>
-              {employee.first_name} {employee.last_name}
-            </h3>
-
-            <table className="table table-striped table-bordered text-center">
-              <thead>
-                <tr>
-                  <th>
-                    {period === "weekly"
-                      ? "Period (Date Range)"
-                      : period === "monthly"
-                      ? "Month"
-                      : "Year"}
-                  </th>
-                  <th>Facility Total Hours</th>
-                  <th>Driving Total Hours</th>
-                  <th>Days Worked</th>
-                  <th>Days Absent</th>
-                </tr>
-              </thead>
-              <tbody>
-                {employee.periods.map((record, index) => (
-                  <tr key={`${record.employee_id}-${index}`}>
-                    <td>{formatPeriodRange(record.summary_period, period)}</td>
-                    <td>
-                      {record.facility_total_hours &&
-                      typeof record.facility_total_hours === "object"
-                        ? `${record.facility_total_hours.hours || 0} hours ${
-                            record.facility_total_hours.minutes || 0
-                          } minutes`
-                        : "0 hours 0 minutes"}
-                    </td>
-                    <td>
-                      {record.driving_total_hours &&
-                      typeof record.driving_total_hours === "object"
-                        ? `${record.driving_total_hours.hours || 0} hours ${
-                            record.driving_total_hours.minutes || 0
-                          } minutes`
-                        : "0 hours 0 minutes"}
-                    </td>
-                    <td>{record.days_worked}</td>
-                    <td>{record.absentee_days}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <br />
+          <div className="mt-3">
+            <button className="btn btn-primary mx-2" onClick={handlePrint}>
+              Print Report
+            </button>
+            <button className="btn btn-dark mx-2" onClick={() => navigate(-1)}>
+              Back
+            </button>
           </div>
-        ))}
+        </div>
+        {/* Render a table for each employee */}
+        {Object.values(groupedData).map((employee) => {
+          // For monthly/yearly, aggregate this employee's periods
+          const records =
+            period === "weekly"
+              ? employee.periods
+              : aggregateDataByPeriod(employee.periods, period);
+
+          // Compute overall totals for this employee (from the aggregated records)
+          const employeeTotals = records.reduce(
+            (acc, record) => {
+              const facH = record.facility_total_hours ? parseInt(record.facility_total_hours.hours, 10) || 0 : 0;
+              const facM = record.facility_total_hours ? parseInt(record.facility_total_hours.minutes, 10) || 0 : 0;
+              const drvH = record.driving_total_hours ? parseInt(record.driving_total_hours.hours, 10) || 0 : 0;
+              const drvM = record.driving_total_hours ? parseInt(record.driving_total_hours.minutes, 10) || 0 : 0;
+              acc.facility.hours += facH;
+              acc.facility.minutes += facM;
+              acc.driving.hours += drvH;
+              acc.driving.minutes += drvM;
+              acc.daysWorked += Number(record.days_worked) || 0;
+              acc.absenteeDays += Number(record.absentee_days) || 0;
+              return acc;
+            },
+            { facility: { hours: 0, minutes: 0 }, driving: { hours: 0, minutes: 0 }, daysWorked: 0, absenteeDays: 0 }
+          );
+          // Normalize minutes to hours
+          employeeTotals.facility.hours += Math.floor(employeeTotals.facility.minutes / 60);
+          employeeTotals.facility.minutes %= 60;
+          employeeTotals.driving.hours += Math.floor(employeeTotals.driving.minutes / 60);
+          employeeTotals.driving.minutes %= 60;
+
+          return (
+            <div key={employee.employee_id} className="mb-4">
+              <h3 style={{ textAlign: "left" }}>
+                {employee.first_name} {employee.last_name}
+              </h3>
+              <table className="table table-striped table-bordered">
+                <thead>
+                  <tr>
+                    <th style={{ textAlign: "left" }}>
+                      {period === "weekly"
+                        ? "Period (Date Range)"
+                        : period === "monthly"
+                        ? "Month"
+                        : "Year"}
+                    </th>
+                    <th style={{ textAlign: "left" }}>Facility Total Hours</th>
+                    <th style={{ textAlign: "left" }}>Driving Total Hours</th>
+                    <th style={{ textAlign: "left" }}>Days Worked</th>
+                    <th style={{ textAlign: "left" }}>Days Absent</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {records.map((record, index) => (
+                    <tr key={`${employee.employee_id}-${index}`}>
+                      <td>
+                        {period === "weekly"
+                          ? formatPeriodRange(record.summary_period, "weekly")
+                          : formatPeriodRange(record.summary_period, period)}
+                      </td>
+                      <td>
+                        {record.facility_total_hours
+                          ? `${record.facility_total_hours.hours} hours ${record.facility_total_hours.minutes} minutes`
+                          : "0 hours 0 minutes"}
+                      </td>
+                      <td>
+                        {record.driving_total_hours
+                          ? `${record.driving_total_hours.hours} hours ${record.driving_total_hours.minutes} minutes`
+                          : "0 hours 0 minutes"}
+                      </td>
+                      <td>{record.days_worked}</td>
+                      <td>{record.absentee_days}</td>
+                    </tr>
+                  ))}
+                  {/* Overall Totals Row for this employee */}
+                  <tr>
+                    <td style={{ textAlign: "right" }}>
+                      <strong>Overall Totals</strong>
+                    </td>
+                    <td>
+                      <strong>
+                        {employeeTotals.facility.hours} hours{ "  " }
+                        {employeeTotals.facility.minutes} minutes
+                      </strong>
+                    </td>
+                    <td>
+                      <strong>
+                        {employeeTotals.driving.hours} hours{ "  " }
+                        {employeeTotals.driving.minutes} minutes
+                      </strong>
+                    </td>
+                    <td>
+                      <strong>{employeeTotals.daysWorked}</strong>
+                    </td>
+                    <td>
+                      <strong>{employeeTotals.absenteeDays}</strong>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          );
+        })}
       </div>
     );
-  };
+
+  } else {
+    // Single employee branch
+    // If the period is monthly or yearly, aggregate the single employee’s data
+    const records =
+      period === "weekly"
+        ? reportData
+        : aggregateDataByPeriod(reportData, period);
+  
+    // Compute overall totals from `records` (the aggregated data)
+    const overallTotalsForSingle = records.reduce(
+      (acc, record) => {
+        const facH = record.facility_total_hours ? parseInt(record.facility_total_hours.hours, 10) || 0 : 0;
+        const facM = record.facility_total_hours ? parseInt(record.facility_total_hours.minutes, 10) || 0 : 0;
+        const drvH = record.driving_total_hours ? parseInt(record.driving_total_hours.hours, 10) || 0 : 0;
+        const drvM = record.driving_total_hours ? parseInt(record.driving_total_hours.minutes, 10) || 0 : 0;
+  
+        acc.facility.hours += facH;
+        acc.facility.minutes += facM;
+        acc.driving.hours += drvH;
+        acc.driving.minutes += drvM;
+        acc.daysWorked += Number(record.days_worked) || 0;
+        acc.absenteeDays += Number(record.absentee_days) || 0;
+        return acc;
+      },
+      {
+        facility: { hours: 0, minutes: 0 },
+        driving: { hours: 0, minutes: 0 },
+        daysWorked: 0,
+        absenteeDays: 0,
+      }
+    );
+  
+    // Normalize minutes
+    overallTotalsForSingle.facility.hours += Math.floor(overallTotalsForSingle.facility.minutes / 60);
+    overallTotalsForSingle.facility.minutes %= 60;
+    overallTotalsForSingle.driving.hours += Math.floor(overallTotalsForSingle.driving.minutes / 60);
+    overallTotalsForSingle.driving.minutes %= 60;
+  
+    return (
+      <div className={`${styles.pageContainer} mt-4`}>
+        <h2 className="text-center mb-4">
+          {titlePrefix} Employee Summary Report For <br /> {firstName} {lastName}
+        </h2>
+        <div className="text-center mb-4">
+          <button
+            className={`btn btn-sm mx-2 ${period === "weekly" ? "btn-primary" : "btn-secondary"}`}
+            onClick={() => handlePeriodChange("weekly")}
+          >
+            Weekly
+          </button>
+          <button
+            className={`btn btn-sm mx-2 ${period === "monthly" ? "btn-primary" : "btn-secondary"}`}
+            onClick={() => handlePeriodChange("monthly")}
+          >
+            Monthly
+          </button>
+          <button
+            className={`btn btn-sm mx-2 ${period === "yearly" ? "btn-primary" : "btn-secondary"}`}
+            onClick={() => handlePeriodChange("yearly")}
+          >
+            Yearly
+          </button>
+          <br />
+          <div className="mt-3">
+            <button className="btn btn-primary mx-2" onClick={handlePrint}>
+              Print Report
+            </button>
+            <button className="btn btn-dark mx-2" onClick={() => navigate(-1)}>
+              Back
+            </button>
+          </div>
+        </div>
+  
+        <table className="table table-striped table-bordered text-center">
+          <thead>
+            <tr>
+              <th>
+                {period === "weekly"
+                  ? "Period (Date Range)"
+                  : period === "monthly"
+                  ? "Month"
+                  : "Year"}
+              </th>
+              <th>Facility Total Hours</th>
+              <th>Driving Total Hours</th>
+              <th>Days Worked</th>
+              <th>Days Absent</th>
+            </tr>
+          </thead>
+          <tbody>
+            {/* Render from `records`, which might be aggregated data */}
+            {records.map((record, index) => (
+              <tr key={`${employeeId}-${index}`}>
+                <td>
+                  {period === "weekly"
+                    ? formatPeriodRange(record.summary_period, "weekly")
+                    : formatPeriodRange(record.summary_period, period)}
+                </td>
+                <td>
+                  {record.facility_total_hours
+                    ? `${record.facility_total_hours.hours} hours ${record.facility_total_hours.minutes} minutes`
+                    : "0 hours 0 minutes"}
+                </td>
+                <td>
+                  {record.driving_total_hours
+                    ? `${record.driving_total_hours.hours} hours ${record.driving_total_hours.minutes} minutes`
+                    : "0 hours 0 minutes"}
+                </td>
+                <td>{record.days_worked}</td>
+                <td>{record.absentee_days}</td>
+              </tr>
+            ))}
+            {/* Overall Totals */}
+            <tr>
+              <td style={{ textAlign: "right" }}>
+                <strong>Overall Totals</strong>
+              </td>
+              <td>
+                <strong>
+                  {overallTotalsForSingle.facility.hours} hours{" "}
+                  {overallTotalsForSingle.facility.minutes} minutes
+                </strong>
+              </td>
+              <td>
+                <strong>
+                  {overallTotalsForSingle.driving.hours} hours{" "}
+                  {overallTotalsForSingle.driving.minutes} minutes
+                </strong>
+              </td>
+              <td>
+                <strong>{overallTotalsForSingle.daysWorked}</strong>
+              </td>
+              <td>
+                <strong>{overallTotalsForSingle.absenteeDays}</strong>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    );
+  }
+}  
 
   return (
-    <div className={`${styles.pageContainer} mt-4`}>
+    <div className={`${styles.reportpageContainer} mt-4`}>
       {reportType === "detailedTimecards" && renderDetailedTimecards()}
       {reportType === "totalHours" && renderTotalHours()}
       {reportType === "monthlySummary" && renderMonthlySummary()}
