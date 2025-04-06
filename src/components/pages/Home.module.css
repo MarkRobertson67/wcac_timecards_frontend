@@ -29,3 +29,30 @@ See LICENSE.txt file for details. */
     border-radius: 5px;
     font-size: 1rem;
   }
+
+  /* Ensure the homepage container has relative positioning */
+.homepage {
+  position: relative;
+  /* Other styling */
+}
+  
+/* Container for the bus - position it absolutely */
+
+  
+/* The bus image itself */
+.busAnimation {
+  position: absolute;
+  margin-top: 100px;
+  width: 150px; /* Adjust size as needed */
+  animation: driveAcross 10s linear infinite;
+}
+  
+/* Keyframes for the bus moving from left to right */
+@keyframes driveAcross {
+  from {
+    left: -120px; /* Start off-screen on the left */
+  }
+  to {
+    left: 100%; /* Move off-screen on the right */
+  }
+}
