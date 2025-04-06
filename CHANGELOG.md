@@ -3,6 +3,8 @@
 // See LICENSE.txt file for details.
 
 
+## Version 1.1 (2025-04-06)
+- Added animated bus
 
 ## Version 1.1 (2025-04-04)
 - Completed

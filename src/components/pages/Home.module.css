@@ -42,7 +42,7 @@ See LICENSE.txt file for details. */
 /* The bus image itself */
 .busAnimation {
   position: absolute;
-  margin-top: 100px;
+  margin-top: 80px;
   width: 150px; /* Adjust size as needed */
   animation: driveAcross 10s linear infinite;
 }
@@ -50,9 +50,15 @@ See LICENSE.txt file for details. */
 /* Keyframes for the bus moving from left to right */
 @keyframes driveAcross {
   from {
-    left: -120px; /* Start off-screen on the left */
+    left: -160px; /* Start off-screen on the left */
   }
   to {
     left: 100%; /* Move off-screen on the right */
+  }
+}
+
+@media (max-width: 768px) {
+  .busAnimation {
+    margin-top: 10px; /* Mobile */
   }
 }
