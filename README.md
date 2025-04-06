@@ -6,14 +6,16 @@ This project is licensed under the Proprietary Software License. See the [LICENS
 
 For licensing inquiries, please contact Mark Robertson at [markrobertson67@gmail.com](mailto:markrobertson67@gmail.com).
 
-[![Build Status](https://img.shields.io/travis/your-username/your-repo/main.svg)](https://travis-ci.org/your-username/your-repo)
+[![Build Status](https://img.shields.io/travis/markrobertson67/wcac-timecards/main.svg)](https://travis-ci.org/markrobertson67/wcac-timecards)
 [![Coverage Status](https://img.shields.io/codecov/c/github/your-username/your-repo/main.svg)](https://codecov.io/gh/your-username/your-repo)
 [![License](https://img.shields.io/badge/License-Proprietary-blue.svg)](./LICENSE.txt)
 [![Version](https://img.shields.io/badge/Version-1.0.0-blue.svg)](package.json)
-
-
 [![Netlify Status](https://api.netlify.com/api/v1/badges/d9b982a6-78ec-40a3-9e2e-f9857b4a1706/deploy-status)](https://app.netlify.com/sites/wcac-timecards/deploys)
 
+<video width="640" height="360" controls>
+  <source src="Bus_Screen_Recordiong.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
 
 ## Table of Contents
