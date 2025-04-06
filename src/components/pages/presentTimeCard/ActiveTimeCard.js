@@ -1,5 +1,5 @@
 // Proprietary Software License
-// Copyright (c) 2024 Mark Robertson
+// Copyright (c) 2025 Mark Robertson
 // See LICENSE.txt file for details.
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
@@ -9,6 +9,7 @@ import styles from "./ActiveTimeCard.module.css";
 import moment from "moment-timezone";
 import Confetti from "react-confetti";
 import { useWindowSize } from "react-use";
+import mySound from "../../../Assets/mySound.wav";
 
 const API = process.env.REACT_APP_API_URL;
 
@@ -31,6 +32,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
   // Check if the screen width is mobile (adjust as needed for your breakpoint)
   //const isMobile = width <= 768;
+
 
   useEffect(() => {
     const fetchEmployeeId = async () => {
@@ -809,7 +811,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     // If there are incomplete days, prompt the user
     if (incompleteEntries.length > 0) {
       const confirmation = window.confirm(
-        `There are ${incompleteEntries.length} incomplete days. Do you still want to proceed with submission?`
+        `There are incomplete entries. Do you still want to proceed with submission?`
       );
       if (!confirmation) {
         console.log("User canceled submission due to incomplete entries.");
@@ -856,12 +858,19 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
       );
 
       console.log("All submissions succeeded. Triggering confetti.");
+
+      // Play the submission sound
+      const audio = new Audio(mySound);
+      audio.play();
+
       setShowConfetti(true);
       setIsSubmitted(true);
 
       setTimeout(() => {
+        audio.pause();
+        audio.currentTime = 0; // Reset playback to the start
         setShowConfetti(false);
-        console.log("Hiding confetti after 5 seconds");
+        console.log("Hiding confetti and stopping audio after 5 seconds");
         setIsNewTimeCardCreated(false);
         afterSubmitReset();
         navigate("/CreatenewTimeCard");
@@ -1048,7 +1057,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
                       onChange={(e) =>
                         handleChange(index, "morningActivity", e.target.value)
                       }
-                       className="form-select w-200"
+                      className="form-select w-200"
                     >
                       <option value="Facility">Facility</option>
                       <option value="Driving">Driving</option>
