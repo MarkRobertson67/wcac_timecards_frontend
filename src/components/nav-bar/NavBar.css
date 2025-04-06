@@ -2,26 +2,44 @@
    Copyright (c) 2024 Mark Robertson
    See LICENSE.txt file for details. */
 
-/* NavBar.css */
-.navbar {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+   #uniqueNavbar {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  #uniqueNavbar .nav-link {
+    padding: 0.5rem 1rem;
+  }
+  
+  #uniqueNavbar .nav-link:hover {
+    color: #ffcc00;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+  }
+  
+  #uniqueNavbar .navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+  }
+  
+  #uniqueNavbar .nav-item.active .nav-link {
+    color: #ffc107;
+  }
+
+  /* NavBar.css */
+.navbar-toggler-icon {
+  width: 24px !important;   
+  height: 24px !important;
+  background-size: 24px 24px;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
-.nav-link {
-  padding: 0.5rem 1rem;
+@media (min-width: 992px) {
+  .navbar-title {
+    font-size: 25px;
+    position: absolute; 
+    left: 35%;
+    transform: translateX(-50%);
+  }
 }
 
-.nav-link:hover {
-  color: #ffcc00; /* Example hover color */
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
-}
-
-.navbar-brand {
-  font-weight: bold;
-  font-size: 1.5rem;
-}
-
-.nav-item.active .nav-link {
-  color: #ffc107; 
-}

@@ -4,7 +4,7 @@
 
    import React, { useEffect, useState } from "react";
    import { useNavigate } from "react-router-dom";
-   import { Container, Table, Button, Spinner } from "react-bootstrap";
+   import { Table, Button, Spinner } from "react-bootstrap";
    import { auth } from "../../../firebase/firebaseConfig";
    import styles from "./Employee.module.css";
    
@@ -58,97 +58,85 @@
    
    
      const renderEmployeeDetails = () => {
-       if (isLoading) {
-         return (
-           <div className="text-center mt-4">
-             <Spinner animation="border" role="status">
-               <span className="visually-hidden">Loading employee data...</span>
-             </Spinner>
-           </div>
-         );
-       }
-   
-       if (!Array.isArray(employees) || employees.length === 0) {
-         return <div className="text-center">No employee data available</div>;
-       }
-   
-       return (
+      if (isLoading) {
+        return (
+          <div className="text-center mt-4">
+            <Spinner animation="border" role="status">
+              <span className="visually-hidden">Loading employee data...</span>
+            </Spinner>
+          </div>
+        );
+      }
+  
+      if (!Array.isArray(employees) || employees.length === 0) {
+        return <div className="text-center">No employee data available</div>;
+      }
+  
+      return (
         <div className={styles.ePage}>
-         <div
-           className={`${styles.container} mt-4`}
-           style={{ paddingBottom: "50px", maxWidth: "600px", margin: "0 auto" }}
-         >
-           <h4 className="text-center mb-3" style={{ fontSize: "1rem" }}>
-             {isAdmin ? "All Employees" : "Your Profile"}
-           </h4>
-           <Table
-             striped
-             bordered
-             hover
-             responsive="sm"
-             size="sm"
-             className="text-center"
-             style={{ fontSize: "0.8rem" }}
-           >
-             <thead>
-               <tr>
-                 <th>Name</th>
-                 {isAdmin && <th>Actions</th>}
-               </tr>
-             </thead>
-           </Table>
-           {/* Scrollable container for the table body */}
-           <div
-             style={{
-               maxHeight: "400px", // Set the maximum height for scrolling
-               overflowY: "auto",
-               border: "1px solid #ddd",
-             }}
-           >
-             <Table striped bordered hover responsive="sm" size="sm" className="text-center">
-               <tbody>
-                 {employees.map((record) => (
-                   <tr key={record.id}>
-                     <td>
-                       {record.first_name} {record.last_name}
-                     </td>
-                     {isAdmin ? (
-                       <td>
-                         <Button
-                           variant="primary"
-                           size="sm"
-                           onClick={() => navigate(`/employee/${record.id}`)}
-                         >
-                           View Details
-                         </Button>
-                       </td>
-                     ) : (
-                       // If not admin, show a button only for their own profile
-                       record.id === currentUser?.id && (
-                         <td>
-                           <Button
-                             variant="primary"
-                             size="sm"
-                             onClick={() => navigate(`/employee/${record.id}`)}
-                           >
-                             Edit My Profile
-                           </Button>
-                         </td>
-                       )
-                     )}
-                   </tr>
-                 ))}
-               </tbody>
-             </Table>
-           </div>
-         </div>
-         </div>
-       );
-     };
-   
-   
-     return <Container className="mt-4">{renderEmployeeDetails()}</Container>;
-   }
-   
-   export default Employees;
-   
+          <div className="mt-4" style={{ maxWidth: "600px", margin: "0 auto" }}>
+            <h4 className="text-center mb-3" style={{ fontSize: "1rem" }}>
+              {isAdmin ? "All Employees" : "Your Profile"}
+            </h4>
+            <div
+              style={{
+                maxHeight: "650px",
+                overflowY: "auto",
+                border: "1px solid #ddd",
+              }}
+            >
+              <Table
+                striped
+                bordered
+                hover
+                responsive="sm"
+                size="sm"
+                className={`text-center ${styles.table}`}
+              >
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    {isAdmin && <th>Actions</th>}
+                  </tr>
+                </thead>
+                <tbody>
+                  {employees.map((record) => (
+                    <tr key={record.id}>
+                      <td>{record.first_name} {record.last_name}</td>
+                      {isAdmin ? (
+                        <td>
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            onClick={() => navigate(`/employee/${record.id}`)}
+                          >
+                            View Details
+                          </Button>
+                        </td>
+                      ) : (
+                        record.id === currentUser?.id && (
+                          <td>
+                            <Button
+                              variant="primary"
+                              size="sm"
+                              onClick={() => navigate(`/employee/${record.id}`)}
+                            >
+                              Edit My Profile
+                            </Button>
+                          </td>
+                        )
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </div>
+          </div>
+        </div>
+      );
+    };
+  
+    return <>{renderEmployeeDetails()}</>; // No Container or background
+  }
+  
+  export default Employees;
