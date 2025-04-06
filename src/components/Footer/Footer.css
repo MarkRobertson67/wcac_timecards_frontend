@@ -2,26 +2,49 @@
    Copyright (c) 2024 Mark Robertson
    See LICENSE.txt file for details. */
 
-   .footer {
-    font-size: 10px;
-    position: fixed;
-    width: 100%;
-    bottom: 0;
-    background: #007bff;
-  }
-  
+   /* Basic footer styles */
+.footer {
+  font-size: 10px;
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+  background: #007bff;
+  z-index: 9999;
+}
+
+.footer-bottom {
+  /* The area containing the copyright text */
+  font-size: 10px;
+}
+
+/* Hide the toggler on medium+ screens; show it on smaller */
+.footer-toggler {
+  display: block;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.3rem;
+  cursor: pointer;
+  margin: 0 auto;  /* Center horizontally in its column */
+}
+
+/* By default, the columns are visible on large screens. 
+   On small screens, we can hide them unless "show-menu" is active. */
+.footer-col {
+  display: block; 
+}
+
+/* hidden on small screens by default:
+   .footer-col { display: none; }
+   .footer-col.show-menu { display: block; } 
+   Then the toggler toggles the "show-menu" class. */
+
+/* Hides toggler on md (768px) and above */
+@media (min-width: 768px) {
   .footer-toggler {
-    display: none;  
-    background: none;
-    border: none;
-    color: white;
-    font-size: 15px;
-    cursor: pointer;
-    position: absolute;
-    top: 10px;
-    right: 10px;
+    display: none;
   }
-  
+
   .footer-menu {
     display: block;  
     text-align: center;  
@@ -47,23 +70,20 @@
   .col-md-4:hover .footer-content {
   display: block;
 }
-  
-  @media (max-width: 767px) {
-    .footer-toggler {
-      display: block;  
-    }
-    .footer-menu {
-      display: none;  
-    }
-    .footer-menu.open {
-      display: block;  
-    }
-    .row {
-      text-align: center;  
-    }
-    .col-sm-6, .col-md-4 {
-      float: none;  
-      display: inline-block;  
-      width: 100%;  
-    }
+}
+
+
+@media (max-width: 767px) {
+  .footer-col {
+    display: none; /* hide columns on small screens by default */
   }
+  .footer-col.show-menu {
+    display: block; /* show them if toggler is pressed */
+    margin-top: 0.5rem;
+  }
+  
+  /* If you want them stacked, they'd be 100% width in your row. */
+  .footer-col ul {
+    text-align: center;
+  }
+}

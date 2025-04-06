@@ -3,7 +3,6 @@
 // See LICENSE.txt file for details.
 
 
-
 import React, { useState, useEffect } from "react";
 import {
   createUserWithEmailAndPassword,
@@ -19,6 +18,7 @@ import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import styles from "./Home.module.css"
+import bus from '../../Assets/Bus.png'
 
 const API = process.env.REACT_APP_API_URL;
 
@@ -226,111 +226,118 @@ function Home() {
 
   return (
     <div className={styles.hPage}>
-    <div className="container mt-5">
-      {isWaitingForEmailVerification && (
-  <div className="text-center">
-    <div className="spinner-border text-primary" role="status"></div>
-    <p className="mt-3">
-      Waiting for email verification. 
-    </p>
-    <p className="mt-2">
-      An email has been sent to your inbox with a verification link. Please open the email and click on the verification link to confirm your account.
-    </p>
-    <p className="mt-2">
-      Once you verify your email, this page will automatically update, and you can proceed to complete your profile.
-    </p>
-    <p className="mt-2 text-muted">
-      If you didn't receive the email, please check your spam or junk folder. You can also click the button below to resend the verification email.
-    </p>
-    <button className="btn btn-link" onClick={handleResendVerification}>
-      Didn't get an email? Resend Verification Email
-    </button>
-    {resendMessage && (
-      <p className="text-success mt-2">{resendMessage}</p>
-    )}
-  </div>
-)}
-
-      {currentUser && !isWaitingForEmailVerification && (
-        <div className="text-center">
-          <h1>Hello {firstName || "User"}! You are currently logged in</h1>
-          {showModal && !isProfileComplete && (
-            <ProfileModal onClose={handleModalClose} />
-          )}
-          {isProfileComplete && (
-            <button className="btn btn-danger mt-3" onClick={handleLogout}>
-              Logout
+      <div className="container mt-5">
+        {isWaitingForEmailVerification && (
+          <div className="text-center">
+            <div className="spinner-border text-primary" role="status"></div>
+            <p className="mt-3">
+              Waiting for email verification.
+            </p>
+            <p className="mt-2">
+              An email has been sent to your inbox with a verification link. Please open the email and click on the verification link to confirm your account.
+            </p>
+            <p className="mt-2">
+              Once you verify your email, this page will automatically update, and you can proceed to complete your profile.
+            </p>
+            <p className="mt-2 text-muted">
+              If you didn't receive the email, please check your spam or junk folder. You can also click the button below to resend the verification email.
+            </p>
+            <button className="btn btn-link" onClick={handleResendVerification}>
+              Didn't get an email? Resend Verification Email
             </button>
-          )}
-        </div>
-      )}
-      {!currentUser && !isWaitingForEmailVerification && (
-        <>
-          <h1 className="text-center mb-4">Please Login to access your account</h1>
-          <form
-            onSubmit={handleSubmit}
-            className="card p-3 mx-auto"
-            style={{ maxWidth: "400px" }}
-          >
-            <div className="mb-3">
-              <input
-                type="email"
-                className="form-control"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div className="mb-3 position-relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                className="form-control"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              <FontAwesomeIcon
-                icon={showPassword ? faEyeSlash : faEye}
-                className="position-absolute top-50 end-0 translate-middle-y me-3"
-                style={{ cursor: "pointer" }}
-                onClick={togglePasswordVisibility}
-              />
-            </div>
-            <button
-              type="submit"
-              className="btn btn-primary w-100"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Submitting..." : isLogin ? "Login" : "Sign Up"}
-            </button>
-            {isLogin && (
-              <div className="text-center mt-2">
-                <button
-                  type="button"
-                  className="btn btn-link"
-                  onClick={handleForgotPassword}
-                >
-                  Forgot Password?
-                </button>
-              </div>
+            {resendMessage && (
+              <p className="text-success mt-2">{resendMessage}</p>
             )}
-            {error && <p className="text-danger mt-2">{error}</p>}
-          </form>
-          <div className="text-center mt-3">
-            <button
-              className="btn btn-secondary"
-              onClick={() => setIsLogin(!isLogin)}
-            >
-              {isLogin ? "Switch to Sign Up" : "Switch to Login"}
-            </button>
           </div>
-        </>
-      )}
-    </div>
+        )}
+  
+        {currentUser && !isWaitingForEmailVerification && (
+          <div className="text-center">
+            <h1>Hello {firstName || "User"}! You are currently logged in</h1>
+            {showModal && !isProfileComplete && (
+              <ProfileModal onClose={handleModalClose} />
+            )}
+            {isProfileComplete && (
+              <button className="btn btn-danger mt-3" onClick={handleLogout}>
+                Logout
+              </button>
+            )}
+          </div>
+        )}
+  
+        {!currentUser && !isWaitingForEmailVerification && (
+          <>
+            <h1 className="text-center mb-4">Please Login to access your account</h1>
+            <form
+              onSubmit={handleSubmit}
+              className="card p-3 mx-auto"
+              style={{ maxWidth: "400px" }}
+            >
+              <div className="mb-3">
+                <input
+                  type="email"
+                  className="form-control"
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="mb-3 position-relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  className="form-control"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <FontAwesomeIcon
+                  icon={showPassword ? faEyeSlash : faEye}
+                  className="position-absolute top-50 end-0 translate-middle-y me-3"
+                  style={{ cursor: "pointer" }}
+                  onClick={togglePasswordVisibility}
+                />
+              </div>
+              <button
+                type="submit"
+                className="btn btn-primary w-100"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Submitting..." : isLogin ? "Login" : "Sign Up"}
+              </button>
+              {isLogin && (
+                <div className="text-center mt-2">
+                  <button
+                    type="button"
+                    className="btn btn-link"
+                    onClick={handleForgotPassword}
+                  >
+                    Forgot Password?
+                  </button>
+                </div>
+              )}
+              {error && <p className="text-danger mt-2">{error}</p>}
+            </form>
+            <div className="text-center mt-3">
+              <button
+                className="btn btn-secondary"
+                onClick={() => setIsLogin(!isLogin)}
+              >
+                {isLogin ? "Switch to Sign Up" : "Switch to Login"}
+              </button>
+            </div>
+          </>
+        )}
+  
+        {/* Bus Image at the bottom */}
+        <div style={{ position: "relative", zIndex: 10 }}>
+        <img src={bus} alt="Bus" className={styles.busAnimation} />
+      </div>
+      </div>
     </div>
   );
+  
 }
 
 export default Home;

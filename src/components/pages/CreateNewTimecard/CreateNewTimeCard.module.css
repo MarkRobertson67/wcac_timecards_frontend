@@ -18,6 +18,9 @@
   align-items: center; /* Center items horizontally */
 }
 
+.react-calendar {
+  margin: 0 auto; /* Center horizontally */
+}
 
 .card {
   margin: auto;
