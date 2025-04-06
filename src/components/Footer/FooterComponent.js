@@ -1,11 +1,11 @@
 // Proprietary Software License
-// Copyright (c) 2024 Mark Robertson
+// Copyright (c) 2025 Mark Robertson
 // See LICENSE.txt file for details.
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import './Footer.css';
 import packageJson from '../../../package.json';
+import './Footer.css';
 
 function FooterComponent() {
   const [isMenuOpen, setMenuOpen] = useState(false); 
@@ -16,7 +16,7 @@ function FooterComponent() {
   };
 
   return (
-    <footer className="footer bg-primary text-white text-center text-xs fixed-bottom">
+    <footer className="footer custom-footer bg-primary text-white text-center fixed-bottom">
       <div className="container p-2">
         {/* Button to toggle menu visibility on small screens */}
         <button className="footer-toggler" onClick={toggleMenu} aria-expanded={isMenuOpen}>
@@ -49,7 +49,7 @@ function FooterComponent() {
         </div>
       </div>
       <div className="text-center py-1 bg-secondary">
-        <span>© 2025 We Care Adult Care Timecards App™ by Mark Robertson.</span>
+      <span>© {new Date().getFullYear()} We Care Adult Care Timecards App™ by Mark Robertson.</span>
         <br></br>
         <span>All Rights Reserved. Version: {packageJson.version}</span> {/* Display version from package.json */}
 
