@@ -15,7 +15,10 @@ function NavBar({ isNewTimeCardCreated }) {
   const closeMenu = () => setIsMenuOpen(false);
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-primary" style={{ minHeight: "50px" }}>
+    <nav
+      className="navbar navbar-expand-lg navbar-dark bg-primary"
+      style={{ minHeight: "50px" }}
+    >
       <div
         className="container-fluid d-flex align-items-center"
         style={{ justifyContent: "space-between" }}
@@ -50,7 +53,6 @@ function NavBar({ isNewTimeCardCreated }) {
           }}
         >
           <button
-            className="navbar-toggler d-flex align-items-center justify-content-center"
             type="button"
             onClick={toggleMenu}
             aria-controls="navbarNav"
@@ -59,12 +61,16 @@ function NavBar({ isNewTimeCardCreated }) {
             style={{
               width: "40px",
               height: "40px",
+              display: "flex", // Make the button a flex container
+              alignItems: "center", // Vertically center items
+              justifyContent: "center", // Horizontally center items
+              border: "none", // Remove any default border if needed
+              background: "none", // Remove default background if needed
             }}
           >
-            <span
-              className="navbar-toggler-icon"
-              style={{ width: "25px", height: "25px" }}
-            />
+            <span style={{ fontSize: "20px", color: "white" }}>
+              {isMenuOpen ? "✕" : "☰"}
+            </span>
           </button>
         </div>
 
@@ -77,12 +83,20 @@ function NavBar({ isNewTimeCardCreated }) {
           // screens as well, you can remove the .d-lg-none from the toggler above.
         >
           <ul className="navbar-nav ms-auto">
-            <li className={`nav-item ${location.pathname === "/" ? "active" : ""}`}>
+            <li
+              className={`nav-item ${
+                location.pathname === "/" ? "active" : ""
+              }`}
+            >
               <Link className="nav-link" to="/" onClick={closeMenu}>
                 Home
               </Link>
             </li>
-            <li className={`nav-item ${location.pathname === "/tutorials" ? "active" : ""}`}>
+            <li
+              className={`nav-item ${
+                location.pathname === "/tutorials" ? "active" : ""
+              }`}
+            >
               <Link className="nav-link" to="/tutorials" onClick={closeMenu}>
                 Tutorials
               </Link>
@@ -97,23 +111,45 @@ function NavBar({ isNewTimeCardCreated }) {
             >
               <Link
                 className="nav-link"
-                to={isNewTimeCardCreated ? "/activeTimeCard" : "/createNewTimeCard"}
+                to={
+                  isNewTimeCardCreated
+                    ? "/activeTimeCard"
+                    : "/createNewTimeCard"
+                }
                 onClick={closeMenu}
               >
-                {isNewTimeCardCreated ? "Active Time Card" : "View / Create Time Card"}
+                {isNewTimeCardCreated
+                  ? "Active Time Card"
+                  : "View / Create Time Card"}
               </Link>
             </li>
-            <li className={`nav-item ${location.pathname === "/timeCardIndex" ? "active" : ""}`}>
-              <Link className="nav-link" to="/timeCardIndex" onClick={closeMenu}>
+            <li
+              className={`nav-item ${
+                location.pathname === "/timeCardIndex" ? "active" : ""
+              }`}
+            >
+              <Link
+                className="nav-link"
+                to="/timeCardIndex"
+                onClick={closeMenu}
+              >
                 Time Card Index
               </Link>
             </li>
-            <li className={`nav-item ${location.pathname === "/reports" ? "active" : ""}`}>
+            <li
+              className={`nav-item ${
+                location.pathname === "/reports" ? "active" : ""
+              }`}
+            >
               <Link className="nav-link" to="/reports" onClick={closeMenu}>
                 Reports
               </Link>
             </li>
-            <li className={`nav-item ${location.pathname === "/employees" ? "active" : ""}`}>
+            <li
+              className={`nav-item ${
+                location.pathname === "/employees" ? "active" : ""
+              }`}
+            >
               <Link className="nav-link" to="/employees" onClick={closeMenu}>
                 Employees
               </Link>
@@ -126,5 +162,3 @@ function NavBar({ isNewTimeCardCreated }) {
 }
 
 export default NavBar;
-
-

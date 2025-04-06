@@ -1,5 +1,5 @@
 /* Proprietary Software License
-Copyright (c) 2024 Mark Robertson
+Copyright (c) 2025 Mark Robertson
 See LICENSE.txt file for details. */
 
 
@@ -15,7 +15,7 @@ See LICENSE.txt file for details. */
 
 /* Container: Prevent page from scrolling vertically and make it fill the screen */
 .container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   padding-bottom: 120px; /* Space for footer */
   height: 89vh;
