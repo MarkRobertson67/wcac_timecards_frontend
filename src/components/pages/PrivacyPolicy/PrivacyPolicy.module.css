@@ -7,7 +7,7 @@ See LICENSE.txt file for details. */
 .ppPage {
   overflow: auto; /* Allow scrolling */
   min-height: 100vh; /* Ensure it takes full height of the screen */
-  background: linear-gradient(135deg, #d3d8dd, #3c4650); /* Gradient background */
+  background: linear-gradient(135deg, #d3d8dd, #737e8a); /* Gradient background */
   padding: 20px;
   font-family: 'Arial', sans-serif;
   padding-bottom: 120px; /* Space for the footer */
