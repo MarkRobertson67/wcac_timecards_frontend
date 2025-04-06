@@ -4,7 +4,7 @@
 
 
 
-## Version 1.1 (2024-12-**)
+## Version 1.1 (2025-04-04)
 - Completed
 
 ## Version 0.7.1 beta (2024-04-01)
