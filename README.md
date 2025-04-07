@@ -157,6 +157,9 @@ Clone the main repository:
   - Add any required variables. These might include database connection strings, API keys, or other configuration settings.  
 If you’re unsure which variables to add, consult the backend documentation or refer to [12 Factor App - Config](https://12factor.net/config) for best practices.
 
+**Note:** Ensure that your `.env` file is added to your `.gitignore` file to keep your environment variables and sensitive credentials secure.
+
+
 
 
 4. **Run the application locally:**
@@ -330,4 +333,5 @@ For any questions, support, or feedback, please contact Mark Robertson at [Mark 
 [![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=flat-square&logo=firebase&logoColor=black)](https://firebase.google.com/)
 [![Node.js](https://img.shields.io/badge/Node.js-18.16.0-green?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
 [![EmailJS](https://img.shields.io/badge/EmailJS-Email%20Service-blue?style=flat-square)](https://www.emailjs.com/)
-
+[![Git](https://img.shields.io/badge/Git-2.35.1-orange?style=flat-square&logo=git&logoColor=white)](https://git-scm.com/)
+[![Node.js](https://img.shields.io/badge/Node.js-v18.16.0-green?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
