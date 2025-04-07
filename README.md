@@ -65,6 +65,15 @@ The WCAC Timecards App is a web-based solution designed to streamline timecard m
   [Download Git](https://git-scm.com/downloads)  
   [Git documentation](https://git-scm.com/doc)
 
+- **Firebase:**  
+  [Firebase Web Setup Guide](https://firebase.google.com/docs/web/setup)  
+  [Firebase Documentation](https://firebase.google.com/docs)
+
+- **EmailJS:**  
+  [EmailJS Website](https://www.emailjs.com/)  
+  [EmailJS Documentation](https://www.emailjs.com/docs/)
+
+
 
 1. **Clone the repository:**
 
@@ -117,6 +126,28 @@ Clone the main repository:
 };
 
 ```
+
+
+  ### EmailJS Setup
+
+  EmailJS allows you to send emails directly from your client-side code without exposing sensitive credentials. To set up EmailJS:
+
+1. **Sign Up and Configure:**  
+   If you haven't already, create an account on [EmailJS](https://www.emailjs.com/). Follow their dashboard instructions to configure your email service and templates.
+
+2. **Add Your EmailJS Credentials:**  
+   In your project, open src/components/pages/ContactUs.js and on line 26-40 update the email.js.send with your EmailJS configuration details. For example:
+
+   ```js
+        // Send the email using EmailJS
+    emailjs
+      .send(
+        "service_your service number",
+        "template_your template number",
+        formData,
+        "your account public key"
+      )
+   ```
 
 
   ### Backend Environment Variables
@@ -294,7 +325,9 @@ For any questions, support, or feedback, please contact Mark Robertson at [Mark 
 
 [![React](https://img.shields.io/badge/React-18.2.0-blue?style=flat-square)](https://reactjs.org/)
 [![CSS3](https://img.shields.io/badge/CSS3-3-blue?style=flat-square)](https://developer.mozilla.org/en-US/docs/Web/CSS)
+[![Bootstrap](https://img.shields.io/badge/Bootstrap-5-blue?style=flat-square&logo=bootstrap&logoColor=white)](https://getbootstrap.com/)
 [![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-yellow?style=flat-square)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=flat-square&logo=firebase&logoColor=black)](https://firebase.google.com/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 [![Node.js](https://img.shields.io/badge/Node.js-18.16.0-green?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![EmailJS](https://img.shields.io/badge/EmailJS-Email%20Service-blue?style=flat-square)](https://www.emailjs.com/)
+
