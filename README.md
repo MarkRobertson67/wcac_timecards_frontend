@@ -92,11 +92,11 @@ npm run build
   <table>
   <tr>
     <td align="center">
-      <img src="./public/HomeScreenBus.png" alt="Desktop View" width="400">
+      <img src="./public/HomeScreenBus.png" alt="Desktop View" width="500">
       <br><strong>Desktop View</strong>
     </td>
     <td align="center">
-      <img src="./public/MobileHomeScreen.png" alt="Mobile View" width="200">
+      <img src="./public/MobileHomeScreen.png" alt="Mobile View" width="300">
       <br><strong>Mobile View</strong>
     </td>
   </tr>
@@ -109,11 +109,11 @@ npm run build
   <table>
   <tr>
     <td align="center">
-      <img src="./public/CreateNewtimecard.png" alt="Desktop View" width="400">
+      <img src="./public/CreateNewtimecard.png" alt="Create New timecard" width="500">
       <br><strong>Desktop View</strong>
     </td>
     <td align="center">
-      <img src="./public/CreateNewTimecardMobile.png" alt="Mobile View" width="300">
+      <img src="./public/CreateNewTimecardMobile.png" alt="Create New timecard Mobile" width="300">
       <br><strong>Mobile View</strong>
     </td>
   </tr>
@@ -122,6 +122,35 @@ npm run build
 
 - **View Detailed Reports:**  
   Employees can view their submitted timecards and detailed reports on the status of their entries.
+
+  <table>
+  <tr>
+    <td align="center">
+      <img src="./public/ReportsPage.png" alt="Reports Page" width="500">
+      <br><strong>Desktop View</strong>
+    </td>
+    <td align="center">
+      <img src="./public/ReportsPageMobile.png" alt="Reports Page Mobile" width="300">
+      <br><strong>Mobile View</strong>
+    </td>
+  </tr>
+</table>
+
+- **Employees:**
+  Employees can view their details and update seclect fields, while administyrators have acess to update most fields.
+
+  <table>
+  <tr>
+    <td align="center">
+      <img src="./public/EmployeeDetails.png" alt="Employees Page" width="500">
+      <br><strong>Desktop View</strong>
+    </td>
+    <td align="center">
+      <img src="./public/EmployeeDetailsMobile.png" alt="Reports Page Mobile" width="300">
+      <br><strong>Mobile View</strong>
+    </td>
+  </tr>
+</table>
 
 ## For Administrators
 
