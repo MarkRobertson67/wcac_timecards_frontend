@@ -1,4 +1,4 @@
-# WCAC Timecards App
+# Timecards App
 
 ## *Empowering Accurate, Efficient Employee Time Tracking*
 > **Simplify Your Workflow with Precision and Speed**
@@ -106,8 +106,7 @@ Clone the main repository:
         REACT_APP_FIREBASE_API_KEY=your_firebase_api_key
         REACT_APP_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
         REACT_APP_FIREBASE_PROJECT_ID=your_firebase_project_id
-        ```
-
+```
 
 
   ### Backend Environment Variables
