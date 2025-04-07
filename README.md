@@ -34,6 +34,7 @@ The WCAC Timecards App is a web-based application designed to manage and track t
 ## Features
 
 - **User Authentication:** Secure login, signup, and password reset functionality using Firebase Authentication.
+- ** Protected routes can only be accessed once logged in.
 - **Timecard Management:** Create, view, and manage daily timecards.
 - **Detailed Reports:** Generate detailed and aggregated reports (by week, month, and year) for timecard entries.
 - **Responsive Design:** Optimized for both desktop and mobile viewing.
@@ -45,23 +46,14 @@ The WCAC Timecards App is a web-based application designed to manage and track t
 | ------------------------------- | -------- | ------------- |
 | Dashboard Access                | ✔️       | ✔️            |
 | Timecard Management             | ✔️       | ✔️            |
-| Expense Reporting               | ✔️       | ✔️            |
 | Profile Editing                 | ✔️       | ✔️            |
 | Approve Timecards               | ❌       | ✔️            |
-| Approve Expenses                | ❌       | ✔️            |
 | Manage Users                    | ❌       | ✔️            |
-| Access Audit Logs               | ❌       | ✔️            |
 | System Configuration            | ❌       | ✔️            |
-| Generate Reports                | ✔️       | ✔️            |
-| Notification Settings           | ✔️       | ✔️            |
-| Employee Performance Reviews    | ✔️       | ❌            |
-| Leave Management                | ✔️       | ✔️            |
-| Security Settings               | ❌       | ✔️            |
-| Data Backup & Recovery          | ❌       | ✔️            |
+| Generate Reports                | ✔️       | ✔️  Enhanced  |
 | Integration with Third-Party Apps | ❌     | ✔️            |
-| Customizable Dashboards         | ✔️       | ✔️            |
 | Mobile Access                   | ✔️       | ✔️            |
-| API Access                      | ❌       | ✔️            |
+
 
 
 ## Installation
@@ -100,11 +92,11 @@ npm run build
   <table>
   <tr>
     <td align="center">
-      <img src="./public/CreateNewtimecard.png" alt="Desktop View" width="400">
+      <img src="./public/HomeScreenBus.png" alt="Desktop View" width="400">
       <br><strong>Desktop View</strong>
     </td>
     <td align="center">
-      <img src="./public/CreateNewtimecardMobile.png" alt="Mobile View" width="200">
+      <img src="./public/MobileHomeScreen.png" alt="Mobile View" width="200">
       <br><strong>Mobile View</strong>
     </td>
   </tr>
@@ -113,6 +105,19 @@ npm run build
 
 - **Create and Update Timecards:**  
   Once logged in, employees can create a new timecard, fill in their work schedule, and submit their timecard.
+
+  <table>
+  <tr>
+    <td align="center">
+      <img src="./public/CreateNewtimecard.png" alt="Desktop View" width="400">
+      <br><strong>Desktop View</strong>
+    </td>
+    <td align="center">
+      <img src="./public/CreateNewTimecardMobile.png" alt="Mobile View" width="300">
+      <br><strong>Mobile View</strong>
+    </td>
+  </tr>
+</table>
 
 
 - **View Detailed Reports:**  
