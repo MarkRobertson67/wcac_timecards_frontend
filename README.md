@@ -29,6 +29,8 @@ For licensing inquiries, please contact Mark Robertson at [markrobertson67@gmail
 
 The WCAC Timecards App is a web-based application designed to manage and track timecards for employees at We Care Adult Care. The app allows employees to create and view their timecards, while administrators can access detailed reports, aggregate data, and manage employee profiles.
 
+
+
 ## Features
 
 - **User Authentication:** Secure login, signup, and password reset functionality using Firebase Authentication.
@@ -38,6 +40,29 @@ The WCAC Timecards App is a web-based application designed to manage and track t
 - **CSV Export:** Save report data as CSV for further analysis.
 - **Dynamic Footer & Navbar:** Consistent UI components that adjust responsively.
 - **Real-Time Updates:** Automatic email verification handling and profile completion prompts.
+
+| Feature                         | Employee | Administrator |
+| ------------------------------- | -------- | ------------- |
+| Dashboard Access                | ✔️       | ✔️            |
+| Timecard Management             | ✔️       | ✔️            |
+| Expense Reporting               | ✔️       | ✔️            |
+| Profile Editing                 | ✔️       | ✔️            |
+| Approve Timecards               | ❌       | ✔️            |
+| Approve Expenses                | ❌       | ✔️            |
+| Manage Users                    | ❌       | ✔️            |
+| Access Audit Logs               | ❌       | ✔️            |
+| System Configuration            | ❌       | ✔️            |
+| Generate Reports                | ✔️       | ✔️            |
+| Notification Settings           | ✔️       | ✔️            |
+| Employee Performance Reviews    | ✔️       | ❌            |
+| Leave Management                | ✔️       | ✔️            |
+| Security Settings               | ❌       | ✔️            |
+| Data Backup & Recovery          | ❌       | ✔️            |
+| Integration with Third-Party Apps | ❌     | ✔️            |
+| Customizable Dashboards         | ✔️       | ✔️            |
+| Mobile Access                   | ✔️       | ✔️            |
+| API Access                      | ❌       | ✔️            |
+
 
 ## Installation
 
@@ -72,9 +97,19 @@ npm run build
   ## Screenshots
 
   ### Home Page
-  | Desktop View | Mobile View |
-| ------------ | ----------- |
-| ![Desktop](./public/CreateNewtimecard.png) | ![Mobile](./public/CreateNewtimecardMobile.png) |
+  <table>
+  <tr>
+    <td align="center">
+      <img src="./public/CreateNewtimecard.png" alt="Desktop View" width="400">
+      <br><strong>Desktop View</strong>
+    </td>
+    <td align="center">
+      <img src="./public/CreateNewtimecardMobile.png" alt="Mobile View" width="200">
+      <br><strong>Mobile View</strong>
+    </td>
+  </tr>
+</table>
+
 
 - **Create and Update Timecards:**  
   Once logged in, employees can create a new timecard, fill in their work schedule, and submit their timecard.
