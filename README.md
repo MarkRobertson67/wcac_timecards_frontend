@@ -20,8 +20,8 @@ The backend for the WCAC Timecards App is available at [WCAC Timecards Backend](
 
 ## Screenshots
 
-![Desktop View](assets/HomeScreenBus.png)
-![Mobile View](assets/MobileHomeScreen.png)
+![Desktop View](/HomeScreenBus.png)
+![Mobile View](/MobileHomeScreen.png)
 
 
 ## Table of Contents
