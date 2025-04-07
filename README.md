@@ -1,14 +1,13 @@
 # WCAC Timecards App
 
-
+## *Empowering Accurate, Efficient Employee Time Tracking*
+> **Simplify Your Workflow with Precision and Speed**
 
 For licensing inquiries, please contact Mark Robertson at [markrobertson67@gmail.com](mailto:markrobertson67@gmail.com).
 
 [![License](https://img.shields.io/badge/License-Proprietary-blue.svg)](./LICENSE.txt)
 [![Version](https://img.shields.io/badge/Version-1.0.0-blue.svg)](package.json)
 [![Netlify Status](https://api.netlify.com/api/v1/badges/d9b982a6-78ec-40a3-9e2e-f9857b4a1706/deploy-status)](https://app.netlify.com/sites/wcac-timecards/deploys)
-
-- **Screenshots Section:**
 
 
 
@@ -27,9 +26,7 @@ For licensing inquiries, please contact Mark Robertson at [markrobertson67@gmail
 
 ## Introduction
 
-The WCAC Timecards App is a web-based application designed to manage and track timecards for employees at We Care Adult Care. The app allows employees to create and view their timecards, while administrators can access detailed reports, aggregate data, and manage employee profiles.
-
-
+The WCAC Timecards App is a web-based solution designed to streamline timecard management and tracking for employees at We Care Adult Care, Inc. Employees can register and authenticate using Firebase, enabling them to create, view, and generate reports for their own timecards over any chosen time period. Meanwhile, administrators have the ability to access detailed reports for individual employees or the entire workforce, review aggregate data, and manage employee profiles. This application significantly reduces the time needed to verify employee hours. At the end of the designated two-week cycle, employees submit their timecards, which locks the data and prompts the start of a new cycle. 
 
 ## Features
 
@@ -187,3 +184,7 @@ For licensing inquiries, please contact [Mark Robertson](mailto:markrobertson67@
 ## Contact
 
 For any questions, support, or feedback, please contact Mark Robertson at [Mark Robertson](mailto:markrobertson67@gmail.com).
+
+[![React](https://img.shields.io/badge/React-18.2.0-blue?style=flat-square)](https://reactjs.org/)
+[![CSS3](https://img.shields.io/badge/CSS3-3-blue?style=flat-square)](https://developer.mozilla.org/en-US/docs/Web/CSS)
+[![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-yellow?style=flat-square)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
