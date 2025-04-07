@@ -96,12 +96,13 @@ Clone the main repository:
 
     - Add your environment-specific variables. For example, you might include:
 
-    ```js
+    ```
     REACT_APP_FIREBASE_API_KEY=your_firebase_api_key
     REACT_APP_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
     REACT_APP_FIREBASE_PROJECT_ID=your_firebase_project_id
-    # Add other variables as needed
-```
+    Add other variables as needed
+    ```
+
     - For guidance on Firebase configuration, check out the [Firebase Web Setup Guide](https://firebase.google.com/docs/web/setup)
 
 
@@ -115,12 +116,14 @@ If you’re unsure which variables to add, consult the backend documentation or 
 
 
 4. **Run the application locally:**
-
-npm start
+```
+  npm start
+```
 
 5.  **Build for production:**
-
-npm run build
+```
+  npm run build
+  ```
 
 ## Usage
 
