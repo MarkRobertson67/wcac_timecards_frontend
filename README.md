@@ -6,6 +6,9 @@ This project is licensed under the Proprietary Software License. See the [LICENS
 
 For licensing inquiries, please contact Mark Robertson at [markrobertson67@gmail.com](mailto:markrobertson67@gmail.com).
 
+## Backend Repository
+
+The backend for the WCAC Timecards App is available at [WCAC Timecards Backend](https://github.com/MarkRobertson67/wcac_timecards_backend).
 
 
 [![License](https://img.shields.io/badge/License-Proprietary-blue.svg)](./LICENSE.txt)
@@ -13,10 +16,12 @@ For licensing inquiries, please contact Mark Robertson at [markrobertson67@gmail
 [![Netlify Status](https://api.netlify.com/api/v1/badges/d9b982a6-78ec-40a3-9e2e-f9857b4a1706/deploy-status)](https://app.netlify.com/sites/wcac-timecards/deploys)
 
 
-<video width="640" height="360" controls>
-  <source src="Bus_Screen_Recordiong.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+- **Screenshots Section:**
+
+## Screenshots
+
+![Desktop View](assets/HomeScreenBus.png)
+![Mobile View](assets/MobileHomeScreen.png)
 
 
 ## Table of Contents
@@ -49,6 +54,65 @@ The WCAC Timecards App is a web-based application designed to manage and track t
 
 1. **Clone the repository:**
 
-   ```bash
    git clone https://github.com/your-username/wcac-timecards.git
    cd wcac-timecards
+
+2. **Install dependencies:**
+
+  npm install
+
+3. **Set up environment variables:**
+
+  Create a .env file in the root directory and add your environment-specific variables (e.g., API keys, Firebase config).
+
+4. **Run the application locally:**
+
+  npm start
+
+5.  **Build for production:**
+
+  npm run build
+
+## Usage
+
+  **For Employees:**
+
+  - **Login / Signup:**  
+  Users can sign up or log in using their email and password.
+
+  - **Create and Update Timecards:**  
+  Once logged in, employees can create a new timecard, fill in their work schedule, and submit their timecard.
+
+  - **View Detailed Reports:**  
+  Employees can view their submitted timecards and detailed reports on the status of their entries.
+
+## For Administrators
+
+  - **Access Reports:**  
+  Admins have the ability to view aggregated reports (weekly, monthly, and yearly) for all employees.
+
+  - **Manage Profiles:**  
+  Administrators can access and manage employee profiles, ensuring that all data is up-to-date.
+
+   **Export Data:**  
+  Reports can be exported as CSV files for offline analysis and record keeping.
+
+## Configuration
+
+  - **Firebase:**  
+  The app uses Firebase for authentication. Update your Firebase configuration in the `firebaseConfig.js` file.
+
+  - **Backend API:**  
+  Configure the API URL in the environment variable `REACT_APP_API_URL` in your `.env` file.
+
+  - **Styling:**  
+  Custom styles are defined in the `ReportPage.module.css` and `NavBar.css` files. Modify these files to adjust the look and feel.
+
+## License
+
+  This project is licensed under the [Proprietary Software License](./LICENSE.txt).  
+For licensing inquiries, please contact [Mark Robertson](mailto:markrobertson67@gmail.com).
+
+## Contact
+
+  For any questions, support, or feedback, please contact Mark Robertson at [Mark Robertson](mailto:markrobertson67@gmail.com).
