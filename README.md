@@ -1,9 +1,9 @@
 # WCAC Timecards App
-<br/>
+
 ## *Empowering Accurate, Efficient Employee Time Tracking*
 > **Simplify Your Workflow with Precision and Speed**
 
-<br/><br/>
+<br/>
 
 [![License](https://img.shields.io/badge/License-Proprietary-blue.svg)](./LICENSE.txt)
 [![Version](https://img.shields.io/badge/Version-1.0.0-blue.svg)](package.json)
@@ -96,15 +96,18 @@ Clone the main repository:
 
     - Create a file named .env in the wcac-timecards directory.
 
-    - Add your environment-specific variables. For example, you might include:
+    - Add your environment-specific variables. 
 
-        ```js
+    - For guidance on Firebase configuration, check out the [Firebase Web Setup Guide](https://firebase.google.com/docs/web/setup)
+
+    An example of your environment variables might include:
+
+```js
         REACT_APP_FIREBASE_API_KEY=your_firebase_api_key
         REACT_APP_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
         REACT_APP_FIREBASE_PROJECT_ID=your_firebase_project_id
         ```
 
-    - For guidance on Firebase configuration, check out the [Firebase Web Setup Guide](https://firebase.google.com/docs/web/setup)
 
 
   ### Backend Environment Variables
