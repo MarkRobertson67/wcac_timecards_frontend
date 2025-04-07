@@ -1,5 +1,5 @@
 // Proprietary Software License
-// Copyright (c) 2024 Mark Robertson
+// Copyright (c) 2025 Mark Robertson
 // See LICENSE.txt file for details.
 
 
@@ -60,7 +60,11 @@ function Home() {
             }
           } catch (err) {
             console.error("Error fetching user profile:", err.message);
-            alert("An error occurred while fetching your profile.");
+            alert("An error occurred while fetching your profile. Please log in again.");
+            await signOut(auth);
+            setCurrentUser(null);
+            navigate("/"); // Redirect to login page
+            return; // Exit early if an error occurs
           }
         } else {
           setIsWaitingForEmailVerification(true);
@@ -75,7 +79,7 @@ function Home() {
     });
   
     return () => unsubscribe();
-  }, []);
+  }, [navigate]);
   
 
   useEffect(() => {
@@ -183,9 +187,7 @@ function Home() {
 
   const handleModalClose = () => {
     setShowModal(false);
-
-    //const activeTimecard = localStorage.getItem("startDate");
-    navigate("/createNewTimeCard");  //navigate(activeTimecard ? "/activeTimeCard" : "/createNewTimeCard");
+    navigate("/createNewTimeCard"); 
   };
 
   const handleResendVerification = async () => {

@@ -331,7 +331,6 @@ For any questions, support, or feedback, please contact Mark Robertson at [Mark 
 [![Bootstrap](https://img.shields.io/badge/Bootstrap-5-blue?style=flat-square&logo=bootstrap&logoColor=white)](https://getbootstrap.com/)
 [![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-yellow?style=flat-square)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=flat-square&logo=firebase&logoColor=black)](https://firebase.google.com/)
-[![Node.js](https://img.shields.io/badge/Node.js-18.16.0-green?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
 [![EmailJS](https://img.shields.io/badge/EmailJS-Email%20Service-blue?style=flat-square)](https://www.emailjs.com/)
 [![Git](https://img.shields.io/badge/Git-2.35.1-orange?style=flat-square&logo=git&logoColor=white)](https://git-scm.com/)
 [![Node.js](https://img.shields.io/badge/Node.js-v18.16.0-green?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
