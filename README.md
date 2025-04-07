@@ -77,6 +77,7 @@ npm run build
 - **Create and Update Timecards:**  
   Once logged in, employees can create a new timecard, fill in their work schedule, and submit their timecard.
 
+### Home Page
   <div style="display: flex; justify-content: center; gap: 20px; margin: 0 20px;">
   <!-- Desktop View -->
   <div style="text-align: center;">
