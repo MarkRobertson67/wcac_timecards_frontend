@@ -78,18 +78,19 @@ npm run build
   Once logged in, employees can create a new timecard, fill in their work schedule, and submit their timecard.
 
 ### Home Page
-  <div style="display: flex; justify-content: center; gap: 20px; margin: 0 20px;">
-  <!-- Desktop View -->
-  <div style="text-align: center;">
-    <img src="./public/CreateNewtimecard.png" style="width: 60%;" alt="Desktop View">
-    <div style="margin-top: 8px;">Desktop View</div>
-  </div>
-  <!-- Mobile View -->
-  <div style="text-align: center;">
-    <img src="./public/CreateNewtimecardMobile.png" style="width: 30%;" alt="Mobile View">
-    <div style="margin-top: 8px;">Mobile View</div>
-  </div>
-</div>
+  <table>
+  <tr>
+    <td align="center" style="padding: 0 20px;">
+      <img src="./public/CreateNewtimecard.png" alt="Desktop View"><br>
+      Desktop View
+    </td>
+    <td align="center" style="padding: 0 20px;">
+      <img src="./public/CreateNewtimecardMobile.png" alt="Mobile View"><br>
+      Mobile View
+    </td>
+  </tr>
+</table>
+
 
 
 - **View Detailed Reports:**  
