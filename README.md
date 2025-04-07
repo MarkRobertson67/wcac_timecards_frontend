@@ -3,7 +3,7 @@
 ## *Empowering Accurate, Efficient Employee Time Tracking*
 > **Simplify Your Workflow with Precision and Speed**
 
-For licensing inquiries, please contact Mark Robertson at [markrobertson67@gmail.com](mailto:markrobertson67@gmail.com).
+
 
 [![License](https://img.shields.io/badge/License-Proprietary-blue.svg)](./LICENSE.txt)
 [![Version](https://img.shields.io/badge/Version-1.0.0-blue.svg)](package.json)
@@ -55,18 +55,64 @@ The WCAC Timecards App is a web-based solution designed to streamline timecard m
 
 ## Installation
 
+### Prerequisites:
+
+- **Node.js and npm:**  
+  [Download Node.js](https://nodejs.org/en/download/) (npm comes bundled with Node.js)  
+  [Learn how to install Node.js and npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
+
+- **Git:**  
+  [Download Git](https://git-scm.com/downloads)  
+  [Git documentation](https://git-scm.com/doc)
+
+
 1. **Clone the repository:**
 
-   git clone https://github.com/markrobertson67/wcac-timecards.git
-   cd wcac-timecards
+   ### Frontend
+
+Clone the main repository:
+
+  - git clone https://github.com/markrobertson67/wcac-timecards.git
+    cd wcac-timecards
+
+  ### Backend
+
+  - git clone https://github.com/markrobertson67/wcac-timecards-backend.git
+    cd wcac-timecards-backend
+
 
 2. **Install dependencies:**
 
-npm install
+  - For the Frontend & Backend:  npm install
+
 
 3. **Set up environment variables:**
 
-Create a .env file in the root directory and add your environment-specific variables (e.g., API keys, Firebase config).
+    Both the frontend and backend require specific environment variables (e.g., API keys, Firebase configuration). You need to create a .env file in the root directory of each repository.
+
+  ### Frontend Environment Variables
+
+    - Create a file named .env in the wcac-timecards directory.
+
+    - Add your environment-specific variables. For example, you might include:
+
+    ```js
+    REACT_APP_FIREBASE_API_KEY=your_firebase_api_key
+    REACT_APP_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
+    REACT_APP_FIREBASE_PROJECT_ID=your_firebase_project_id
+    # Add other variables as needed
+```
+    - For guidance on Firebase configuration, check out the [Firebase Web Setup Guide](https://firebase.google.com/docs/web/setup)
+
+
+  ### Backend Environment Variables
+
+  - Create a .env file in the wcac-timecards-backend directory.
+
+  - Add any required variables. These might include database connection strings, API keys, or other configuration settings.  
+If you’re unsure which variables to add, consult the backend documentation or refer to [12 Factor App - Config](https://12factor.net/config) for best practices.
+
+
 
 4. **Run the application locally:**
 
@@ -83,7 +129,7 @@ npm run build
 - **Login / Signup:**  
   Users can sign up or log in using their email and password.
 
-  ## Screenshots
+  
 
   ### Home Page
   <table>
@@ -188,3 +234,6 @@ For any questions, support, or feedback, please contact Mark Robertson at [Mark 
 [![React](https://img.shields.io/badge/React-18.2.0-blue?style=flat-square)](https://reactjs.org/)
 [![CSS3](https://img.shields.io/badge/CSS3-3-blue?style=flat-square)](https://developer.mozilla.org/en-US/docs/Web/CSS)
 [![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-yellow?style=flat-square)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=flat-square&logo=firebase&logoColor=black)](https://firebase.google.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Node.js](https://img.shields.io/badge/Node.js-18.16.0-green?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
