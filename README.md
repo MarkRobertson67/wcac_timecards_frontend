@@ -96,7 +96,7 @@ Clone the main repository:
 
     - Add your environment-specific variables. For example, you might include:
 
-    ```
+    ```js
     REACT_APP_FIREBASE_API_KEY=your_firebase_api_key
     REACT_APP_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
     REACT_APP_FIREBASE_PROJECT_ID=your_firebase_project_id
@@ -150,7 +150,7 @@ If you’re unsure which variables to add, consult the backend documentation or 
 
 
 - **Create and Update Timecards:**  
-  Once logged in, employees can create a new timecard, fill in their work schedule, and submit their timecard.
+  Once logged in, employees can create a new timecard by selecting a date from the calandar. 
 
   <table>
   <tr>
@@ -160,6 +160,21 @@ If you’re unsure which variables to add, consult the backend documentation or 
     </td>
     <td align="center">
       <img src="./public/CreateNewTimecardMobile.png" alt="Create New timecard Mobile" width="300">
+      <br><strong>Mobile View</strong>
+    </td>
+  </tr>
+</table>
+
+They fill in their work schedule, and submit their timecard.
+
+  <table>
+  <tr>
+    <td align="center">
+      <img src="./public/NewTimecard.png" alt="timecard" width="500">
+      <br><strong>Desktop View</strong>
+    </td>
+    <td align="center">
+      <img src="./public/NewTimecardMobile.png" alt="Timecard Mobile" width="300">
       <br><strong>Mobile View</strong>
     </td>
   </tr>
