@@ -1,9 +1,9 @@
 # WCAC Timecards App
-
+<br/>
 ## *Empowering Accurate, Efficient Employee Time Tracking*
 > **Simplify Your Workflow with Precision and Speed**
 
-
+<br/><br/>
 
 [![License](https://img.shields.io/badge/License-Proprietary-blue.svg)](./LICENSE.txt)
 [![Version](https://img.shields.io/badge/Version-1.0.0-blue.svg)](package.json)
@@ -80,6 +80,8 @@ Clone the main repository:
   - git clone https://github.com/markrobertson67/wcac-timecards-backend.git
     cd wcac-timecards-backend
 
+    Follow the instruction in this repo to set up the backend.
+
 
 2. **Install dependencies:**
 
@@ -96,12 +98,11 @@ Clone the main repository:
 
     - Add your environment-specific variables. For example, you might include:
 
-    ```js
-    REACT_APP_FIREBASE_API_KEY=your_firebase_api_key
-    REACT_APP_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
-    REACT_APP_FIREBASE_PROJECT_ID=your_firebase_project_id
-    Add other variables as needed
-    ```
+        ```js
+        REACT_APP_FIREBASE_API_KEY=your_firebase_api_key
+        REACT_APP_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
+        REACT_APP_FIREBASE_PROJECT_ID=your_firebase_project_id
+        ```
 
     - For guidance on Firebase configuration, check out the [Firebase Web Setup Guide](https://firebase.google.com/docs/web/setup)
 
@@ -116,14 +117,44 @@ If you’re unsure which variables to add, consult the backend documentation or 
 
 
 4. **Run the application locally:**
+
+  Before you start, make sure both servers (frontend and backend) are running.
+
+  ### Starting the Frontend
+
+  In the wcac-timecards directory, run:
+
 ```
   npm start
 ```
+This command will start the development server. You should then be able to access the application in your web browser, typically at http://localhost:3000.
+
+### Starting the Backend
+
+In the wcac-timecards-backend directory, run:
+
+```
+     npm start
+```
+
+Ensure the backend server is running. The frontend may depend on API endpoints provided by the backend.
+
 
 5.  **Build for production:**
+
+  When you're ready to deploy your application, you can build production-ready bundles.
+
+  ### For the Frontend
 ```
-  npm run build
+     npm run build
   ```
+This command creates an optimized production build. For more details, see the [Create React App Deployment Guide](https://create-react-app.dev/docs/deployment/).
+
+
+
+  ### For the Backend
+
+  If your backend needs to be built (or bundled), follow the instructions provided in its README or documentation.
 
 ## Usage
 
@@ -165,7 +196,7 @@ If you’re unsure which variables to add, consult the backend documentation or 
   </tr>
 </table>
 
-They fill in their work schedule, and submit their timecard.
+- They fill in their work schedule, and submit their timecard.
 
   <table>
   <tr>
@@ -198,7 +229,7 @@ They fill in their work schedule, and submit their timecard.
 </table>
 
 - **Employees:**
-  Employees can view their details and update seclect fields, while administyrators have acess to update most fields.
+  Employees can view their details and update seclect fields, while administrators have acess to update most fields.
 
   <table>
   <tr>
@@ -221,7 +252,7 @@ They fill in their work schedule, and submit their timecard.
 - **Manage Profiles:**  
   Administrators can access and manage employee profiles, ensuring that all data is up-to-date.
 
-  **Export Data:**  
+-  **Export Data:**  
   Reports can be exported as CSV files for offline analysis and record keeping.
 
 ## Configuration
