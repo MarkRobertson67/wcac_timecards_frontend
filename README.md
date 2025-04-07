@@ -1,8 +1,6 @@
 # WCAC Timecards App
 
-## License
 
-This project is licensed under the Proprietary Software License. See the [LICENSE.txt](./LICENSE.txt) file for details.
 
 For licensing inquiries, please contact Mark Robertson at [markrobertson67@gmail.com](mailto:markrobertson67@gmail.com).
 
@@ -12,10 +10,7 @@ For licensing inquiries, please contact Mark Robertson at [markrobertson67@gmail
 
 - **Screenshots Section:**
 
-## Screenshots
 
-![Desktop View](./public/HomeScreenBus.png)
-![Mobile View](./public/MobileHomeScreen.png)
 
 ## Table of Contents
 
@@ -74,15 +69,15 @@ npm run build
 - **Login / Signup:**  
   Users can sign up or log in using their email and password.
 
-- **Create and Update Timecards:**  
-  Once logged in, employees can create a new timecard, fill in their work schedule, and submit their timecard.
+  ## Screenshots
 
-### Home Page
+  ### Home Page
   | Desktop View | Mobile View |
 | ------------ | ----------- |
 | ![Desktop](./public/CreateNewtimecard.png) | ![Mobile](./public/CreateNewtimecardMobile.png) |
 
-
+- **Create and Update Timecards:**  
+  Once logged in, employees can create a new timecard, fill in their work schedule, and submit their timecard.
 
 
 - **View Detailed Reports:**  
@@ -118,6 +113,7 @@ The backend for the WCAC Timecards App is available at [WCAC Timecards Backend](
 
 This project is licensed under the [Proprietary Software License](./LICENSE.txt).  
 For licensing inquiries, please contact [Mark Robertson](mailto:markrobertson67@gmail.com).
+
 
 ## Contact
 
