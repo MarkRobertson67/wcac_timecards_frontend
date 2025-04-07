@@ -17,8 +17,8 @@ For licensing inquiries, please contact Mark Robertson at [markrobertson67@gmail
 
 ## Screenshots
 
-![Desktop View](./HomeScreenBus.png)
-![Mobile View](./MobileHomeScreen.png)
+![Desktop View](./public/HomeScreenBus.png)
+![Mobile View](./public/MobileHomeScreen.png)
 
 
 ## Table of Contents
@@ -52,7 +52,7 @@ The WCAC Timecards App is a web-based application designed to manage and track t
 
 1. **Clone the repository:**
 
-   git clone https://github.com/your-username/wcac-timecards.git
+   git clone https://github.com/markrobertson67/wcac-timecards.git
    cd wcac-timecards
 
 2. **Install dependencies:**
@@ -80,6 +80,9 @@ The WCAC Timecards App is a web-based application designed to manage and track t
 
   - **Create and Update Timecards:**  
   Once logged in, employees can create a new timecard, fill in their work schedule, and submit their timecard.
+
+  ![Create New Timecard](./public/CreateNewtimecard.png)
+  ![Create New Timecard Mobile View](./public/CreateNewTimecardMobile.png)
 
   - **View Detailed Reports:**  
   Employees can view their submitted timecards and detailed reports on the status of their entries.
