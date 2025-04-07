@@ -103,9 +103,19 @@ Clone the main repository:
     An example of your environment variables might include:
 
 ```js
-        REACT_APP_FIREBASE_API_KEY=your_firebase_api_key
-        REACT_APP_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
-        REACT_APP_FIREBASE_PROJECT_ID=your_firebase_project_id
+        // Set your API URL (adjust the port or URL as needed)
+        REACT_APP_API_URL=http://localhost:3535
+
+        // Firebase configuration (replace placeholder values with your project's actual configuration)
+        const firebaseConfig = {
+        REACT_APP_FIREBASE_API_KEY: "your_firebase_api_key",
+        REACT_APP_FIREBASE_AUTH_DOMAIN: "your_project.firebaseapp.com",
+        REACT_APP_FIREBASE_PROJECT_ID: "your_project_id",
+        REACT_APP_FIREBASE_STORAGE_BUCKET: "your_project_storage_bucket.appspot.com",
+        REACT_APP_FIREBASE_MESSAGING_SENDER_ID: "your_messaging_sender_id",
+        REACT_APP_FIREBASE_APP_ID: "your_app_id"
+};
+
 ```
 
 
