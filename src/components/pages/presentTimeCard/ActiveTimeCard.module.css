@@ -29,7 +29,6 @@ See LICENSE.txt file for details. */
   overflow-x: auto;
   overflow-y: auto;
   flex-grow: 1; /* Allow table to take up available space */
-  padding-bottom: 120px;
   max-height:80vh
 }
 

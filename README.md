@@ -43,8 +43,8 @@ The WCAC Timecards App is a web-based solution designed to streamline timecard m
 | ------------------------------- | -------- | ------------- |
 | Dashboard Access                | ✔️       | ✔️            |
 | Timecard Management             | ✔️       | ✔️            |
-| Profile Editing                 | ✔️       | ✔️            |
-| Approve Timecards               | ❌       | ✔️            |
+| Profile Editing                 | ✔️       | ✔️  Enhanced  |
+| Submit Timecard                 | ✔️       | ❌            |
 | Manage Users                    | ❌       | ✔️            |
 | System Configuration            | ❌       | ✔️            |
 | Generate Reports                | ✔️       | ✔️  Enhanced  |

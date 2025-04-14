@@ -1,12 +1,26 @@
 /* Proprietary Software License
-Copyright (c) 2024 Mark Robertson
+Copyright (c) 2025 Mark Robertson
 See LICENSE.txt file for details. */
 
 
 /* TimeCardsIndex.module.css */
 
+@media (min-width: 769px) {
+  html, body {
+    overflow: hidden;
+  }
+}
+
+.container {
+  margin-top: 40px;
+  min-height: calc(100vh - 70px - 50px);
+  overflow-y: hidden;
+}
+
 /* Component-Specific Styles */
 .eventContent {
+  min-height: 100vh;
+  overflow-y: visible; 
   display: flex;
   justify-content: center;
   align-items: center; /* Ensure vertical centering */
@@ -73,7 +87,7 @@ body, html {
   flex-direction: column;
   align-items: center;
   padding-bottom: 150px;
-  overflow-y: auto; /* Allows scrolling within the container if content exceeds view */
+  
 }
 
 /* Centering title */
