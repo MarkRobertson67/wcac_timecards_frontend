@@ -53,8 +53,8 @@ function Home() {
               setIsProfileComplete(!!data.first_name);
               setShowModal(!data.first_name); // Show modal if no profile exists
             } else if (response.status === 404) {
-              console.log("No employee found, showing modal to create profile.");
-              setShowModal(true); // Trigger modal to create new employee profile
+              console.log("No employee found, logging out.");
+              throw new Error("Profile not found");
             } else {
               throw new Error("Unexpected error fetching profile.");
             }
