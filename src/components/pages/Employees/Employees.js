@@ -1,12 +1,12 @@
 /* Proprietary Software License
-   Copyright (c) 2024 Mark Robertson
+   Copyright (c) 2025 Mark Robertson
    See LICENSE.txt file for details. */
 
    import React, { useEffect, useState } from "react";
    import { useNavigate } from "react-router-dom";
    import { Table, Button, Spinner } from "react-bootstrap";
    import { auth } from "../../../firebase/firebaseConfig";
-   import styles from "./Employee.module.css";
+   import styles from "./Employees.module.css";
    
    const API = process.env.REACT_APP_API_URL;
    
@@ -74,17 +74,11 @@
   
       return (
         <div className={styles.ePage}>
-          <div className="mt-4" style={{ maxWidth: "600px", margin: "0 auto" }}>
-            <h4 className="text-center mb-3" style={{ fontSize: "1rem" }}>
+          <div className="mt-3" style={{ maxWidth: "600px", margin: "0 auto" }}>
+            <h4 className="text-center mb-3" style={{ fontSize: "2rem" }}>
               {isAdmin ? "All Employees" : "Your Profile"}
             </h4>
-            <div
-              style={{
-                maxHeight: "650px",
-                overflowY: "auto",
-                border: "1px solid #ddd",
-              }}
-            >
+            <div className={styles.scrollableTable}>
               <Table
                 striped
                 bordered
@@ -136,7 +130,7 @@
       );
     };
   
-    return <>{renderEmployeeDetails()}</>; // No Container or background
+    return <>{renderEmployeeDetails()}</>;
   }
   
   export default Employees;

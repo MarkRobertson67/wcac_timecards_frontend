@@ -1,5 +1,5 @@
 /* Proprietary Software License
-   Copyright (c) 2024 Mark Robertson
+   Copyright (c) 2025 Mark Robertson
    See LICENSE.txt file for details. */
 
    /* Basic footer styles */
@@ -19,6 +19,7 @@
 
 /* Hide the toggler on medium+ screens; show it on smaller */
 .footer-toggler {
+  padding: 0;
   display: block;
   background: none;
   border: none;
@@ -79,11 +80,12 @@
   }
   .footer-col.show-menu {
     display: block; /* show them if toggler is pressed */
-    margin-top: 0.5rem;
+    margin-top: 0.0rem;
   }
   
   /* If you want them stacked, they'd be 100% width in your row. */
   .footer-col ul {
     text-align: center;
   }
+  
 }

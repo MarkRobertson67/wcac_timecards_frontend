@@ -2,10 +2,9 @@
 // Copyright (c) 2024 Mark Robertson
 // See LICENSE.txt file for details.
 
-// src/components/pages/ContactUs.js
 
 import React, { useState } from "react";
-import emailjs from "emailjs-com"; // Import EmailJS library
+import emailjs from "emailjs-com";
 import styles from "./ContactUs.module.css"
 
 const ContactUs = () => {

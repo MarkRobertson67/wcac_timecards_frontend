@@ -2,9 +2,6 @@
 // Copyright (c) 2025 Mark Robertson
 // See LICENSE.txt file for details.
 
-// Proprietary Software License
-// Copyright (c) 2024 Mark Robertson
-// See LICENSE.txt file for details.
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -71,7 +68,7 @@ function FooterComponent() {
             </ul>
           </div>
           {/* Hamburger toggler (only visible on small screens) */}
-          <div className="col-12 d-md-none mt-2">
+          <div className="col-12 d-md-none">
             <button
               className="footer-toggler"
               onClick={toggleMenu}

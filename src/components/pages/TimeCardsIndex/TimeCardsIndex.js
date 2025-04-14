@@ -180,7 +180,7 @@ function TimeCardsIndex() {
   return (
     <div className={styles.container}>
       <h2>
-        Total Hours Worked for{" "}
+        Total Hours Worked Each Day<br></br> For{" "}
         {employee ? `${employee.first_name} ${employee.last_name}` : "..."}
       </h2>
 
