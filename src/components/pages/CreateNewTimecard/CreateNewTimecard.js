@@ -11,7 +11,6 @@ import styles from "./CreateNewTimeCard.module.css";
 function CreateNewTimeCard({ setIsNewTimeCardCreated }) {
   const [startDate, setStartDate] = useState(new Date());
   const navigate = useNavigate();
-
   const handleStartDateChange = (date) => {
     setStartDate(date);
   };

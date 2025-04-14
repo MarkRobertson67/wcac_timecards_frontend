@@ -2,23 +2,30 @@
 Copyright (c) 2025 Mark Robertson
 See LICENSE.txt file for details. */
 
-/* ReportPage.module.css */
-
-.pageContainer {
-  max-width: 1200px;
-  margin: 0 auto 120px;
-  padding: 0px 10px 80px;
+/* Ensure the page container can scroll vertically */
+.reportpageContainer {
+  max-width: 1200px;  /* Ensure this width is large enough for the content */
+  margin: 0 auto;
+  padding: 20px;
   background-color: white;
   border-radius: 8px;
+  overflow-y: auto;
+  height: calc(100vh - 160px);
 }
+
 .reportTableContainer {
-  max-width: 1500px;
-  margin: 0 auto 20px;
-  padding: 170px;
+  width: 100%;
+  max-height: 500px;
+  margin: 0 auto;
+  overflow-x: auto;
+  overflow-y: auto;
+  display: block;
 }
 
 .table {
-  width: 1000px;
+  width: 100%;
+  min-width: 1200px;
+  
   margin: 0 auto;
 }
 
@@ -37,61 +44,36 @@ See LICENSE.txt file for details. */
   background-color: #f2f2f2;
 }
 
-/* Mobile Responsiveness */
+/* Mobile responsiveness */
 @media (max-width: 768px) {
-  .tcrPage {
-    padding: 10px;
-  }
-
   .reportTableContainer {
-    max-width: 100%;
-    padding: 0 60px;
+    padding: 0 10px;  /* Add some padding for mobile */
   }
 
   .table {
-    width: 100%;
-    font-size: 0.47rem;
+    width: 100%;  /* Ensure the table takes full width on smaller screens */
+    font-size: 0.75rem;  /* Adjust font size for mobile */
+    word-wrap: break-word;  /* Ensure text in cells is wrapped */
   }
 
   .table th,
   .table td {
     padding: 8px;
   }
-
-  .table th {
-    font-size: 0.7rem;
-  }
-
-  .table td {
-    font-size: 0.7rem;
-  }
-
-  button {
-    width: 50%;
-    margin: 10px 0;
-  }
 }
 
-/* Mobile Responsiveness for max-width 375px */
+/* Mobile responsiveness for very small screens */
 @media (max-width: 375px) {
-  .pageContainer {
-    padding: 0px 10px 80px;
-    width: 100%;
-    overflow-x: auto;
-  }
-
   .reportTableContainer {
-    margin-top: 10px;
     max-width: 100%;
-    padding: 0 50px; 
+    padding: 0 10px;
+    margin-top: 10px;
   }
 
   .table {
-    width: 80%;
-    max-width: 100%;
-    font-size: 0.55rem;
+    width: 100%;
+    font-size: 0.35rem;
     table-layout: fixed;
-    overflow-x: auto;
   }
 
   .table th,
@@ -99,18 +81,5 @@ See LICENSE.txt file for details. */
     padding: 5px;
     word-wrap: break-word;
     white-space: normal;
-  }
-
-  .table th {
-    font-size: 0.55rem;
-  }
-
-  .table td {
-    font-size: 0.55rem;
-  }
-
-  button {
-    width: 100%;
-    margin: 8px 0;
   }
 }

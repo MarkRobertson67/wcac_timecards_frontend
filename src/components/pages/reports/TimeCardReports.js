@@ -523,9 +523,7 @@ function TimeCardReports() {
               onChange={handleChange}
             >
               <option value="totalHours">Total Hours Worked by Employee</option>
-              <option value="detailedTimecards">
-                Detailed Timecards by Employee
-              </option>
+              <option value="detailedTimecards">Detailed Timecards by Employee</option>
               <option value="employeeSummary">Employee Summary Report</option>
             </select>
           </div>
