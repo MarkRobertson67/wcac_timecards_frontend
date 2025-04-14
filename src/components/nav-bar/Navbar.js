@@ -16,7 +16,7 @@ function NavBar({ isNewTimeCardCreated }) {
 
   return (
     <nav
-      className="navbar navbar-expand-lg navbar-dark bg-primary"
+      className="navbar fixed-top navbar-expand-lg navbar-dark bg-primary"
       style={{ minHeight: "50px" }}
     >
       <div

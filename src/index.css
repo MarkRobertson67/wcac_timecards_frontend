@@ -1,11 +1,16 @@
 /* Proprietary Software License
-   Copyright (c) 2024 Mark Robertson
+   Copyright (c) 2025 Mark Robertson
    See LICENSE.txt file for details. */
 
-
+   #root {
+    padding-top: 56px;   /* height of your navbar */
+    padding-bottom: 60px;/* height of your footer */
+    box-sizing: border-box;
+  }
 
 body {
   margin: 0;
+  overflow: hidden;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
