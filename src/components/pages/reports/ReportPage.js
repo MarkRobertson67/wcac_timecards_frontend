@@ -477,18 +477,18 @@ const calculateTotalsForDetailedTimecards = () => {
                 <td>
                   {record.facility_total_hours &&
                   typeof record.facility_total_hours === "object"
-                    ? `${record.facility_total_hours.hours || 0} hours ${
+                    ? `${record.facility_total_hours.hours || 0} h ${
                         record.facility_total_hours.minutes || 0
-                      } minutes`
-                    : "0 Hours 0 Minutes"}
+                      } min`
+                    : "0 H 0 Min"}
                 </td>
                 <td>
                   {record.driving_total_hours &&
                   typeof record.driving_total_hours === "object"
-                    ? `${record.driving_total_hours.hours || 0} hours ${
+                    ? `${record.driving_total_hours.hours || 0} h ${
                         record.driving_total_hours.minutes || 0
-                      } minutes`
-                    : "0 Hours 0 Minutes"}
+                      } min`
+                    : "0 H 0 Min"}
                 </td>
               </tr>
             ))}
@@ -498,12 +498,12 @@ const calculateTotalsForDetailedTimecards = () => {
               </td>
               <td>
                 <strong>
-                  {facilityTotalHours} hours {facilityTotalMinutes} minutes
+                  {facilityTotalHours} h {facilityTotalMinutes} min
                 </strong>
               </td>
               <td>
                 <strong>
-                  {drivingTotalHours} hours {drivingTotalMinutes} minutes
+                  {drivingTotalHours} h {drivingTotalMinutes} min
                 </strong>
               </td>
             </tr>
@@ -664,12 +664,12 @@ const renderEmployeeSummary = () => {
                       </td>
                       <td>
                         {record.facility_total_hours
-                          ? `${record.facility_total_hours.hours} hours ${record.facility_total_hours.minutes} minutes`
+                          ? `${record.facility_total_hours.hours} h ${record.facility_total_hours.minutes} min`
                           : "0 hours 0 minutes"}
                       </td>
                       <td>
                         {record.driving_total_hours
-                          ? `${record.driving_total_hours.hours} hours ${record.driving_total_hours.minutes} minutes`
+                          ? `${record.driving_total_hours.hours} h ${record.driving_total_hours.minutes} min`
                           : "0 hours 0 minutes"}
                       </td>
                       <td>{record.days_worked}</td>
@@ -683,14 +683,14 @@ const renderEmployeeSummary = () => {
                     </td>
                     <td>
                       <strong>
-                        {employeeTotals.facility.hours} hours{ "  " }
-                        {employeeTotals.facility.minutes} minutes
+                        {employeeTotals.facility.hours} h{ "  " }
+                        {employeeTotals.facility.minutes} min
                       </strong>
                     </td>
                     <td>
                       <strong>
-                        {employeeTotals.driving.hours} hours{ "  " }
-                        {employeeTotals.driving.minutes} minutes
+                        {employeeTotals.driving.hours} h{ "  " }
+                        {employeeTotals.driving.minutes} min
                       </strong>
                     </td>
                     <td>
@@ -808,12 +808,12 @@ const renderEmployeeSummary = () => {
                 </td>
                 <td>
                   {record.facility_total_hours
-                    ? `${record.facility_total_hours.hours} hours ${record.facility_total_hours.minutes} minutes`
+                    ? `${record.facility_total_hours.hours} h ${record.facility_total_hours.minutes} min`
                     : "0 hours 0 minutes"}
                 </td>
                 <td>
                   {record.driving_total_hours
-                    ? `${record.driving_total_hours.hours} hours ${record.driving_total_hours.minutes} minutes`
+                    ? `${record.driving_total_hours.hours} h ${record.driving_total_hours.minutes} min`
                     : "0 hours 0 minutes"}
                 </td>
                 <td>{record.days_worked}</td>
@@ -827,14 +827,14 @@ const renderEmployeeSummary = () => {
               </td>
               <td>
                 <strong>
-                  {overallTotalsForSingle.facility.hours} hours{" "}
-                  {overallTotalsForSingle.facility.minutes} minutes
+                  {overallTotalsForSingle.facility.hours} h{" "}
+                  {overallTotalsForSingle.facility.minutes} min
                 </strong>
               </td>
               <td>
                 <strong>
-                  {overallTotalsForSingle.driving.hours} hours{" "}
-                  {overallTotalsForSingle.driving.minutes} minutes
+                  {overallTotalsForSingle.driving.hours} h{" "}
+                  {overallTotalsForSingle.driving.minutes} min
                 </strong>
               </td>
               <td>

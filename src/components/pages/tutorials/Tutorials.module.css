@@ -1,11 +1,10 @@
 /* Proprietary Software License
-Copyright (c) 2024 Mark Robertson
+Copyright (c) 202 Mark Robertson
 See LICENSE.txt file for details. */
 
 /* Styling for the AboutComponent page */
 .acPage {
-    overflow: auto; /* Allow scrolling */
-    min-height: 100vh; /* Ensure it takes full height of the screen */
+    min-height: calc(100vh - 70px - 50px);
     background: linear-gradient(135deg, #d3d8dd, #3c4650); /* Gradient background */
     padding: 20px;
     font-family: 'Arial', sans-serif;

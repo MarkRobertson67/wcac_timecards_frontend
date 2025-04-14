@@ -56,7 +56,14 @@ input:disabled, select:disabled {
 
 /* Media Queries for responsiveness */
 @media (max-width: 768px) {
+
+  html, body {
+    overflow: hidden;
+  }
+
   .container {
+    max-height: calc(100vh - 120px);
+    overflow-y: hidden;
     padding: 10px;
   }
 
