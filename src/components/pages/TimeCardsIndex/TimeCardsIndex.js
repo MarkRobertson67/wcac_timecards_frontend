@@ -168,7 +168,15 @@ function TimeCardsIndex() {
   });
 
   return (
-    <div className={styles.container}>
+    <div
+      className={styles.container}
+      style={{
+        width: "100%",
+        maxHeight: isMobile ? "calc(100vh - 150px)" : "100%",
+        overflowY: isMobile ? "auto" : "hidden", // Scrollable for mobile, hidden for desktop
+        paddingBottom: isMobile ? "100px" : "0px", // Extra space at the bottom for mobile
+      }}
+    >
       <h2>
         Total Hours Worked Each Day<br></br> For{" "}
         {employee ? `${employee.first_name} ${employee.last_name}` : "..."}
