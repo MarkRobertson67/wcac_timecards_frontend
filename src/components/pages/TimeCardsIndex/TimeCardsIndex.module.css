@@ -12,7 +12,7 @@ See LICENSE.txt file for details. */
 }
 
 .container {
-  margin-top: 40px;
+  margin-top: 60px;
   min-height: calc(100vh - 70px - 50px);
   overflow-y: hidden;
 }
@@ -98,9 +98,9 @@ body, html {
 
 /* FullCalendar styling */
 .fc {
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
+  height: 50vh; /* Make the calendar take up 50% of the screen height on mobile */
+    max-height: 50vh; /* Optional: limit the height for mobile devices */
+    overflow-y: auto; /* Allow scrolling if the content exceeds the height */
 }
 
 /* Adjusting the height of the calendar cells */
@@ -145,12 +145,6 @@ body, html {
 @media (max-width: 600px) {
   .container {
     padding: 5px;
-  }
-}
-
-/* Media query for mobile devices */
-@media (max-width: 600px) {
-  .container {
-    padding-bottom: 100px; /* Increase padding-bottom only for screens narrower than 600px */
+    padding-bottom: 300px;
   }
 }
