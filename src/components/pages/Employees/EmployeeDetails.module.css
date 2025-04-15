@@ -5,6 +5,7 @@
    
 /* EmployeeDetails.module.css */
 
+/* Main Page Style */
 .edPage {
   background: linear-gradient(135deg, #d3d8dd, #3c4650); /* Gradient background */
   padding: 20px;
@@ -12,8 +13,8 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  height: 100vh; 
-  overflow: hidden;
+  height: 100vh; /* Ensure it takes full height */
+  overflow: hidden; /* Prevent scrolling on desktop */
 }
 
 /* Container Styles */
@@ -22,8 +23,9 @@
   margin: 0 auto;
   padding: 1.5rem;
   flex-grow: 1;
-  overflow-y: auto;
-  height: calc(100vh - 120px);
+  overflow-y: auto; /* Allow scrolling in the container */
+  max-height: calc(100vh - 60px); /* Ensure content fits in mobile screens */
+  position: relative; /* Allow scroll within the container */
 }
 
 /* Title */
@@ -95,10 +97,11 @@ h2 {
 
 /* Responsive Styles */
 @media (max-width: 600px) {
+  /* Ensure the content container scrolls */
   .container {
     padding: 1rem;
     overflow-y: auto; /* Allow scrolling on mobile */
-    max-height: calc(100vh - 120px); /* Ensure the content takes up available space */
+    max-height: calc(100vh - 100px); /* Ensure content takes up available space */
   }
 
   h2 {
@@ -122,12 +125,17 @@ h2 {
     font-size: 0.85rem;
   }
 
-  /* Make sure the footer area is correctly adjusted for mobile */
+  /* Adjust the footer area for mobile */
   .edPage {
     display: flex;
     flex-direction: column;
     height: auto; /* Allow height to adjust with content */
     overflow: visible;
+  }
 
+  /* Make sure the card body is scrollable if content exceeds */
+  .card-body {
+    height: 100%; /* Allow it to fill the remaining height */
+    overflow-y: auto; /* Allow vertical scrolling */
   }
 }
