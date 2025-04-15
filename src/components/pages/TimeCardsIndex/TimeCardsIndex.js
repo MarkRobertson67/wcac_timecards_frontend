@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction"; // Needed for dateClick
-import styles from './TimeCardsIndex.module.css';
+import styles from "./TimeCardsIndex.module.css";
 import { auth } from "../../../firebase/firebaseConfig";
 
 const API = process.env.REACT_APP_API_URL;
@@ -18,8 +18,19 @@ function TimeCardsIndex() {
   const [employeeId, setEmployeeId] = useState(null);
   const [isEmployeeLoading, setIsEmployeeLoading] = useState(true);
   const [isTimecardsLoading, setIsTimecardsLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768); // Track screen size
 
   const navigate = useNavigate();
+
+  // Track screen size for responsiveness
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     const fetchEmployeeId = async () => {
@@ -55,7 +66,6 @@ function TimeCardsIndex() {
         setIsEmployeeLoading(true);
         const employeeResponse = await fetch(`${API}/employees/${employeeId}`);
         const employeeData = await employeeResponse.json();
-        console.log("Fetched employee data:", employeeData);
         setEmployee(employeeData.data);
       } catch (error) {
         console.error("Error fetching employee data:", error);
@@ -71,7 +81,6 @@ function TimeCardsIndex() {
           `${API}/timecards/employee/${employeeId}`
         );
         const timecardsData = await timecardsResponse.json();
-        console.log("Fetched timecards data:", timecardsData);
         setTimeEntries(timecardsData.data);
       } catch (error) {
         console.error("Error fetching timecards data:", error);
@@ -86,32 +95,18 @@ function TimeCardsIndex() {
 
   const isLoading = isEmployeeLoading || isTimecardsLoading;
 
-  // const isMobile = () => {
-  //   return window.innerWidth <= 768; // You can adjust the breakpoint as per your requirements
-  // };
-
   const formatTotalTime = (interval) => {
     if (!interval) {
-      return "0h 0m"; // Default for both mobile and desktop
+      return "0h 0m";
     }
-  
+
     const { hours, minutes } = interval;
-  
-    // Use the same format for both mobile and desktop
-    return `${hours || 0}h ${minutes || 0}m`; // Always return "5h 30m" or "5h 0m"
-  };
-  
-
-  const adjustTodayDate = (hoursToSubtract) => {
-    const adjustedDate = new Date();
-    adjustedDate.setHours(adjustedDate.getHours() - hoursToSubtract); // Subtract 4 hours
-    return adjustedDate.toISOString(); // Return in ISO string format
+    return `${hours || 0}h ${minutes || 0}m`;
   };
 
-  
   const handleDateClick = (info) => {
     navigate(`/timeCardIndexDetails/${info.dateStr}`, {
-      state: { employeeId }, // Pass employeeId
+      state: { employeeId },
     });
   };
 
@@ -132,19 +127,16 @@ function TimeCardsIndex() {
   };
 
   const events = timeEntries.flatMap((entry) => {
-    // Create a Date object from work_date
-    const workDate = new Date(entry.work_date); // This should already be in UTC
-    console.log("Processing workDate:", workDate); // Log the processed workDate
-
-    const eventStart = workDate.toISOString(); // Convert to ISO string for UTC
-    console.log("Event Start:", eventStart); // Log the event start time
+    const workDate = new Date(entry.work_date);
+    const eventStart = workDate.toISOString();
 
     const eventsForDay = [];
 
     // Facility work event
     if (
       entry.facility_total_hours &&
-      (entry.facility_total_hours.hours >= 0 || entry.facility_total_hours.minutes >= 0) // Check for valid hours or minutes
+      (entry.facility_total_hours.hours >= 0 ||
+        entry.facility_total_hours.minutes >= 0)
     ) {
       eventsForDay.push({
         title: "Facility Work",
@@ -159,7 +151,8 @@ function TimeCardsIndex() {
     // Driving work event
     if (
       entry.driving_total_hours &&
-      (entry.driving_total_hours.hours >= 0 || entry.driving_total_hours.minutes >= 0) // Check for valid hours or minutes
+      (entry.driving_total_hours.hours >= 0 ||
+        entry.driving_total_hours.minutes >= 0)
     ) {
       eventsForDay.push({
         title: "Driving Work",
@@ -173,9 +166,6 @@ function TimeCardsIndex() {
 
     return eventsForDay;
   });
-
-  console.log("Generated events:", events); // Log the generated events
-
 
   return (
     <div className={styles.container}>
@@ -194,43 +184,35 @@ function TimeCardsIndex() {
           timeZone="UTC"
           plugins={[dayGridPlugin, interactionPlugin]}
           initialView="dayGridMonth"
-          initialDate={new Date(Date.UTC(
-            new Date().getUTCFullYear(),
-            new Date().getUTCMonth(),
-            new Date().getUTCDate()
-          )).toISOString()} // Force UTC for the calendar's initial date
-          now={new Date().toISOString()} // Set FullCalendar's "now" to UTC date and time
+          initialDate={new Date(
+            Date.UTC(
+              new Date().getUTCFullYear(),
+              new Date().getUTCMonth(),
+              new Date().getUTCDate()
+            )
+          ).toISOString()}
+          now={new Date().toISOString()}
           headerToolbar={{
-            left: "prev,next today",
+            left: isMobile ? "prev,next" : "prev,next today", // Hide 'today' button on mobile
             center: "title",
             right: "dayGridMonth,dayGridDay",
           }}
           events={events}
           eventContent={renderEventContent}
           eventTimeFormat={{
-            hour: '2-digit',
-            minute: '2-digit',
+            hour: "2-digit",
+            minute: "2-digit",
             hour12: false,
             timeZone: "UTC",
           }}
           dateClick={handleDateClick}
-  height="auto"
-  buttonText={{
-    today: 'Today' // Override button label to ensure it's correctly displayed
-  }}
-  // Adjust 'today' button functionality
-  customButtons={{
-    today: {
-      text: 'Today',
-      click: function() {
-        // Use the adjusted "today" date
-        const todayDate = adjustTodayDate(4); // Subtract 4 hours for the "today" button
-        this.gotoDate(todayDate); // Go to the adjusted "today" date
-      }
-    }
-  }}
+          height="auto"
+          style={{
+            maxHeight: isMobile ? "calc(100vh - 180px)" : "100%", // Adjust for mobile screens
+            overflowY: isMobile ? "auto" : "hidden", // Allow scrolling on mobile only
+            paddingBottom: isMobile ? "80px" : "0px", // Add extra space on mobile
+          }}
         />
-
       )}
       <div style={{ display: "flex", justifyContent: "center", gap: "20px" }}>
         <span>Key:</span>
