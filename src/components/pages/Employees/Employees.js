@@ -7,9 +7,8 @@
    import { Table, Button, Spinner } from "react-bootstrap";
    import { auth } from "../../../firebase/firebaseConfig";
    import styles from "./Employees.module.css";
-   import { act } from 'react';
-
    
+
    const API = process.env.REACT_APP_API_URL;
    
    function Employees() {
