@@ -26,7 +26,7 @@
 
 ## Introduction
 
-The WCAC Timecards App is a web-based solution designed to streamline timecard management and tracking for employees at We Care Adult Care, Inc. Employees can register and authenticate using Firebase, enabling them to create, view, and generate reports for their own timecards over any chosen time period. Meanwhile, administrators have the ability to access detailed reports for individual employees or the entire workforce, review aggregate data, and manage employee profiles. This application significantly reduces the time needed to verify employee hours. At the end of the designated two-week cycle, employees submit their timecards, which locks the data and prompts the start of a new cycle. 
+The WCAC Timecards App is a web-based solution designed to streamline timecard management and tracking for employees, tailored specifically for We Care Adult Care, Inc. Employees can register and authenticate using Firebase, enabling them to create, view, and generate reports for their own timecards over any chosen time period. Meanwhile, administrators have the ability to access detailed reports for individual employees or the entire workforce, review aggregate data, and manage employee profiles. This application significantly reduces the time needed to verify employee hours. At the end of the designated two-week cycle, employees submit their timecards, which locks the data and prompts the start of a new, 2-week, cycle. 
 
 ## Features
 
@@ -35,7 +35,7 @@ The WCAC Timecards App is a web-based solution designed to streamline timecard m
 - **Timecard Management:** Create, view, and manage daily timecards.
 - **Detailed Reports:** Generate detailed and aggregated reports (by week, month, and year) for timecard entries.
 - **Responsive Design:** Optimized for both desktop and mobile viewing.
-- **CSV Export:** Save report data as CSV for further analysis.
+- **CSV Export:** Save report data as CSV for export to PayChex.
 - **Dynamic Footer & Navbar:** Consistent UI components that adjust responsively.
 - **Real-Time Updates:** Automatic email verification handling and profile completion prompts.
 
@@ -44,9 +44,8 @@ The WCAC Timecards App is a web-based solution designed to streamline timecard m
 | Dashboard Access                | ✔️       | ✔️            |
 | Timecard Management             | ✔️       | ✔️            |
 | Profile Editing                 | ✔️       | ✔️  Enhanced  |
-| Submit Timecard                 | ✔️       | ❌            |
+| Submit Timecard                 | ✔️       | ✔️            |
 | Manage Users                    | ❌       | ✔️            |
-| System Configuration            | ❌       | ✔️            |
 | Generate Reports                | ✔️       | ✔️  Enhanced  |
 | Integration with Third-Party Apps | ❌     | ✔️            |
 | Mobile Access                   | ✔️       | ✔️            |
