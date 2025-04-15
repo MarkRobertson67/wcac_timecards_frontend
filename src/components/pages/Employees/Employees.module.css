@@ -3,13 +3,16 @@
    See LICENSE.txt file for details. */
 
 
+/* EmployeeDetails.module.css */
+
 .ePage {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #d3d8dd, #3c4650);
+  min-height: 100vh; /* Ensure it takes full height of the screen */
+  background: linear-gradient(135deg, #d3d8dd, #3c4650); /* Gradient background */
   margin: 0;
   padding: 20px;
   font-family: 'Arial', sans-serif;
   box-sizing: border-box;
+  overflow: hidden; /* Prevent the page from scrolling */
 }
 
 h2 {
@@ -47,20 +50,23 @@ h2 {
   background-color: #e9e9e9;
 }
 
+/* Scrollable Table */
 .scrollableTable {
-  max-height: 700px;
-  overflow-y: auto;
+  max-height: 500px; /* Adjust this based on the screen size */
+  overflow-y: auto; /* Allow scrolling of the table content */
   border: 1px solid #ddd;
 }
 
-
-
+/* Ensure the page doesn't scroll on mobile devices */
 @media (max-width: 768px) {
 
+  .ePage {
+    overflow: hidden; /* Prevent page scrolling on mobile */
+  }
+
   .scrollableTable {
-    max-height: calc(100vh - 250px);
+    max-height: calc(100vh - 350px); /* Allow more space for mobile */
     overflow-y: auto;
-    border: 1px solid #ddd;
   }
 
   .table {
