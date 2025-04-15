@@ -14,7 +14,7 @@ import {
   Card,
 } from "react-bootstrap";
 import { auth } from "../../../firebase/firebaseConfig";
-import styles from "./EmployeeDetails.module.css"
+import styles from "./EmployeeDetails.module.css";
 
 const API = process.env.REACT_APP_API_URL;
 
@@ -65,15 +65,11 @@ function EmployeeDetails() {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-      // Prevent changing is_admin to false for the protected admin account
-  if (
-    name === "admin" &&
-    employee.id === 1 && // Check the protected admin account ID
-    value === "false"
-  ) {
-    alert("Admin privileges cannot be removed for this account.");
-    return;
-  }
+    // Prevent changing is_admin to false for the protected admin account
+    if (name === "is_admin" && employee.id === 1 && value === "false") {
+      alert("Admin privileges cannot be removed for this account.");
+      return;
+    }
 
     setEmployee((prevEmployee) => ({
       ...prevEmployee,
@@ -83,26 +79,29 @@ function EmployeeDetails() {
 
   const handleSave = async () => {
     try {
-      // Check if the protected admin account is being modified
+      // Prevent saving changes for the primary admin account (ID = 1)
       if (employee.id === 1 && employee.is_admin === false) {
-        alert("The primary admin account cannot have admin privileges removed.");
+        alert(
+          "The primary admin account cannot have admin privileges removed."
+        );
         return;
       }
-  
+
       // Confirm the save operation
       if (!window.confirm("Are you sure you want to save these changes?")) {
         return;
       }
-  
-      // Prepare data to update based on admin status
+
       const dataToUpdate = isAdmin
-        ? employee
+        ? employee // Admins can update everything
         : {
             first_name: employee.first_name,
             last_name: employee.last_name,
             phone: employee.phone,
-          };
-  
+            email: employee.email,
+          }; // Non-admins can only update non-sensitive info (name, phone)
+
+
       const response = await fetch(`${API}/employees/${id}`, {
         method: "PUT",
         headers: {
@@ -110,30 +109,24 @@ function EmployeeDetails() {
         },
         body: JSON.stringify(dataToUpdate),
       });
-  
+
       if (!response.ok) {
         throw new Error("Failed to update employee details");
       }
-  
+
       alert("Employee details updated successfully!");
     } catch (error) {
       console.error("Error updating employee details:", error);
       alert("Failed to update employee details.");
     }
   };
-  
 
   const handleDelete = async () => {
-      // Prevent deletion of the protected admin account
-  if (employee.id === 1) { // Protected admin account ID
-    alert("The primary admin account cannot be deleted.");
-    return;
-  }
-    if (
-      window.confirm(
-        "Are you sure you want to delete this employee? This action cannot be undone."
-      )
-    ) {
+    if (employee.id === 1) {
+      alert("The primary admin account cannot be deleted.");
+      return;
+    }
+    if (window.confirm("Are you sure you want to delete this employee?")) {
       try {
         const response = await fetch(`${API}/employees/${id}`, {
           method: "DELETE",
@@ -151,9 +144,8 @@ function EmployeeDetails() {
     }
   };
 
-  // Conditional rendering for buttons
-const isProtectedAdminAccount = employee?.id === 1;
-
+  // Check if the employee is the protected admin account (ID = 1)
+  const isProtectedAdminAccount = employee?.id === 1;
 
   if (isLoading) {
     return (
@@ -171,138 +163,143 @@ const isProtectedAdminAccount = employee?.id === 1;
 
   return (
     <div className={styles.edPage}>
-    <Container
-      className="mt-4 d-flex justify-content-center"
-      style={{ paddingBottom: "100px" }}
-    >
-      <Card
-        style={{
-          width: window.innerWidth < 600 ? "100%" : "800px",
-          padding: "15px",
-        }}
+      <Container
+        className="mt-4 d-flex justify-content-center"
+        style={{ paddingBottom: "100px" }}
       >
-        <Card.Body>
-          <h4 className="text-center mb-4">
-            Employee Details for {employee.first_name} {employee.last_name}
-          </h4>
-          <Form>
-            <Row className="mb-2">
-              <Col xs={12} md={6}>
-                <Form.Group controlId="first_name">
-                  <Form.Label className="small-text">First Name</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="first_name"
-                    value={employee.first_name}
-                    onChange={handleChange}
-                    size="sm"
-                    disabled={false}
-                  />
-                </Form.Group>
-              </Col>
-              <Col xs={12} md={6}>
-                <Form.Group controlId="last_name">
-                  <Form.Label className="small-text">Last Name</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="last_name"
-                    value={employee.last_name}
-                    onChange={handleChange}
-                    size="sm"
-                    disabled={false}
-                  />
-                </Form.Group>
-              </Col>
-            </Row>
-            <Row className="mb-2">
-              <Col xs={12} md={6}>
-                <Form.Group controlId="email">
-                  <Form.Label className="small-text">Email</Form.Label>
-                  <Form.Control
-                    type="email"
-                    name="email"
-                    value={employee.email}
-                    size="sm"
-                    disabled // Email cannot be changed
-                  />
-                </Form.Group>
-              </Col>
-              <Col xs={12} md={6}>
-                <Form.Group controlId="phone">
-                  <Form.Label className="small-text">Phone</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="phone"
-                    value={employee.phone || ""}
-                    onChange={handleChange}
-                    size="sm"
-                  />
-                </Form.Group>
-              </Col>
-            </Row>
-            {isAdmin && (
-              <>
-                <Row className="mb-2">
-                  <Col xs={12} md={6}>
-                    <Form.Group controlId="firebase_uid">
-                      <Form.Label className="small-text">
-                        Firebase UID
-                      </Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="firebase_uid"
-                        value={employee.firebase_uid}
-                        size="sm"
-                        disabled // Firebase UID should not be editable
-                      />
-                    </Form.Group>
-                  </Col>
-                  <Col xs={12} md={6}>
-                    <Form.Group controlId="paychex_id">
-                      <Form.Label className="small-text">Paychex ID</Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="paychex_id"
-                        value={employee.paychex_id || ""}
-                        onChange={handleChange}
-                        size="sm"
-                      />
-                    </Form.Group>
-                  </Col>
-                </Row>
-                <Row className="mb-2">
-                  <Col xs={12} md={6}>
-                    <Form.Group controlId="position">
-                      <Form.Label className="small-text">Position</Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="position"
-                        value={employee.position || ""}
-                        onChange={handleChange}
-                        size="sm"
-                      />
-                    </Form.Group>
-                  </Col>
-                  <Col xs={12} md={6}>
-                    <Form.Group controlId="is_admin">
-                      <Form.Label className="small-text">
-                        Admin Privileges
-                      </Form.Label>
-                      <Form.Select
-                        name="is_admin"
-                        value={employee.is_admin ? "true" : "false"}
-                        onChange={handleChange}
-                        size="sm"
-                      >
-                        <option value="false">No</option>
-                        <option value="true">Yes</option>
-                      </Form.Select>
-                    </Form.Group>
-                  </Col>
-                </Row>
+        <Card
+          style={{
+            width: window.innerWidth < 600 ? "100%" : "800px",
+            padding: "15px",
+          }}
+        >
+          <Card.Body>
+            <h4 className="text-center mb-4">
+              Employee Details for {employee.first_name} {employee.last_name}
+            </h4>
+            <Form>
+              <Row className="mb-2">
                 <Col xs={12} md={6}>
+                  <Form.Group controlId="first_name">
+                    <Form.Label className="small-text">First Name</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="first_name"
+                      value={employee.first_name}
+                      onChange={handleChange}
+                      size="sm"
+                      disabled={isProtectedAdminAccount} // Disable for admin account
+                    />
+                  </Form.Group>
+                </Col>
+                <Col xs={12} md={6}>
+                  <Form.Group controlId="last_name">
+                    <Form.Label className="small-text">Last Name</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="last_name"
+                      value={employee.last_name}
+                      onChange={handleChange}
+                      size="sm"
+                      disabled={isProtectedAdminAccount} // Disable for admin account
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+              <Row className="mb-2">
+                <Col xs={12} md={6}>
+                  <Form.Group controlId="email">
+                    <Form.Label className="small-text">Email</Form.Label>
+                    <Form.Control
+                      type="email"
+                      name="email"
+                      value={employee.email}
+                      size="sm"
+                      disabled // Email cannot be changed
+                    />
+                  </Form.Group>
+                </Col>
+                <Col xs={12} md={6}>
+                  <Form.Group controlId="phone">
+                    <Form.Label className="small-text">Phone</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="phone"
+                      value={employee.phone || ""}
+                      onChange={handleChange}
+                      size="sm"
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+              {isAdmin && (
+                <>
+                  <Row className="mb-2">
+                    <Col xs={12} md={6}>
+                      <Form.Group controlId="firebase_uid">
+                        <Form.Label className="small-text">
+                          Firebase UID
+                        </Form.Label>
+                        <Form.Control
+                          type="text"
+                          name="firebase_uid"
+                          value={employee.firebase_uid}
+                          size="sm"
+                          disabled // Firebase UID should not be editable
+                        />
+                      </Form.Group>
+                    </Col>
+                    <Col xs={12} md={6}>
+                      <Form.Group controlId="paychex_id">
+                        <Form.Label className="small-text">
+                          Paychex ID
+                        </Form.Label>
+                        <Form.Control
+                          type="text"
+                          name="paychex_id"
+                          value={employee.paychex_id || ""}
+                          onChange={handleChange}
+                          size="sm"
+                        />
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  <Row className="mb-2">
+                    <Col xs={12} md={6}>
+                      <Form.Group controlId="position">
+                        <Form.Label className="small-text">Position</Form.Label>
+                        <Form.Control
+                          type="text"
+                          name="position"
+                          value={employee.position || ""}
+                          onChange={handleChange}
+                          size="sm"
+                        />
+                      </Form.Group>
+                    </Col>
+                    <Col xs={12} md={6}>
+                      <Form.Group controlId="is_admin">
+                        <Form.Label className="small-text">
+                          Admin Privileges
+                        </Form.Label>
+                        <Form.Select
+                          name="is_admin"
+                          value={employee.is_admin ? "true" : "false"}
+                          onChange={handleChange}
+                          size="sm"
+                          disabled={isProtectedAdminAccount} // Disable admin modification for protected account
+                        >
+                          <option value="false">No</option>
+                          <option value="true">Yes</option>
+                        </Form.Select>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  <Col xs={12} md={6}>
                     <Form.Group controlId="employee_id">
-                      <Form.Label className="small-text">Employee ID</Form.Label>
+                      <Form.Label className="small-text">
+                        Employee ID
+                      </Form.Label>
                       <Form.Control
                         type="text"
                         name="employee_id"
@@ -312,42 +309,40 @@ const isProtectedAdminAccount = employee?.id === 1;
                       />
                     </Form.Group>
                   </Col>
-              </>
-            )}
-          </Form>
-          <div className="text-center mt-3">
-            <Button
-              variant="primary"
-              size="sm"
-              className="mx-1"
-              onClick={handleSave}
-              disabled={isProtectedAdminAccount} // Disable Save button for admin account
-            >
-              Save Changes
-            </Button>
-            {isAdmin && (
+                </>
+              )}
+            </Form>
+            <div className="text-center mt-3">
               <Button
-                variant="danger"
+                variant="primary"
                 size="sm"
                 className="mx-1"
-                onClick={handleDelete}
-                disabled={isProtectedAdminAccount} // Disable Delete button for admin account
+                onClick={handleSave} // Now Save button should work for admin
               >
-                Delete Employee
+                Save Changes
               </Button>
-            )}
-            <Button
-              variant="dark"
-              size="sm"
-              className="mx-1"
-              onClick={() => navigate(-1)}
-            >
-              Back
-            </Button>
-          </div>
-        </Card.Body>
-      </Card>
-    </Container>
+              {isAdmin && (
+                <Button
+                  variant="danger"
+                  size="sm"
+                  className="mx-1"
+                  onClick={handleDelete} // Now Delete button should work for admin
+                >
+                  Delete Employee
+                </Button>
+              )}
+              <Button
+                variant="dark"
+                size="sm"
+                className="mx-1"
+                onClick={() => navigate(-1)}
+              >
+                Back
+              </Button>
+            </div>
+          </Card.Body>
+        </Card>
+      </Container>
     </div>
   );
 }

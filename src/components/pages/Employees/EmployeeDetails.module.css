@@ -6,11 +6,14 @@
 /* EmployeeDetails.module.css */
 
 .edPage {
-  min-height: 80vh; /* Ensure it takes full height of the screen */
   background: linear-gradient(135deg, #d3d8dd, #3c4650); /* Gradient background */
   padding: 20px;
   font-family: 'Arial', sans-serif;
-  box-sizing: border-box; /* Include padding in the element's total width and height */
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 100vh; 
+  overflow: hidden;
 }
 
 /* Container Styles */
@@ -18,9 +21,12 @@
   max-width: 800px;
   margin: 0 auto;
   padding: 1.5rem;
-  padding-bottom: 150px;
+  flex-grow: 1;
+  overflow-y: auto;
+  height: calc(100vh - 120px);
 }
 
+/* Title */
 h2 {
   font-size: 2rem;
   text-align: center;
@@ -91,6 +97,8 @@ h2 {
 @media (max-width: 600px) {
   .container {
     padding: 1rem;
+    overflow-y: auto; /* Allow scrolling on mobile */
+    max-height: calc(100vh - 120px); /* Ensure the content takes up available space */
   }
 
   h2 {
@@ -113,6 +121,13 @@ h2 {
     padding: 0.6rem 1.2rem;
     font-size: 0.85rem;
   }
-}
 
-  
+  /* Make sure the footer area is correctly adjusted for mobile */
+  .edPage {
+    display: flex;
+    flex-direction: column;
+    height: auto; /* Allow height to adjust with content */
+    overflow: visible;
+
+  }
+}
