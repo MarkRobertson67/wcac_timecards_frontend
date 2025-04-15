@@ -302,7 +302,7 @@ const calculateTotalsForDetailedTimecards = () => {
           </button>
         </div>
         <table className={`table table-striped table-bordered text-center ${styles.table}`}
-        style={{ width: "1200px" }}
+        
 >
           <thead>
             <tr>
@@ -456,7 +456,7 @@ const calculateTotalsForDetailedTimecards = () => {
           </button>
         </div>
         <div className={styles.reportTableContainer}
-        style={{ marginTop: "-100px" }}
+        style={{ marginTop: "30px" }}
         >
         <table className="table table-striped table-bordered text-center">
           <thead>
