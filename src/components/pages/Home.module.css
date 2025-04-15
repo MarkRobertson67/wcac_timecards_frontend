@@ -1,20 +1,19 @@
 /* Proprietary Software License
-Copyright (c) 2024 Mark Robertson
+Copyright (c) 2025 Mark Robertson
 See LICENSE.txt file for details. */
 
 /* Home.module.css */
 
 .hPage {
-    overflow: auto; /* Allow scrolling */
-    min-height: 90vh; /* Ensure it takes full height of the screen */
-    background: linear-gradient(135deg, #d3d8dd, #3c4650); /* Gradient background */
+    overflow: auto;
+    min-height: 90vh;
+    background: linear-gradient(135deg, #d3d8dd, #3c4650);
     padding: 20px;
     font-family: 'Arial', sans-serif;
-    padding-bottom: 120px; /* Space for the footer */
-    box-sizing: border-box; /* Include padding in the element's total width and height */
+    padding-bottom: 120px;
+    box-sizing: border-box;
   }
   
-  /* Optional: Adding some padding and margin styles for better content alignment */
 .hPage .container {
     margin-top: 20px;
     padding: 20px;

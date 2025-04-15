@@ -1,12 +1,12 @@
 // Proprietary Software License
-// Copyright (c) 2024 Mark Robertson
+// Copyright (c) 2025 Mark Robertson
 // See LICENSE.txt file for details.
 
 
-## Version 1.1 (2025-04-06)
+## Version 1.0.1 (2025-04-06)
 - Added animated bus
 
-## Version 1.1 (2025-04-04)
+## Version 1.0.0 (2025-04-04)
 - Completed
 
 ## Version 0.7.1 beta (2024-04-01)
