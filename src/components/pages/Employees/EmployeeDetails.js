@@ -171,9 +171,10 @@ function EmployeeDetails() {
           style={{
             width: window.innerWidth < 600 ? "100%" : "800px",
             padding: "15px",
+            overflowY: "auto",
           }}
         >
-          <Card.Body>
+          <Card.Body style={{ maxHeight: 'calc(100vh - 260px)', overflowY: 'auto' }}>
             <h4 className="text-center mb-4">
               Employee Details for {employee.first_name} {employee.last_name}
             </h4>
