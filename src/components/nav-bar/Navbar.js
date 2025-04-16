@@ -64,8 +64,8 @@ function NavBar({ isNewTimeCardCreated }) {
               display: "flex", // Make the button a flex container
               alignItems: "center", // Vertically center items
               justifyContent: "center", // Horizontally center items
-              border: "none", // Remove any default border if needed
-              background: "none", // Remove default background if needed
+              border: "none",
+              background: "none",
             }}
           >
             <span style={{ fontSize: "20px", color: "white" }}>
@@ -76,11 +76,9 @@ function NavBar({ isNewTimeCardCreated }) {
 
         {/* Collapsible menu */}
         <div
+          data-testid="navbar-collapse"
           className={`collapse navbar-collapse ${isMenuOpen ? "show" : ""}`}
           id="navbarNav"
-          // In Bootstrap 5, the toggler is typically hidden on larger screens
-          // and the nav is always shown. If you want the toggler to show on large
-          // screens as well, you can remove the .d-lg-none from the toggler above.
         >
           <ul className="navbar-nav ms-auto">
             <li
