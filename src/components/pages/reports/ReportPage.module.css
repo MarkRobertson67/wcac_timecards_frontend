@@ -44,6 +44,40 @@ See LICENSE.txt file for details. */
   background-color: #f2f2f2;
 }
 
+@media print {
+  /* Ensure everything is visible when printing */
+  body, html {
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  .print-hide {
+    display: none !important;
+  }
+
+  .table {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .pageContainer, .reportpageContainer {
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  /* Optional: Force tables to break cleanly between pages */
+  tr {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Remove margins or paddings that may interfere with layout */
+  @page {
+    margin: 1in;
+  }
+}
+
+
 /* Mobile responsiveness */
 @media (max-width: 768px) {
   .reportTableContainer {
