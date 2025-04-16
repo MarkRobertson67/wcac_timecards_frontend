@@ -3,6 +3,9 @@
 // See LICENSE.txt file for details.
 
 
+## Version 1.0.2 (2025-04-06)
+- Mobile responsive
+
 ## Version 1.0.1 (2025-04-06)
 - Added animated bus
 
