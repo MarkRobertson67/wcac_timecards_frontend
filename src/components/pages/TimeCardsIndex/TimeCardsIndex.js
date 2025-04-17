@@ -139,7 +139,7 @@ function TimeCardsIndex() {
         entry.facility_total_hours.minutes >= 0)
     ) {
       eventsForDay.push({
-        title: "Facility Work",
+        // title: "Facility Work",
         start: eventStart,
         end: eventStart,
         extendedProps: {
@@ -155,7 +155,7 @@ function TimeCardsIndex() {
         entry.driving_total_hours.minutes >= 0)
     ) {
       eventsForDay.push({
-        title: "Driving Work",
+        // title: "Driving Work",
         start: eventStart,
         end: eventStart,
         extendedProps: {
