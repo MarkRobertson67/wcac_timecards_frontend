@@ -17,8 +17,8 @@ See LICENSE.txt file for details. */
 
 /* Component-Specific Styles */
 .eventContent {
-  min-height: 100vh;
-  overflow-y: visible; 
+  /* min-height: 100vh;
+  overflow-y: visible;  */
   display: flex;
   justify-content: center;
   align-items: center; /* Ensure vertical centering */
