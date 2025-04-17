@@ -65,13 +65,11 @@ See LICENSE.txt file for details. */
     height: auto !important;
   }
 
-  /* Optional: Force tables to break cleanly between pages */
   tr {
     page-break-inside: avoid;
     break-inside: avoid;
   }
 
-  /* Remove margins or paddings that may interfere with layout */
   @page {
     margin: 1in;
   }
@@ -82,6 +80,7 @@ See LICENSE.txt file for details. */
 @media (max-width: 768px) {
   .reportTableContainer {
     padding: 0 10px;
+    margin-bottom: 40px;
   }
 
   .table {
@@ -104,6 +103,7 @@ See LICENSE.txt file for details. */
     max-width: 100%;
     padding: 0 10px;
     margin-top: 10px;
+    margin-bottom: 40px;
   }
 
   .table {
