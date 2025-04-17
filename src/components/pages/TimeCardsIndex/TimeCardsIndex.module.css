@@ -10,7 +10,7 @@ See LICENSE.txt file for details. */
 }
 
 .container {
-  margin-top: 20px;
+  margin-top: 10px;
   min-height: calc(100vh - 70px - 50px);
   overflow-y: hidden;
 }
@@ -141,6 +141,6 @@ body, html {
 @media (max-width: 600px) {
   .container {
     padding: 5px;
-    padding-bottom: 300px;
+    padding-bottom: 350px;
   }
 }

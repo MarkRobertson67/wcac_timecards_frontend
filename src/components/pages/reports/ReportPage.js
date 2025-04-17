@@ -302,6 +302,7 @@ const ReportPage = () => {
             justifyContent: "center",
             gap: "10px",
             flexWrap: "wrap",
+            paddingBottom: "40px"
           }}
           className="print-hide mb-4"
         >
@@ -898,14 +899,22 @@ const ReportPage = () => {
               </tr>
             </thead>
             <tbody>
-              {/* Render from `records`, which might be aggregated data */}
+              {/* Render from `records` */}
               {records.map((record, index) => (
                 <tr key={`${employeeId}-${index}`}>
-                  <td>
-                    {period === "weekly"
-                      ? formatPeriodRange(record.summary_period, "weekly")
-                      : formatPeriodRange(record.summary_period, period)}
-                  </td>
+                  <td
+  style={{
+    whiteSpace: "normal",
+    wordBreak: "break-word",
+    fontSize: "0.45rem", // smaller text
+    maxWidth: "140px",
+  }}
+>
+  {period === "weekly"
+    ? formatPeriodRange(record.summary_period, "weekly")
+    : formatPeriodRange(record.summary_period, period)}
+</td>
+
                   <td>
                     {record.facility_total_hours
                       ? `${record.facility_total_hours.hours} h ${record.facility_total_hours.minutes} min`
