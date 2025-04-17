@@ -171,8 +171,8 @@ function TimeCardsIndex() {
       style={{
         width: "100%",
         maxHeight: isMobile ? "calc(100vh - 150px)" : "100%",
-        overflowY: isMobile ? "auto" : "hidden", // Scrollable for mobile, hidden for desktop
-        paddingBottom: isMobile ? "100px" : "0px", // Extra space at the bottom for mobile
+        overflowY: isMobile ? "auto" : "hidden",
+        paddingBottom: isMobile ? "100px" : "0px",
       }}
     >
       <h2>
