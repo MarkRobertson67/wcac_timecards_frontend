@@ -80,7 +80,7 @@ See LICENSE.txt file for details. */
 @media (max-width: 768px) {
   .reportTableContainer {
     padding: 0 10px;
-    margin-bottom: 40px;
+    padding-bottom: 50px;
   }
 
   .table {
@@ -95,6 +95,17 @@ See LICENSE.txt file for details. */
     word-wrap: break-word;
     white-space: normal;
   }
+
+  .button-group {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .button-group button {
+    font-size: 0.85rem;
+    padding: 6px 10px;
+  }
+
 }
 
 /* For even smaller screens */
@@ -103,7 +114,7 @@ See LICENSE.txt file for details. */
     max-width: 100%;
     padding: 0 10px;
     margin-top: 10px;
-    margin-bottom: 40px;
+    padding-bottom: 50px;
   }
 
   .table {
@@ -117,4 +128,5 @@ See LICENSE.txt file for details. */
     word-wrap: break-word;
     white-space: normal;
   }
+  
 }
