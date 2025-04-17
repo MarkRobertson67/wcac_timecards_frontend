@@ -28,100 +28,110 @@ const ReportPage = () => {
   const [loading, setLoading] = useState(false);
   const [cachedData, setCachedData] = useState({}); // Cache data for periods
 
-
   // Helper function to calculate the overall totals for detailed timecards
-const calculateTotalsForDetailedTimecards = () => {
-  let totalFacilityMinutes = 0;
-  let totalDrivingMinutes = 0;
+  const calculateTotalsForDetailedTimecards = () => {
+    let totalFacilityMinutes = 0;
+    let totalDrivingMinutes = 0;
 
-  reportData.forEach((record) => {
-    if (record.facility_total_hours) {
-      totalFacilityMinutes +=
-        record.facility_total_hours.hours * 60 +
-        record.facility_total_hours.minutes;
-    }
-    if (record.driving_total_hours) {
-      totalDrivingMinutes +=
-        record.driving_total_hours.hours * 60 +
-        record.driving_total_hours.minutes;
-    }
-  });
+    reportData.forEach((record) => {
+      if (record.facility_total_hours) {
+        totalFacilityMinutes +=
+          record.facility_total_hours.hours * 60 +
+          record.facility_total_hours.minutes;
+      }
+      if (record.driving_total_hours) {
+        totalDrivingMinutes +=
+          record.driving_total_hours.hours * 60 +
+          record.driving_total_hours.minutes;
+      }
+    });
 
-  const facilityHours = Math.floor(totalFacilityMinutes / 60);
-  const facilityMinutes = totalFacilityMinutes % 60;
-  const drivingHours = Math.floor(totalDrivingMinutes / 60);
-  const drivingMinutes = totalDrivingMinutes % 60;
+    const facilityHours = Math.floor(totalFacilityMinutes / 60);
+    const facilityMinutes = totalFacilityMinutes % 60;
+    const drivingHours = Math.floor(totalDrivingMinutes / 60);
+    const drivingMinutes = totalDrivingMinutes % 60;
 
-  return {
-    facility: { hours: facilityHours, minutes: facilityMinutes },
-    driving: { hours: drivingHours, minutes: drivingMinutes },
+    return {
+      facility: { hours: facilityHours, minutes: facilityMinutes },
+      driving: { hours: drivingHours, minutes: drivingMinutes },
+    };
   };
-};
 
+  // Helper function to format period based on weekly, monthly, or yearly
+  const formatPeriodRange = useCallback((summaryPeriod, period) => {
+    const startOfPeriod = new Date(summaryPeriod);
 
-    // Helper function to format period based on weekly, monthly, or yearly
-    const formatPeriodRange = useCallback((summaryPeriod, period) => {
-      const startOfPeriod = new Date(summaryPeriod);
-  
-      if (period === "weekly") {
-        const endOfPeriod = new Date(startOfPeriod);
-        endOfPeriod.setDate(startOfPeriod.getDate() + 6);
-        return `${formatDate(startOfPeriod)} - ${formatDate(endOfPeriod)}`;
-      }
-  
-      if (period === "monthly") {
-        return `${startOfPeriod.toLocaleString("default", {
-          month: "long",
-        })} ${startOfPeriod.getFullYear()}`;
-      }
-  
-      if (period === "yearly") {
-        return `${startOfPeriod.getUTCFullYear()}`;
-      }
-  
-      return formatDate(startOfPeriod); // Fallback if no valid period is provided
-    }, []);
+    if (period === "weekly") {
+      const endOfPeriod = new Date(startOfPeriod);
+      endOfPeriod.setDate(startOfPeriod.getDate() + 6);
+      return `${formatDate(startOfPeriod)} - ${formatDate(endOfPeriod)}`;
+    }
 
-  const aggregateDataByPeriod = useCallback((data, period) => {
-    const aggregation = {};
-    data.forEach((record) => {
-      // Use the preserved original date for grouping (if available) or fallback to summary_period
-      const originalDate = record.original_summary_period || record.summary_period;
-      const periodLabel = formatPeriodRange(originalDate, period);
-      if (!aggregation[periodLabel]) {
-        aggregation[periodLabel] = {
-          summary_period: periodLabel,
-          facility_total_hours: { hours: 0, minutes: 0 },
-          driving_total_hours: { hours: 0, minutes: 0 },
-          days_worked: 0,
-          absentee_days: 0,
-          employee_id: record.employee_id,
-          first_name: record.first_name,
-          last_name: record.last_name,
-        };
-      }
-      aggregation[periodLabel].facility_total_hours.hours += record.facility_total_hours.hours;
-      aggregation[periodLabel].facility_total_hours.minutes += record.facility_total_hours.minutes;
-      aggregation[periodLabel].driving_total_hours.hours += record.driving_total_hours.hours;
-      aggregation[periodLabel].driving_total_hours.minutes += record.driving_total_hours.minutes;
-      aggregation[periodLabel].days_worked += Number(record.days_worked) || 0;
-      aggregation[periodLabel].absentee_days += Number(record.absentee_days) || 0;
-    });
-  
-    // Normalize minutes into hours for each period
-    Object.values(aggregation).forEach((item) => {
-      const extraFacilityHours = Math.floor(item.facility_total_hours.minutes / 60);
-      item.facility_total_hours.hours += extraFacilityHours;
-      item.facility_total_hours.minutes %= 60;
-  
-      const extraDrivingHours = Math.floor(item.driving_total_hours.minutes / 60);
-      item.driving_total_hours.hours += extraDrivingHours;
-      item.driving_total_hours.minutes %= 60;
-    });
-  
-    return Object.values(aggregation);
-  }, [formatPeriodRange]);
-  
+    if (period === "monthly") {
+      return `${startOfPeriod.toLocaleString("default", {
+        month: "long",
+      })} ${startOfPeriod.getFullYear()}`;
+    }
+
+    if (period === "yearly") {
+      return `${startOfPeriod.getUTCFullYear()}`;
+    }
+
+    return formatDate(startOfPeriod); // Fallback if no valid period is provided
+  }, []);
+
+  const aggregateDataByPeriod = useCallback(
+    (data, period) => {
+      const aggregation = {};
+      data.forEach((record) => {
+        // Use the preserved original date for grouping (if available) or fallback to summary_period
+        const originalDate =
+          record.original_summary_period || record.summary_period;
+        const periodLabel = formatPeriodRange(originalDate, period);
+        if (!aggregation[periodLabel]) {
+          aggregation[periodLabel] = {
+            summary_period: periodLabel,
+            facility_total_hours: { hours: 0, minutes: 0 },
+            driving_total_hours: { hours: 0, minutes: 0 },
+            days_worked: 0,
+            absentee_days: 0,
+            employee_id: record.employee_id,
+            first_name: record.first_name,
+            last_name: record.last_name,
+          };
+        }
+        aggregation[periodLabel].facility_total_hours.hours +=
+          record.facility_total_hours.hours;
+        aggregation[periodLabel].facility_total_hours.minutes +=
+          record.facility_total_hours.minutes;
+        aggregation[periodLabel].driving_total_hours.hours +=
+          record.driving_total_hours.hours;
+        aggregation[periodLabel].driving_total_hours.minutes +=
+          record.driving_total_hours.minutes;
+        aggregation[periodLabel].days_worked += Number(record.days_worked) || 0;
+        aggregation[periodLabel].absentee_days +=
+          Number(record.absentee_days) || 0;
+      });
+
+      // Normalize minutes into hours for each period
+      Object.values(aggregation).forEach((item) => {
+        const extraFacilityHours = Math.floor(
+          item.facility_total_hours.minutes / 60
+        );
+        item.facility_total_hours.hours += extraFacilityHours;
+        item.facility_total_hours.minutes %= 60;
+
+        const extraDrivingHours = Math.floor(
+          item.driving_total_hours.minutes / 60
+        );
+        item.driving_total_hours.hours += extraDrivingHours;
+        item.driving_total_hours.minutes %= 60;
+      });
+
+      return Object.values(aggregation);
+    },
+    [formatPeriodRange]
+  );
 
   // Group the report data by employee_id
   const groupByEmployee = (reportData) => {
@@ -155,13 +165,11 @@ const calculateTotalsForDetailedTimecards = () => {
       console.log(`No cached data for period: ${newPeriod}`);
       // Simulate fetching data
       setTimeout(() => {
-        setReportData([]); // Clear the data or set a default
-        setLoading(false); // Stop loading after timeout
-      }, 500); // Simulate a quick load
+        setReportData([]);
+        setLoading(false);
+      }, 500);
     }
   };
-
-
 
   // Cache the initial data when the component mounts
   useEffect(() => {
@@ -247,7 +255,7 @@ const calculateTotalsForDetailedTimecards = () => {
         drivingHours,
       ]
         .map((field) => `"${field}"`)
-        .join(","); // Wrap each field in quotes
+        .join(",");
     });
 
     let rows = [
@@ -288,22 +296,40 @@ const calculateTotalsForDetailedTimecards = () => {
           <strong>Employee Name:</strong> {firstName || "N/A"}{" "}
           {lastName || "N/A"}
         </p>
-        <div className="text-center mb-4 print-hide">
-          <button className="btn btn-primary mx-2" onClick={handlePrint}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            gap: "10px",
+            flexWrap: "wrap",
+          }}
+          className="print-hide mb-4"
+        >
+          <button
+            className="btn btn-primary"
+            onClick={handlePrint}
+            style={{
+              flex: "1 0 120px", // min width 120px, will shrink/grow
+              maxWidth: "150px", // optional max
+            }}
+          >
             Print Report
           </button>
-          {reportType === "totalHours" && (
-            <button className="btn btn-secondary mx-2" onClick={handleSaveCSV}>
-              Save as CSV
-            </button>
-          )}
-          <button className="btn btn-dark mx-2" onClick={() => navigate(-1)}>
+          <button
+            className="btn btn-dark"
+            onClick={() => navigate(-1)}
+            style={{
+              flex: "1 0 120px",
+              maxWidth: "150px",
+            }}
+          >
             Back
           </button>
         </div>
-        <table className={`table table-striped table-bordered text-center ${styles.table}`}
-        
->
+
+        <table
+          className={`table table-striped table-bordered text-center ${styles.table}`}
+        >
           <thead>
             <tr>
               <th>Work Date</th>
@@ -311,7 +337,7 @@ const calculateTotalsForDetailedTimecards = () => {
               <th colSpan="5">Driving Activity</th>
             </tr>
             <tr>
-            <th style={{ width: "160px" }}></th>
+              <th style={{ width: "160px" }}></th>
               <th>Start Time</th>
               <th>Lunch Start</th>
               <th>Lunch End</th>
@@ -455,60 +481,61 @@ const calculateTotalsForDetailedTimecards = () => {
             Back
           </button>
         </div>
-        <div className={styles.reportTableContainer}
-        style={{ marginTop: "30px" }}
+        <div
+          className={styles.reportTableContainer}
+          style={{ marginTop: "30px" }}
         >
-        <table className="table table-striped table-bordered text-center">
-          <thead>
-            <tr>
-              <th>Employee ID</th>
-              <th>First Name</th>
-              <th>Last Name</th>
-              <th>Facility Total Hours</th>
-              <th>Driving Total Hours</th>
-            </tr>
-          </thead>
-          <tbody>
-            {reportData.map((record) => (
-              <tr key={record.employee_id}>
-                <td>{record.employee_id}</td>
-                <td>{record.first_name}</td>
-                <td>{record.last_name}</td>
-                <td>
-                  {record.facility_total_hours &&
-                  typeof record.facility_total_hours === "object"
-                    ? `${record.facility_total_hours.hours || 0} h ${
-                        record.facility_total_hours.minutes || 0
-                      } min`
-                    : "0 H 0 Min"}
+          <table className="table table-striped table-bordered text-center">
+            <thead>
+              <tr>
+                <th>Employee ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Facility Total Hours</th>
+                <th>Driving Total Hours</th>
+              </tr>
+            </thead>
+            <tbody>
+              {reportData.map((record) => (
+                <tr key={record.employee_id}>
+                  <td>{record.employee_id}</td>
+                  <td>{record.first_name}</td>
+                  <td>{record.last_name}</td>
+                  <td>
+                    {record.facility_total_hours &&
+                    typeof record.facility_total_hours === "object"
+                      ? `${record.facility_total_hours.hours || 0} h ${
+                          record.facility_total_hours.minutes || 0
+                        } min`
+                      : "0 H 0 Min"}
+                  </td>
+                  <td>
+                    {record.driving_total_hours &&
+                    typeof record.driving_total_hours === "object"
+                      ? `${record.driving_total_hours.hours || 0} h ${
+                          record.driving_total_hours.minutes || 0
+                        } min`
+                      : "0 H 0 Min"}
+                  </td>
+                </tr>
+              ))}
+              <tr>
+                <td colSpan="3" style={{ textAlign: "right" }}>
+                  <strong>Total</strong>
                 </td>
                 <td>
-                  {record.driving_total_hours &&
-                  typeof record.driving_total_hours === "object"
-                    ? `${record.driving_total_hours.hours || 0} h ${
-                        record.driving_total_hours.minutes || 0
-                      } min`
-                    : "0 H 0 Min"}
+                  <strong>
+                    {facilityTotalHours} h {facilityTotalMinutes} min
+                  </strong>
+                </td>
+                <td>
+                  <strong>
+                    {drivingTotalHours} h {drivingTotalMinutes} min
+                  </strong>
                 </td>
               </tr>
-            ))}
-            <tr>
-              <td colSpan="3" style={{ textAlign: "right" }}>
-                <strong>Total</strong>
-              </td>
-              <td>
-                <strong>
-                  {facilityTotalHours} h {facilityTotalMinutes} min
-                </strong>
-              </td>
-              <td>
-                <strong>
-                  {drivingTotalHours} h {drivingTotalMinutes} min
-                </strong>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+            </tbody>
+          </table>
         </div>
       </div>
     );
@@ -551,305 +578,378 @@ const calculateTotalsForDetailedTimecards = () => {
     );
   };
 
+  const renderEmployeeSummary = () => {
+    // Determine title prefix based on period
+    let titlePrefix = "";
+    if (period === "weekly") {
+      titlePrefix = "Weekly";
+    } else if (period === "monthly") {
+      titlePrefix = "Monthly";
+    } else if (period === "yearly") {
+      titlePrefix = "Yearly";
+    }
 
-const renderEmployeeSummary = () => {
-  // Determine title prefix based on period
-  let titlePrefix = "";
-  if (period === "weekly") {
-    titlePrefix = "Weekly";
-  } else if (period === "monthly") {
-    titlePrefix = "Monthly";
-  } else if (period === "yearly") {
-    titlePrefix = "Yearly";
-  }
+    // ALL employees branch
+    if (employeeId === "ALL") {
+      const groupedData = groupByEmployee(reportData);
 
-  // ALL employees branch
-  if (employeeId === "ALL") {
-    const groupedData = groupByEmployee(reportData);
+      return (
+        <div className={`${styles.pageContainer} mt-4`}>
+          <h2 className="text-center mb-4">
+            {titlePrefix} Employee Summary Report For ALL
+          </h2>
+          {/* Buttons Block */}
+<div className="mb-4">
 
-    return (
-      <div className={`${styles.pageContainer} mt-4`}>
-        <h2 className="text-center mb-4">
-          {titlePrefix} Employee Summary Report For ALL
-        </h2>
-        {/* Buttons Block */}
-        <div className="text-center mb-4">
-          <button
-            className={`btn btn-sm mx-2 ${period === "weekly" ? "btn-primary" : "btn-secondary"}`}
-            onClick={() => handlePeriodChange("weekly")}
-          >
-            Weekly
-          </button>
-          <button
-            className={`btn btn-sm mx-2 ${period === "monthly" ? "btn-primary" : "btn-secondary"}`}
-            onClick={() => handlePeriodChange("monthly")}
-          >
-            Monthly
-          </button>
-          <button
-            className={`btn btn-sm mx-2 ${period === "yearly" ? "btn-primary" : "btn-secondary"}`}
-            onClick={() => handlePeriodChange("yearly")}
-          >
-            Yearly
-          </button>
-          <br />
-          <div className="mt-3">
-            <button className="btn btn-primary mx-2" onClick={handlePrint}>
-              Print Report
-            </button>
-            <button className="btn btn-dark mx-2" onClick={() => navigate(-1)}>
-              Back
-            </button>
-          </div>
-        </div>
-        {/* Render a table for each employee */}
-        {Object.values(groupedData).map((employee) => {
-          // For monthly/yearly, aggregate this employee's periods
-          const records =
-            period === "weekly"
-              ? employee.periods
-              : aggregateDataByPeriod(employee.periods, period);
+{/* Period Toggle Buttons */}
+<div
+  style={{
+    display: "flex",
+    justifyContent: "center",
+    gap: "10px",
+    flexWrap: "wrap",
+    marginBottom: "1rem",
+  }}
+>
+  <button
+    className={`btn btn-sm ${period === "weekly" ? "btn-primary" : "btn-secondary"}`}
+    onClick={() => handlePeriodChange("weekly")}
+    style={{ flex: "1 0 100px", maxWidth: "120px" }}
+  >
+    Weekly
+  </button>
+  <button
+    className={`btn btn-sm ${period === "monthly" ? "btn-primary" : "btn-secondary"}`}
+    onClick={() => handlePeriodChange("monthly")}
+    style={{ flex: "1 0 100px", maxWidth: "120px" }}
+  >
+    Monthly
+  </button>
+  <button
+    className={`btn btn-sm ${period === "yearly" ? "btn-primary" : "btn-secondary"}`}
+    onClick={() => handlePeriodChange("yearly")}
+    style={{ flex: "1 0 100px", maxWidth: "120px" }}
+  >
+    Yearly
+  </button>
+</div>
 
-          // Compute overall totals for this employee (from the aggregated records)
-          const employeeTotals = records.reduce(
-            (acc, record) => {
-              const facH = record.facility_total_hours ? parseInt(record.facility_total_hours.hours, 10) || 0 : 0;
-              const facM = record.facility_total_hours ? parseInt(record.facility_total_hours.minutes, 10) || 0 : 0;
-              const drvH = record.driving_total_hours ? parseInt(record.driving_total_hours.hours, 10) || 0 : 0;
-              const drvM = record.driving_total_hours ? parseInt(record.driving_total_hours.minutes, 10) || 0 : 0;
-              acc.facility.hours += facH;
-              acc.facility.minutes += facM;
-              acc.driving.hours += drvH;
-              acc.driving.minutes += drvM;
-              acc.daysWorked += Number(record.days_worked) || 0;
-              acc.absenteeDays += Number(record.absentee_days) || 0;
-              return acc;
-            },
-            { facility: { hours: 0, minutes: 0 }, driving: { hours: 0, minutes: 0 }, daysWorked: 0, absenteeDays: 0 }
-          );
-          // Normalize minutes to hours
-          employeeTotals.facility.hours += Math.floor(employeeTotals.facility.minutes / 60);
-          employeeTotals.facility.minutes %= 60;
-          employeeTotals.driving.hours += Math.floor(employeeTotals.driving.minutes / 60);
-          employeeTotals.driving.minutes %= 60;
+{/* Print / Back Buttons */}
+<div
+  style={{
+    display: "flex",
+    justifyContent: "center",
+    gap: "10px",
+    flexWrap: "wrap",
+  }}
+  className="print-hide"
+>
+  <button
+    className="btn btn-sm btn-primary"
+    onClick={handlePrint}
+    style={{ flex: "1 0 100px", maxWidth: "120px" }}
+  >
+    Print Report
+  </button>
+  <button
+    className="btn btn-sm btn-dark"
+    onClick={() => navigate(-1)}
+    style={{ flex: "1 0 100px", maxWidth: "120px" }}
+  >
+    Back
+  </button>
+</div>
 
-          return (
-            <div key={employee.employee_id} className="mb-4">
-              <h3 style={{ textAlign: "left" }}>
-                {employee.first_name} {employee.last_name}
-              </h3>
-              <table className="table table-striped table-bordered">
-                <thead>
-                  <tr>
-                    <th style={{ textAlign: "left" }}>
-                      {period === "weekly"
-                        ? "Period (Date Range)"
-                        : period === "monthly"
-                        ? "Month"
-                        : "Year"}
-                    </th>
-                    <th style={{ textAlign: "left" }}>Facility Total Hours</th>
-                    <th style={{ textAlign: "left" }}>Driving Total Hours</th>
-                    <th style={{ textAlign: "left" }}>Days Worked</th>
-                    <th style={{ textAlign: "left" }}>Days Absent</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {records.map((record, index) => (
-                    <tr key={`${employee.employee_id}-${index}`}>
-                      <td>
+</div>
+
+          {/* Render a table for each employee */}
+          {Object.values(groupedData).map((employee) => {
+            // For monthly/yearly, aggregate this employee's periods
+            const records =
+              period === "weekly"
+                ? employee.periods
+                : aggregateDataByPeriod(employee.periods, period);
+
+            // Compute overall totals for this employee (from the aggregated records)
+            const employeeTotals = records.reduce(
+              (acc, record) => {
+                const facH = record.facility_total_hours
+                  ? parseInt(record.facility_total_hours.hours, 10) || 0
+                  : 0;
+                const facM = record.facility_total_hours
+                  ? parseInt(record.facility_total_hours.minutes, 10) || 0
+                  : 0;
+                const drvH = record.driving_total_hours
+                  ? parseInt(record.driving_total_hours.hours, 10) || 0
+                  : 0;
+                const drvM = record.driving_total_hours
+                  ? parseInt(record.driving_total_hours.minutes, 10) || 0
+                  : 0;
+                acc.facility.hours += facH;
+                acc.facility.minutes += facM;
+                acc.driving.hours += drvH;
+                acc.driving.minutes += drvM;
+                acc.daysWorked += Number(record.days_worked) || 0;
+                acc.absenteeDays += Number(record.absentee_days) || 0;
+                return acc;
+              },
+              {
+                facility: { hours: 0, minutes: 0 },
+                driving: { hours: 0, minutes: 0 },
+                daysWorked: 0,
+                absenteeDays: 0,
+              }
+            );
+            // Normalize minutes to hours
+            employeeTotals.facility.hours += Math.floor(
+              employeeTotals.facility.minutes / 60
+            );
+            employeeTotals.facility.minutes %= 60;
+            employeeTotals.driving.hours += Math.floor(
+              employeeTotals.driving.minutes / 60
+            );
+            employeeTotals.driving.minutes %= 60;
+
+            return (
+              <div key={employee.employee_id} className="mb-4">
+                <h3 style={{ textAlign: "left" }}>
+                  {employee.first_name} {employee.last_name}
+                </h3>
+                <table className="table table-striped table-bordered">
+                  <thead>
+                    <tr>
+                      <th style={{ textAlign: "left" }}>
                         {period === "weekly"
-                          ? formatPeriodRange(record.summary_period, "weekly")
-                          : formatPeriodRange(record.summary_period, period)}
-                      </td>
-                      <td>
-                        {record.facility_total_hours
-                          ? `${record.facility_total_hours.hours} h ${record.facility_total_hours.minutes} min`
-                          : "0 hours 0 minutes"}
-                      </td>
-                      <td>
-                        {record.driving_total_hours
-                          ? `${record.driving_total_hours.hours} h ${record.driving_total_hours.minutes} min`
-                          : "0 hours 0 minutes"}
-                      </td>
-                      <td>{record.days_worked}</td>
-                      <td>{record.absentee_days}</td>
+                          ? "Period (Date Range)"
+                          : period === "monthly"
+                          ? "Month"
+                          : "Year"}
+                      </th>
+                      <th style={{ textAlign: "left" }}>
+                        Facility Total Hours
+                      </th>
+                      <th style={{ textAlign: "left" }}>Driving Total Hours</th>
+                      <th style={{ textAlign: "left" }}>Days Worked</th>
+                      <th style={{ textAlign: "left" }}>Days Absent</th>
                     </tr>
-                  ))}
-                  {/* Overall Totals Row for this employee */}
-                  <tr>
-                    <td style={{ textAlign: "right" }}>
-                      <strong>Overall Totals</strong>
-                    </td>
-                    <td>
-                      <strong>
-                        {employeeTotals.facility.hours} h{ "  " }
-                        {employeeTotals.facility.minutes} min
-                      </strong>
-                    </td>
-                    <td>
-                      <strong>
-                        {employeeTotals.driving.hours} h{ "  " }
-                        {employeeTotals.driving.minutes} min
-                      </strong>
-                    </td>
-                    <td>
-                      <strong>{employeeTotals.daysWorked}</strong>
-                    </td>
-                    <td>
-                      <strong>{employeeTotals.absenteeDays}</strong>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          );
-        })}
-      </div>
-    );
-
-  } else {
-    // Single employee branch
-    // If the period is monthly or yearly, aggregate the single employee’s data
-    const records =
-      period === "weekly"
-        ? reportData
-        : aggregateDataByPeriod(reportData, period);
-  
-    // Compute overall totals from `records` (the aggregated data)
-    const overallTotalsForSingle = records.reduce(
-      (acc, record) => {
-        const facH = record.facility_total_hours ? parseInt(record.facility_total_hours.hours, 10) || 0 : 0;
-        const facM = record.facility_total_hours ? parseInt(record.facility_total_hours.minutes, 10) || 0 : 0;
-        const drvH = record.driving_total_hours ? parseInt(record.driving_total_hours.hours, 10) || 0 : 0;
-        const drvM = record.driving_total_hours ? parseInt(record.driving_total_hours.minutes, 10) || 0 : 0;
-  
-        acc.facility.hours += facH;
-        acc.facility.minutes += facM;
-        acc.driving.hours += drvH;
-        acc.driving.minutes += drvM;
-        acc.daysWorked += Number(record.days_worked) || 0;
-        acc.absenteeDays += Number(record.absentee_days) || 0;
-        return acc;
-      },
-      {
-        facility: { hours: 0, minutes: 0 },
-        driving: { hours: 0, minutes: 0 },
-        daysWorked: 0,
-        absenteeDays: 0,
-      }
-    );
-  
-    // Normalize minutes
-    overallTotalsForSingle.facility.hours += Math.floor(overallTotalsForSingle.facility.minutes / 60);
-    overallTotalsForSingle.facility.minutes %= 60;
-    overallTotalsForSingle.driving.hours += Math.floor(overallTotalsForSingle.driving.minutes / 60);
-    overallTotalsForSingle.driving.minutes %= 60;
-  
-    return (
-      <div className={`${styles.pageContainer} mt-4`}>
-        <h2 className="text-center mb-4">
-          {titlePrefix} Employee Summary Report For <br /> {firstName} {lastName}
-        </h2>
-        <div className="text-center mb-4">
-          <button
-            className={`btn btn-sm mx-2 ${period === "weekly" ? "btn-primary" : "btn-secondary"}`}
-            onClick={() => handlePeriodChange("weekly")}
-          >
-            Weekly
-          </button>
-          <button
-            className={`btn btn-sm mx-2 ${period === "monthly" ? "btn-primary" : "btn-secondary"}`}
-            onClick={() => handlePeriodChange("monthly")}
-          >
-            Monthly
-          </button>
-          <button
-            className={`btn btn-sm mx-2 ${period === "yearly" ? "btn-primary" : "btn-secondary"}`}
-            onClick={() => handlePeriodChange("yearly")}
-          >
-            Yearly
-          </button>
-          <br />
-          <div className="mt-3">
-            <button className="btn btn-primary mx-2" onClick={handlePrint}>
-              Print Report
-            </button>
-            <button className="btn btn-dark mx-2" onClick={() => navigate(-1)}>
-              Back
-            </button>
-          </div>
+                  </thead>
+                  <tbody>
+                    {records.map((record, index) => (
+                      <tr key={`${employee.employee_id}-${index}`}>
+                        <td>
+                          {period === "weekly"
+                            ? formatPeriodRange(record.summary_period, "weekly")
+                            : formatPeriodRange(record.summary_period, period)}
+                        </td>
+                        <td>
+                          {record.facility_total_hours
+                            ? `${record.facility_total_hours.hours} h ${record.facility_total_hours.minutes} min`
+                            : "0 hours 0 minutes"}
+                        </td>
+                        <td>
+                          {record.driving_total_hours
+                            ? `${record.driving_total_hours.hours} h ${record.driving_total_hours.minutes} min`
+                            : "0 hours 0 minutes"}
+                        </td>
+                        <td>{record.days_worked}</td>
+                        <td>{record.absentee_days}</td>
+                      </tr>
+                    ))}
+                    {/* Overall Totals Row for this employee */}
+                    <tr>
+                      <td style={{ textAlign: "right" }}>
+                        <strong>Overall Totals</strong>
+                      </td>
+                      <td>
+                        <strong>
+                          {employeeTotals.facility.hours} h{"  "}
+                          {employeeTotals.facility.minutes} min
+                        </strong>
+                      </td>
+                      <td>
+                        <strong>
+                          {employeeTotals.driving.hours} h{"  "}
+                          {employeeTotals.driving.minutes} min
+                        </strong>
+                      </td>
+                      <td>
+                        <strong>{employeeTotals.daysWorked}</strong>
+                      </td>
+                      <td>
+                        <strong>{employeeTotals.absenteeDays}</strong>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            );
+          })}
         </div>
-  
-        <table className="table table-striped table-bordered text-center">
-          <thead>
-            <tr>
-              <th>
-                {period === "weekly"
-                  ? "Period (Date Range)"
-                  : period === "monthly"
-                  ? "Month"
-                  : "Year"}
-              </th>
-              <th>Facility Total Hours</th>
-              <th>Driving Total Hours</th>
-              <th>Days Worked</th>
-              <th>Days Absent</th>
-            </tr>
-          </thead>
-          <tbody>
-            {/* Render from `records`, which might be aggregated data */}
-            {records.map((record, index) => (
-              <tr key={`${employeeId}-${index}`}>
-                <td>
+      );
+    } else {
+      // Single employee branch
+      // If the period is monthly or yearly, aggregate the single employee’s data
+      const records =
+        period === "weekly"
+          ? reportData
+          : aggregateDataByPeriod(reportData, period);
+
+      // Compute overall totals from `records` (the aggregated data)
+      const overallTotalsForSingle = records.reduce(
+        (acc, record) => {
+          const facH = record.facility_total_hours
+            ? parseInt(record.facility_total_hours.hours, 10) || 0
+            : 0;
+          const facM = record.facility_total_hours
+            ? parseInt(record.facility_total_hours.minutes, 10) || 0
+            : 0;
+          const drvH = record.driving_total_hours
+            ? parseInt(record.driving_total_hours.hours, 10) || 0
+            : 0;
+          const drvM = record.driving_total_hours
+            ? parseInt(record.driving_total_hours.minutes, 10) || 0
+            : 0;
+
+          acc.facility.hours += facH;
+          acc.facility.minutes += facM;
+          acc.driving.hours += drvH;
+          acc.driving.minutes += drvM;
+          acc.daysWorked += Number(record.days_worked) || 0;
+          acc.absenteeDays += Number(record.absentee_days) || 0;
+          return acc;
+        },
+        {
+          facility: { hours: 0, minutes: 0 },
+          driving: { hours: 0, minutes: 0 },
+          daysWorked: 0,
+          absenteeDays: 0,
+        }
+      );
+
+      // Normalize minutes
+      overallTotalsForSingle.facility.hours += Math.floor(
+        overallTotalsForSingle.facility.minutes / 60
+      );
+      overallTotalsForSingle.facility.minutes %= 60;
+      overallTotalsForSingle.driving.hours += Math.floor(
+        overallTotalsForSingle.driving.minutes / 60
+      );
+      overallTotalsForSingle.driving.minutes %= 60;
+
+      return (
+        <div className={`${styles.pageContainer} mt-4`}>
+          <h2 className="text-center mb-4">
+            {titlePrefix} Employee Summary Report For <br /> {firstName}{" "}
+            {lastName}
+          </h2>
+          <div className="text-center mb-4">
+            <button
+              className={`btn btn-sm mx-2 ${
+                period === "weekly" ? "btn-primary" : "btn-secondary"
+              }`}
+              onClick={() => handlePeriodChange("weekly")}
+            >
+              Weekly
+            </button>
+            <button
+              className={`btn btn-sm mx-2 ${
+                period === "monthly" ? "btn-primary" : "btn-secondary"
+              }`}
+              onClick={() => handlePeriodChange("monthly")}
+            >
+              Monthly
+            </button>
+            <button
+              className={`btn btn-sm mx-2 ${
+                period === "yearly" ? "btn-primary" : "btn-secondary"
+              }`}
+              onClick={() => handlePeriodChange("yearly")}
+            >
+              Yearly
+            </button>
+            <br />
+            <div className="mt-3">
+              <button className="btn btn-primary mx-2" onClick={handlePrint}>
+                Print Report
+              </button>
+              <button
+                className="btn btn-dark mx-2"
+                onClick={() => navigate(-1)}
+              >
+                Back
+              </button>
+            </div>
+          </div>
+
+          <table className="table table-striped table-bordered text-center">
+            <thead>
+              <tr>
+                <th>
                   {period === "weekly"
-                    ? formatPeriodRange(record.summary_period, "weekly")
-                    : formatPeriodRange(record.summary_period, period)}
-                </td>
-                <td>
-                  {record.facility_total_hours
-                    ? `${record.facility_total_hours.hours} h ${record.facility_total_hours.minutes} min`
-                    : "0 hours 0 minutes"}
-                </td>
-                <td>
-                  {record.driving_total_hours
-                    ? `${record.driving_total_hours.hours} h ${record.driving_total_hours.minutes} min`
-                    : "0 hours 0 minutes"}
-                </td>
-                <td>{record.days_worked}</td>
-                <td>{record.absentee_days}</td>
+                    ? "Period (Date Range)"
+                    : period === "monthly"
+                    ? "Month"
+                    : "Year"}
+                </th>
+                <th>Facility Total Hours</th>
+                <th>Driving Total Hours</th>
+                <th>Days Worked</th>
+                <th>Days Absent</th>
               </tr>
-            ))}
-            {/* Overall Totals */}
-            <tr>
-              <td style={{ textAlign: "right" }}>
-                <strong>Overall Totals</strong>
-              </td>
-              <td>
-                <strong>
-                  {overallTotalsForSingle.facility.hours} h{" "}
-                  {overallTotalsForSingle.facility.minutes} min
-                </strong>
-              </td>
-              <td>
-                <strong>
-                  {overallTotalsForSingle.driving.hours} h{" "}
-                  {overallTotalsForSingle.driving.minutes} min
-                </strong>
-              </td>
-              <td>
-                <strong>{overallTotalsForSingle.daysWorked}</strong>
-              </td>
-              <td>
-                <strong>{overallTotalsForSingle.absenteeDays}</strong>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    );
-  }
-}  
+            </thead>
+            <tbody>
+              {/* Render from `records`, which might be aggregated data */}
+              {records.map((record, index) => (
+                <tr key={`${employeeId}-${index}`}>
+                  <td>
+                    {period === "weekly"
+                      ? formatPeriodRange(record.summary_period, "weekly")
+                      : formatPeriodRange(record.summary_period, period)}
+                  </td>
+                  <td>
+                    {record.facility_total_hours
+                      ? `${record.facility_total_hours.hours} h ${record.facility_total_hours.minutes} min`
+                      : "0 hours 0 minutes"}
+                  </td>
+                  <td>
+                    {record.driving_total_hours
+                      ? `${record.driving_total_hours.hours} h ${record.driving_total_hours.minutes} min`
+                      : "0 hours 0 minutes"}
+                  </td>
+                  <td>{record.days_worked}</td>
+                  <td>{record.absentee_days}</td>
+                </tr>
+              ))}
+              {/* Overall Totals */}
+              <tr>
+                <td style={{ textAlign: "right" }}>
+                  <strong>Overall Totals</strong>
+                </td>
+                <td>
+                  <strong>
+                    {overallTotalsForSingle.facility.hours} h{" "}
+                    {overallTotalsForSingle.facility.minutes} min
+                  </strong>
+                </td>
+                <td>
+                  <strong>
+                    {overallTotalsForSingle.driving.hours} h{" "}
+                    {overallTotalsForSingle.driving.minutes} min
+                  </strong>
+                </td>
+                <td>
+                  <strong>{overallTotalsForSingle.daysWorked}</strong>
+                </td>
+                <td>
+                  <strong>{overallTotalsForSingle.absenteeDays}</strong>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+  };
 
   return (
     <div className={`${styles.reportpageContainer} mt-4`}>
