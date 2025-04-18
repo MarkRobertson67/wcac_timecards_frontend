@@ -329,113 +329,115 @@ const ReportPage = () => {
           </button>
         </div>
 
-        <table
-          className={`table table-striped table-bordered text-center ${styles.table}`}
-        >
-          <thead>
-            <tr>
-              <th>Work Date</th>
-              <th colSpan="5">Facility Activity</th>
-              <th colSpan="5">Driving Activity</th>
-            </tr>
-            <tr>
-              <th style={{ width: "160px" }}></th>
-              <th>Start Time</th>
-              <th>Lunch Start</th>
-              <th>Lunch End</th>
-              <th>End Time</th>
-              <th style={{ width: "140px" }}>Total Hours</th>
-              <th>Start Time</th>
-              <th>Lunch Start</th>
-              <th>Lunch End</th>
-              <th>End Time</th>
-              <th style={{ width: "140px" }}>Total Hours</th>
-            </tr>
-          </thead>
-          <tbody>
-            {reportData.map((record) => (
-              <tr key={record.timecard_id}>
-                <td>{formatDate(record.work_date)}</td>
+        <div className={styles.reportTableContainer}>
+          <table
+            className={`table table-striped table-bordered text-center ${styles.table}`}
+          >
+            <thead>
+              <tr>
+                <th>Work Date</th>
+                <th colSpan="5">Facility Activity</th>
+                <th colSpan="5">Driving Activity</th>
+              </tr>
+              <tr>
+                <th style={{ width: "160px" }}></th>
+                <th>Start Time</th>
+                <th>Lunch Start</th>
+                <th>Lunch End</th>
+                <th>End Time</th>
+                <th style={{ width: "140px" }}>Total Hours</th>
+                <th>Start Time</th>
+                <th>Lunch Start</th>
+                <th>Lunch End</th>
+                <th>End Time</th>
+                <th style={{ width: "140px" }}>Total Hours</th>
+              </tr>
+            </thead>
+            <tbody>
+              {reportData.map((record) => (
+                <tr key={record.timecard_id}>
+                  <td>{formatDate(record.work_date)}</td>
 
-                {/* Facility Activity Columns */}
-                <td>
-                  {record.facility_start_time
-                    ? formatTime(record.facility_start_time)
-                    : "N/A"}
+                  {/* Facility Activity Columns */}
+                  <td>
+                    {record.facility_start_time
+                      ? formatTime(record.facility_start_time)
+                      : "N/A"}
+                  </td>
+                  <td>
+                    {record.facility_lunch_start
+                      ? formatTime(record.facility_lunch_start)
+                      : "N/A"}
+                  </td>
+                  <td>
+                    {record.facility_lunch_end
+                      ? formatTime(record.facility_lunch_end)
+                      : "N/A"}
+                  </td>
+                  <td>
+                    {record.facility_end_time
+                      ? formatTime(record.facility_end_time)
+                      : "N/A"}
+                  </td>
+                  <td>
+                    {record.facility_total_hours
+                      ? `${record.facility_total_hours.hours} h ${record.facility_total_hours.minutes} min`
+                      : "0 Hours 0 Minutes"}
+                  </td>
+
+                  {/* Driving Activity Columns */}
+                  <td>
+                    {record.driving_start_time
+                      ? formatTime(record.driving_start_time)
+                      : "N/A"}
+                  </td>
+                  <td>
+                    {record.driving_lunch_start
+                      ? formatTime(record.driving_lunch_start)
+                      : "N/A"}
+                  </td>
+                  <td>
+                    {record.driving_lunch_end
+                      ? formatTime(record.driving_lunch_end)
+                      : "N/A"}
+                  </td>
+                  <td>
+                    {record.driving_end_time
+                      ? formatTime(record.driving_end_time)
+                      : "N/A"}
+                  </td>
+                  <td>
+                    {record.driving_total_hours
+                      ? `${record.driving_total_hours.hours} h ${record.driving_total_hours.minutes} min`
+                      : "0 Hours 0 Minutes"}
+                  </td>
+                </tr>
+              ))}
+              {/* Overall Totals Row */}
+              {/* Totals row */}
+              <tr>
+                <td colSpan="5" style={{ textAlign: "right" }}>
+                  <strong>Total</strong>
                 </td>
-                <td>
-                  {record.facility_lunch_start
-                    ? formatTime(record.facility_lunch_start)
-                    : "N/A"}
-                </td>
-                <td>
-                  {record.facility_lunch_end
-                    ? formatTime(record.facility_lunch_end)
-                    : "N/A"}
-                </td>
-                <td>
-                  {record.facility_end_time
-                    ? formatTime(record.facility_end_time)
-                    : "N/A"}
-                </td>
-                <td>
-                  {record.facility_total_hours
-                    ? `${record.facility_total_hours.hours} h ${record.facility_total_hours.minutes} min`
-                    : "0 Hours 0 Minutes"}
+                <td className="time-cell">
+                  <strong>
+                    <div>{totals.facility.hours} h</div>
+                    <br />
+                    <div>{totals.facility.minutes} min</div>
+                  </strong>
                 </td>
 
-                {/* Driving Activity Columns */}
-                <td>
-                  {record.driving_start_time
-                    ? formatTime(record.driving_start_time)
-                    : "N/A"}
-                </td>
-                <td>
-                  {record.driving_lunch_start
-                    ? formatTime(record.driving_lunch_start)
-                    : "N/A"}
-                </td>
-                <td>
-                  {record.driving_lunch_end
-                    ? formatTime(record.driving_lunch_end)
-                    : "N/A"}
-                </td>
-                <td>
-                  {record.driving_end_time
-                    ? formatTime(record.driving_end_time)
-                    : "N/A"}
-                </td>
-                <td>
-                  {record.driving_total_hours
-                    ? `${record.driving_total_hours.hours} h ${record.driving_total_hours.minutes} min`
-                    : "0 Hours 0 Minutes"}
+                <td className="time-cell">
+                  <strong>
+                    <div>{totals.driving.hours} h</div>
+                    <br />
+                    <div>{totals.driving.minutes} min</div>
+                  </strong>
                 </td>
               </tr>
-            ))}
-            {/* Overall Totals Row */}
-            {/* Totals row */}
-            <tr>
-              <td colSpan="5" style={{ textAlign: "right" }}>
-                <strong>Total</strong>
-              </td>
-              <td className="time-cell">
-                <strong>
-                  <div>{totals.facility.hours} h</div>
-                  <br />
-                  <div>{totals.facility.minutes} min</div>
-                </strong>
-              </td>
-
-              <td className="time-cell">
-                <strong>
-                  <div>{totals.driving.hours} h</div>
-                  <br />
-                  <div>{totals.driving.minutes} min</div>
-                </strong>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        </div>
       </div>
     );
   };
@@ -589,43 +591,6 @@ const ReportPage = () => {
     );
   };
 
-  const renderMonthlySummary = () => {
-    return (
-      <div className={`${styles.reportpageContainer} mt-4`}>
-        <h2 className="text-center mb-4">Monthly Summary Report</h2>
-        <div className="text-center mb-4">
-          <button className="btn btn-primary mx-2" onClick={handlePrint}>
-            Print Report
-          </button>
-          <button className="btn btn-secondary mx-2" onClick={handleSaveCSV}>
-            Save as CSV
-          </button>
-          <button className="btn btn-dark mx-2" onClick={() => navigate(-1)}>
-            Back
-          </button>
-        </div>
-        <table className="table table-striped table-bordered text-center">
-          <thead>
-            <tr>
-              <th>Employee ID</th>
-              <th>Month</th>
-              <th>Total Hours</th>
-            </tr>
-          </thead>
-          <tbody>
-            {reportData.map((record) => (
-              <tr key={record.employee_id}>
-                <td>{record.employee_id}</td>
-                <td>{record.month}</td>
-                <td>{record.total_hours}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    );
-  };
-
   const renderEmployeeSummary = () => {
     // Determine title prefix based on period
     let titlePrefix = "";
@@ -767,72 +732,83 @@ const ReportPage = () => {
                 <h3 style={{ textAlign: "left" }}>
                   {employee.first_name} {employee.last_name}
                 </h3>
-                <table className="table table-striped table-bordered">
-                  <thead>
-                    <tr>
-                      <th style={{ textAlign: "left" }}>
-                        {period === "weekly"
-                          ? "Period (Date Range)"
-                          : period === "monthly"
-                          ? "Month"
-                          : "Year"}
-                      </th>
-                      <th style={{ textAlign: "left" }}>
-                        Facility Total Hours
-                      </th>
-                      <th style={{ textAlign: "left" }}>Driving Total Hours</th>
-                      <th style={{ textAlign: "left" }}>Days Worked</th>
-                      <th style={{ textAlign: "left" }}>Days Absent</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {records.map((record, index) => (
-                      <tr key={`${employee.employee_id}-${index}`}>
-                        <td>
+
+                <div className={styles.reportTableContainer}>
+                  <table className="table table-striped table-bordered">
+                    <thead>
+                      <tr>
+                        <th style={{ textAlign: "left" }}>
                           {period === "weekly"
-                            ? formatPeriodRange(record.summary_period, "weekly")
-                            : formatPeriodRange(record.summary_period, period)}
-                        </td>
-                        <td>
-                          {record.facility_total_hours
-                            ? `${record.facility_total_hours.hours} h ${record.facility_total_hours.minutes} min`
-                            : "0 hours 0 minutes"}
-                        </td>
-                        <td>
-                          {record.driving_total_hours
-                            ? `${record.driving_total_hours.hours} h ${record.driving_total_hours.minutes} min`
-                            : "0 hours 0 minutes"}
-                        </td>
-                        <td>{record.days_worked}</td>
-                        <td>{record.absentee_days}</td>
+                            ? "Period (Date Range)"
+                            : period === "monthly"
+                            ? "Month"
+                            : "Year"}
+                        </th>
+                        <th style={{ textAlign: "left" }}>
+                          Facility Total Hours
+                        </th>
+                        <th style={{ textAlign: "left" }}>
+                          Driving Total Hours
+                        </th>
+                        <th style={{ textAlign: "left" }}>Days Worked</th>
+                        <th style={{ textAlign: "left" }}>Days Absent</th>
                       </tr>
-                    ))}
-                    {/* Overall Totals Row for this employee */}
-                    <tr>
-                      <td style={{ textAlign: "right" }}>
-                        <strong>Overall Totals</strong>
-                      </td>
-                      <td>
-                        <strong>
-                          {employeeTotals.facility.hours} h{"  "}
-                          {employeeTotals.facility.minutes} min
-                        </strong>
-                      </td>
-                      <td>
-                        <strong>
-                          {employeeTotals.driving.hours} h{"  "}
-                          {employeeTotals.driving.minutes} min
-                        </strong>
-                      </td>
-                      <td>
-                        <strong>{employeeTotals.daysWorked}</strong>
-                      </td>
-                      <td>
-                        <strong>{employeeTotals.absenteeDays}</strong>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {records.map((record, index) => (
+                        <tr key={`${employee.employee_id}-${index}`}>
+                          <td>
+                            {period === "weekly"
+                              ? formatPeriodRange(
+                                  record.summary_period,
+                                  "weekly"
+                                )
+                              : formatPeriodRange(
+                                  record.summary_period,
+                                  period
+                                )}
+                          </td>
+                          <td>
+                            {record.facility_total_hours
+                              ? `${record.facility_total_hours.hours} h ${record.facility_total_hours.minutes} min`
+                              : "0 hours 0 minutes"}
+                          </td>
+                          <td>
+                            {record.driving_total_hours
+                              ? `${record.driving_total_hours.hours} h ${record.driving_total_hours.minutes} min`
+                              : "0 hours 0 minutes"}
+                          </td>
+                          <td>{record.days_worked}</td>
+                          <td>{record.absentee_days}</td>
+                        </tr>
+                      ))}
+                      {/* Overall Totals Row for this employee */}
+                      <tr>
+                        <td style={{ textAlign: "right" }}>
+                          <strong>Overall Totals</strong>
+                        </td>
+                        <td>
+                          <strong>
+                            {employeeTotals.facility.hours} h{"  "}
+                            {employeeTotals.facility.minutes} min
+                          </strong>
+                        </td>
+                        <td>
+                          <strong>
+                            {employeeTotals.driving.hours} h{"  "}
+                            {employeeTotals.driving.minutes} min
+                          </strong>
+                        </td>
+                        <td>
+                          <strong>{employeeTotals.daysWorked}</strong>
+                        </td>
+                        <td>
+                          <strong>{employeeTotals.absenteeDays}</strong>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             );
           })}
@@ -933,79 +909,83 @@ const ReportPage = () => {
             </div>
           </div>
 
-          <table className="table table-striped table-bordered text-center">
-            <thead>
-              <tr>
-                <th>
-                  {period === "weekly"
-                    ? "Period (Date Range)"
-                    : period === "monthly"
-                    ? "Month"
-                    : "Year"}
-                </th>
-                <th>Facility Total Hours</th>
-                <th>Driving Total Hours</th>
-                <th>Days Worked</th>
-                <th>Days Absent</th>
-              </tr>
-            </thead>
-            <tbody>
-              {/* Render from `records` */}
-              {records.map((record, index) => (
-                <tr key={`${employeeId}-${index}`}>
-                  <td
-                    style={{
-                      whiteSpace: "normal",
-                      wordBreak: "break-word",
-                      fontSize: "0.45rem", // smaller text
-                      maxWidth: "140px",
-                    }}
-                  >
+          <div className={styles.reportTableContainer}>
+            <table
+              className={`table table-striped table-bordered text-center ${styles.table}`}
+            >
+              <thead>
+                <tr>
+                  <th>
                     {period === "weekly"
-                      ? formatPeriodRange(record.summary_period, "weekly")
-                      : formatPeriodRange(record.summary_period, period)}
-                  </td>
-
-                  <td>
-                    {record.facility_total_hours
-                      ? `${record.facility_total_hours.hours} h ${record.facility_total_hours.minutes} min`
-                      : "0 hours 0 minutes"}
-                  </td>
-                  <td>
-                    {record.driving_total_hours
-                      ? `${record.driving_total_hours.hours} h ${record.driving_total_hours.minutes} min`
-                      : "0 hours 0 minutes"}
-                  </td>
-                  <td>{record.days_worked}</td>
-                  <td>{record.absentee_days}</td>
+                      ? "Period (Date Range)"
+                      : period === "monthly"
+                      ? "Month"
+                      : "Year"}
+                  </th>
+                  <th>Facility Total Hours</th>
+                  <th>Driving Total Hours</th>
+                  <th>Days Worked</th>
+                  <th>Days Absent</th>
                 </tr>
-              ))}
-              {/* Overall Totals */}
-              <tr>
-                <td style={{ textAlign: "right" }}>
-                  <strong>Overall Totals</strong>
-                </td>
-                <td>
-                  <strong>
-                    {overallTotalsForSingle.facility.hours} h{" "}
-                    {overallTotalsForSingle.facility.minutes} min
-                  </strong>
-                </td>
-                <td>
-                  <strong>
-                    {overallTotalsForSingle.driving.hours} h{" "}
-                    {overallTotalsForSingle.driving.minutes} min
-                  </strong>
-                </td>
-                <td>
-                  <strong>{overallTotalsForSingle.daysWorked}</strong>
-                </td>
-                <td>
-                  <strong>{overallTotalsForSingle.absenteeDays}</strong>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {/* Render from `records` */}
+                {records.map((record, index) => (
+                  <tr key={`${employeeId}-${index}`}>
+                    <td
+                      style={{
+                        whiteSpace: "normal",
+                        wordBreak: "break-word",
+                        fontSize: "0.45rem", // smaller text
+                        maxWidth: "140px",
+                      }}
+                    >
+                      {period === "weekly"
+                        ? formatPeriodRange(record.summary_period, "weekly")
+                        : formatPeriodRange(record.summary_period, period)}
+                    </td>
+
+                    <td>
+                      {record.facility_total_hours
+                        ? `${record.facility_total_hours.hours} h ${record.facility_total_hours.minutes} min`
+                        : "0 hours 0 minutes"}
+                    </td>
+                    <td>
+                      {record.driving_total_hours
+                        ? `${record.driving_total_hours.hours} h ${record.driving_total_hours.minutes} min`
+                        : "0 hours 0 minutes"}
+                    </td>
+                    <td>{record.days_worked}</td>
+                    <td>{record.absentee_days}</td>
+                  </tr>
+                ))}
+                {/* Overall Totals */}
+                <tr>
+                  <td style={{ textAlign: "right" }}>
+                    <strong>Overall Totals</strong>
+                  </td>
+                  <td>
+                    <strong>
+                      {overallTotalsForSingle.facility.hours} h{" "}
+                      {overallTotalsForSingle.facility.minutes} min
+                    </strong>
+                  </td>
+                  <td>
+                    <strong>
+                      {overallTotalsForSingle.driving.hours} h{" "}
+                      {overallTotalsForSingle.driving.minutes} min
+                    </strong>
+                  </td>
+                  <td>
+                    <strong>{overallTotalsForSingle.daysWorked}</strong>
+                  </td>
+                  <td>
+                    <strong>{overallTotalsForSingle.absenteeDays}</strong>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       );
     }
@@ -1015,7 +995,6 @@ const ReportPage = () => {
     <div className={`${styles.reportpageContainer} mt-4`}>
       {reportType === "detailedTimecards" && renderDetailedTimecards()}
       {reportType === "totalHours" && renderTotalHours()}
-      {reportType === "monthlySummary" && renderMonthlySummary()}
       {reportType === "employeeSummary" && renderEmployeeSummary()}
     </div>
   );
