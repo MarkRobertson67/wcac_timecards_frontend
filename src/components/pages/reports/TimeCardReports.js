@@ -2,11 +2,10 @@
 // Copyright (c) 2025 Mark Robertson
 // See LICENSE.txt file for details.
 
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../../firebase/firebaseConfig";
-import styles from "./TimeCardReports.module.css"
+import styles from "./TimeCardReports.module.css";
 
 const API = process.env.REACT_APP_API_URL;
 
@@ -27,8 +26,6 @@ const monthOptions = [
 
 function TimeCardReports() {
   const navigate = useNavigate();
-
-  
 
   const [formState, setFormState] = useState({
     reportType: "totalHours",
@@ -51,8 +48,6 @@ function TimeCardReports() {
       console.log("Employees updated after fetch:", formState.employees); // This log after the state updates
     }
   }, [formState.employees]);
-
-
 
   const handleChange = (e) => {
     const { id, value, type } = e.target;
@@ -99,7 +94,6 @@ function TimeCardReports() {
     });
   };
 
-
   const fetchEmployees = async () => {
     setIsLoading(true);
     try {
@@ -141,8 +135,6 @@ function TimeCardReports() {
   useEffect(() => {
     fetchEmployees();
   }, []);
-
-
 
   const handleGenerateReport = async () => {
     const {
@@ -218,7 +210,9 @@ function TimeCardReports() {
         try {
           const response = await fetch(`${url}`);
           const reportData = await response.json();
-          const reportArray = Array.isArray(reportData.data) ? reportData.data : [];
+          const reportArray = Array.isArray(reportData.data)
+            ? reportData.data
+            : [];
 
           if (reportArray.length === 0) {
             console.log(
@@ -380,178 +374,150 @@ function TimeCardReports() {
   };
 
   const renderFormFields = () => {
-    const {
-      reportType,
-      startDate,
-      endDate,
-      month,
-      year,
-      selectedEmployeeName,
-      employees,
-    } = formState;
+    const { reportType, startDate, endDate, selectedEmployeeName, employees } =
+      formState;
 
-    switch (reportType) {
-      case "totalHours":
-      case "detailedTimecards":
-      case "employeeSummary":
-        return (
-          <>
-            <div className="row mb-2">
-              <div className="col">
-                <label htmlFor="selectedEmployeeName" className="form-label">
-                  Employee:
-                </label>
-                <select
-                  id="selectedEmployeeName"
-                  className="form-select"
-                  value={selectedEmployeeName || ""}
-                  onChange={handleChange}
-                  disabled={isLoading} // Disable input if loading
-                  style={{
-                    backgroundColor: isLoading ? "#e9ecef" : "",
-                    cursor: isLoading ? "not-allowed" : "pointer",
-                    opacity: isLoading ? 0.7 : 1,
-                  }}
+    if (
+      ["totalHours", "detailedTimecards", "employeeSummary"].includes(
+        reportType
+      )
+    ) {
+      return (
+        <div className="row mb-3">
+          <div className="col-12 col-md mb-2">
+            <label htmlFor="selectedEmployeeName" className="form-label">
+              Employee:
+            </label>
+            <select
+              id="selectedEmployeeName"
+              className="form-select"
+              value={selectedEmployeeName || ""}
+              onChange={handleChange}
+              disabled={isLoading}
+              style={{
+                backgroundColor: isLoading ? "#e9ecef" : "",
+                cursor: isLoading ? "not-allowed" : "pointer",
+                opacity: isLoading ? 0.7 : 1,
+              }}
+            >
+              <option value="">Select Employee</option>
+              {reportType !== "detailedTimecards" && isAdmin && (
+                <option value="ALL">ALL</option>
+              )}
+              {employees.map((emp) => (
+                <option
+                  key={emp.id}
+                  value={`${emp.first_name} ${emp.last_name}`}
                 >
-                  <option value="">Select Employee</option>
-
-                  {/* Only show "ALL" option if the report type is not detailedTimecards and the user is an admin */}
-                  {reportType !== "detailedTimecards" && isAdmin && (
-                    <option value="ALL">ALL</option>
-                  )}
-
-                  {/* Map individual employee names */}
-                  {employees.map((emp) => (
-                    <option
-                      key={emp.id}
-                      value={`${emp.first_name} ${emp.last_name}`}
-                    >
-                      {emp.first_name} {emp.last_name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="col">
-                <label htmlFor="startDate" className="form-label">
-                  Start Date:
-                </label>
-                <input
-                  id="startDate"
-                  type="date"
-                  className="form-control"
-                  value={startDate}
-                  onChange={handleChange}
-                  disabled={isLoading} // Disable input if loading
-                />
-              </div>
-              <div className="col">
-                <label htmlFor="endDate" className="form-label">
-                  End Date:
-                </label>
-                <input
-                  id="endDate"
-                  type="date"
-                  className="form-control"
-                  value={endDate}
-                  onChange={handleChange}
-                  disabled={isLoading} // Disable input if loading
-                />
-              </div>
-            </div>
-          </>
-        );
-
-      case "monthlySummary":
-        return (
-          <div className="row mb-2">
-            <div className="col">
-              <label htmlFor="month" className="form-label">
-                Month:
-              </label>
-              <select
-                id="month"
-                className="form-select"
-                value={month.value}
-                onChange={handleChange}
-              >
-                {monthOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="col">
-              <label htmlFor="year" className="form-label">
-                Year:
-              </label>
-              <input
-                id="year"
-                type="number"
-                className="form-control"
-                value={year}
-                onChange={handleChange}
-              />
-            </div>
+                  {emp.first_name} {emp.last_name}
+                </option>
+              ))}
+            </select>
           </div>
-        );
-      default:
-        return null;
+          <div className="col-12 col-md mb-2">
+            <label htmlFor="startDate" className="form-label">
+              Start Date:
+            </label>
+            <input
+              id="startDate"
+              type="date"
+              className="form-control"
+              value={startDate}
+              onChange={handleChange}
+              disabled={isLoading}
+            />
+          </div>
+          <div className="col-12 col-md mb-2">
+            <label htmlFor="endDate" className="form-label">
+              End Date:
+            </label>
+            <input
+              id="endDate"
+              type="date"
+              className="form-control"
+              value={endDate}
+              onChange={handleChange}
+              disabled={isLoading}
+            />
+          </div>
+        </div>
+      );
     }
+
+    return null;
   };
 
   return (
     <div className={styles.tcrPage}>
-    <div className="container mt-4">
-      <h2 className="text-center mb-4">Time Card Reports</h2>
+      <div className="container mt-4 pt-4">
+        <h2 className="text-center mb-4">Time Card Reports</h2>
 
-      {isLoading ? (
-        <div className="text-center mt-4">
-          <div className="spinner-border custom-spinner" role="status"></div>
-          <div className="mt-2">Loading employee data...</div>
-        </div>
-      ) : (
-        <>
-          <div className="mb-3">
-            <label htmlFor="reportType" className="form-label">
-              Select Report Type:
-            </label>
-            <select
-              id="reportType"
-              className="form-select"
-              value={formState.reportType}
-              onChange={handleChange}
-            >
-              <option value="totalHours">Total Hours Worked by Employee</option>
-              <option value="detailedTimecards">Detailed Timecards by Employee</option>
-              <option value="employeeSummary">Employee Summary Report</option>
-            </select>
+        {isLoading ? (
+          <div className="text-center mt-4">
+            <div className="spinner-border custom-spinner" role="status"></div>
+            <div className="mt-2">Loading employee data...</div>
           </div>
+        ) : (
+          <>
+            <div className="mb-3">
+              <label htmlFor="reportType" className="form-label">
+                Select Report Type:
+              </label>
+              <select
+                id="reportType"
+                className="form-select"
+                value={formState.reportType}
+                onChange={handleChange}
+              >
+                <option value="totalHours">
+                  Total Hours Worked by Employee
+                </option>
+                <option value="detailedTimecards">
+                  Detailed Timecards by Employee
+                </option>
+                <option value="employeeSummary">Employee Summary Report</option>
+              </select>
+            </div>
 
-          {renderFormFields()}
+            {renderFormFields()}
 
-          <div className="text-center">
-            <div className="text-center">
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                gap: "12px",
+                flexWrap: "wrap",
+                marginTop: "16px",
+              }}
+            >
               <button
-                className="btn btn-primary mx-2"
+                className="btn btn-primary"
                 onClick={handleGenerateReport}
-                disabled={isLoading} // Disable the button if loading
+                disabled={isLoading}
+                style={{
+                  padding: "6px 14px",
+                  width: "auto",
+                  minWidth: "fit-content",
+                }}
               >
                 {isLoading ? "Loading..." : "Generate Report"}
               </button>
               <button
-                className="btn btn-secondary mx-2"
+                className="btn btn-secondary"
                 onClick={resetForm}
-                disabled={isLoading} // Disable the button if loading
+                disabled={isLoading}
+                style={{
+                  padding: "6px 14px",
+                  width: "auto",
+                  minWidth: "fit-content",
+                }}
               >
                 {isLoading ? "Loading..." : "Reset"}
               </button>
             </div>
-          </div>
-          
-        </>
-      )}
-    </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }

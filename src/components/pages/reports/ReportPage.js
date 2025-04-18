@@ -286,8 +286,8 @@ const ReportPage = () => {
     console.log(employeeInfo);
 
     return (
-      <div className={`${styles.pageContainer} mt-4`}>
-        <h2 className="text-center mb-4">Detailed Timecards Report</h2>
+      <div className={`${styles.pageContainer}`}>
+        <h2 className="text-center mb-3">Detailed Timecards Report</h2>
         <p className="text-center mb-3">
           {`Report for: ${formatDate(startDate)} - ${formatDate(endDate)}`}
           <br />
@@ -302,7 +302,8 @@ const ReportPage = () => {
             justifyContent: "center",
             gap: "10px",
             flexWrap: "wrap",
-            paddingBottom: "40px"
+            paddingBottom: "40px",
+            paddingRight: "20px",
           }}
           className="print-hide mb-4"
         >
@@ -471,27 +472,56 @@ const ReportPage = () => {
         <p className="text-center">
           {`Report for: ${formatDate(startDate)} - ${formatDate(endDate)}`}
         </p>
-        <div className="text-center">
-          <button className="btn btn-primary mx-2" onClick={handlePrint}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            gap: "10px",
+            flexWrap: "wrap",
+            marginBottom: "2rem",
+          }}
+          className="print-hide"
+        >
+          <button
+            className="btn btn-sm btn-primary"
+            onClick={handlePrint}
+            style={{ flex: "1 0 100px", maxWidth: "140px" }}
+          >
             Print Report
           </button>
-          <button className="btn btn-secondary mx-2" onClick={handleSaveCSV}>
-            Save as CSV
-          </button>
-          <button className="btn btn-dark mx-2" onClick={() => navigate(-1)}>
+
+          {reportType === "totalHours" && (
+            <button
+              className="btn btn-sm btn-secondary"
+              onClick={handleSaveCSV}
+              style={{ flex: "1 0 100px", maxWidth: "140px" }}
+            >
+              Save as CSV
+            </button>
+          )}
+
+          <button
+            className="btn btn-sm btn-dark"
+            onClick={() => navigate(-1)}
+            style={{ flex: "1 0 100px", maxWidth: "140px" }}
+          >
             Back
           </button>
         </div>
+
         <div
           className={styles.reportTableContainer}
-          style={{ marginTop: "30px" }}
+          // style={{ marginTop: "30px" }}
         >
           <table className="table table-striped table-bordered text-center">
             <thead>
               <tr>
-                <th>Employee ID</th>
-                <th>First Name</th>
-                <th>Last Name</th>
+                <th>
+                  <span className="d-none d-md-inline">Employee ID</span>
+                  <span className="d-inline d-md-none">ID</span>
+                </th>
+
+                <th>Name</th>
                 <th>Facility Total Hours</th>
                 <th>Driving Total Hours</th>
               </tr>
@@ -500,8 +530,7 @@ const ReportPage = () => {
               {reportData.map((record) => (
                 <tr key={record.employee_id}>
                   <td>{record.employee_id}</td>
-                  <td>{record.first_name}</td>
-                  <td>{record.last_name}</td>
+                  <td>{`${record.first_name} ${record.last_name}`}</td>
                   <td>
                     {record.facility_total_hours &&
                     typeof record.facility_total_hours === "object"
@@ -521,7 +550,7 @@ const ReportPage = () => {
                 </tr>
               ))}
               <tr>
-                <td colSpan="3" style={{ textAlign: "right" }}>
+                <td colSpan="2" style={{ textAlign: "right" }}>
                   <strong>Total</strong>
                 </td>
                 <td>
@@ -600,68 +629,72 @@ const ReportPage = () => {
             {titlePrefix} Employee Summary Report For ALL
           </h2>
           {/* Buttons Block */}
-<div className="mb-4">
+          <div className="mb-4">
+            {/* Period Toggle Buttons */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                gap: "10px",
+                flexWrap: "wrap",
+                marginBottom: "1rem",
+              }}
+            >
+              <button
+                className={`btn btn-sm ${
+                  period === "weekly" ? "btn-primary" : "btn-secondary"
+                }`}
+                onClick={() => handlePeriodChange("weekly")}
+                style={{ flex: "1 0 100px", maxWidth: "120px" }}
+              >
+                Weekly
+              </button>
+              <button
+                className={`btn btn-sm ${
+                  period === "monthly" ? "btn-primary" : "btn-secondary"
+                }`}
+                onClick={() => handlePeriodChange("monthly")}
+                style={{ flex: "1 0 100px", maxWidth: "120px" }}
+              >
+                Monthly
+              </button>
+              <button
+                className={`btn btn-sm ${
+                  period === "yearly" ? "btn-primary" : "btn-secondary"
+                }`}
+                onClick={() => handlePeriodChange("yearly")}
+                style={{ flex: "1 0 100px", maxWidth: "120px" }}
+              >
+                Yearly
+              </button>
+            </div>
 
-{/* Period Toggle Buttons */}
-<div
-  style={{
-    display: "flex",
-    justifyContent: "center",
-    gap: "10px",
-    flexWrap: "wrap",
-    marginBottom: "1rem",
-  }}
->
-  <button
-    className={`btn btn-sm ${period === "weekly" ? "btn-primary" : "btn-secondary"}`}
-    onClick={() => handlePeriodChange("weekly")}
-    style={{ flex: "1 0 100px", maxWidth: "120px" }}
-  >
-    Weekly
-  </button>
-  <button
-    className={`btn btn-sm ${period === "monthly" ? "btn-primary" : "btn-secondary"}`}
-    onClick={() => handlePeriodChange("monthly")}
-    style={{ flex: "1 0 100px", maxWidth: "120px" }}
-  >
-    Monthly
-  </button>
-  <button
-    className={`btn btn-sm ${period === "yearly" ? "btn-primary" : "btn-secondary"}`}
-    onClick={() => handlePeriodChange("yearly")}
-    style={{ flex: "1 0 100px", maxWidth: "120px" }}
-  >
-    Yearly
-  </button>
-</div>
-
-{/* Print / Back Buttons */}
-<div
-  style={{
-    display: "flex",
-    justifyContent: "center",
-    gap: "10px",
-    flexWrap: "wrap",
-  }}
-  className="print-hide"
->
-  <button
-    className="btn btn-sm btn-primary"
-    onClick={handlePrint}
-    style={{ flex: "1 0 100px", maxWidth: "120px" }}
-  >
-    Print Report
-  </button>
-  <button
-    className="btn btn-sm btn-dark"
-    onClick={() => navigate(-1)}
-    style={{ flex: "1 0 100px", maxWidth: "120px" }}
-  >
-    Back
-  </button>
-</div>
-
-</div>
+            {/* Print / Back Buttons */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                gap: "10px",
+                flexWrap: "wrap",
+              }}
+              className="print-hide"
+            >
+              <button
+                className="btn btn-sm btn-primary"
+                onClick={handlePrint}
+                style={{ flex: "1 0 100px", maxWidth: "120px" }}
+              >
+                Print Report
+              </button>
+              <button
+                className="btn btn-sm btn-dark"
+                onClick={() => navigate(-1)}
+                style={{ flex: "1 0 100px", maxWidth: "120px" }}
+              >
+                Back
+              </button>
+            </div>
+          </div>
 
           {/* Render a table for each employee */}
           {Object.values(groupedData).map((employee) => {
@@ -903,17 +936,17 @@ const ReportPage = () => {
               {records.map((record, index) => (
                 <tr key={`${employeeId}-${index}`}>
                   <td
-  style={{
-    whiteSpace: "normal",
-    wordBreak: "break-word",
-    fontSize: "0.45rem", // smaller text
-    maxWidth: "140px",
-  }}
->
-  {period === "weekly"
-    ? formatPeriodRange(record.summary_period, "weekly")
-    : formatPeriodRange(record.summary_period, period)}
-</td>
+                    style={{
+                      whiteSpace: "normal",
+                      wordBreak: "break-word",
+                      fontSize: "0.45rem", // smaller text
+                      maxWidth: "140px",
+                    }}
+                  >
+                    {period === "weekly"
+                      ? formatPeriodRange(record.summary_period, "weekly")
+                      : formatPeriodRange(record.summary_period, period)}
+                  </td>
 
                   <td>
                     {record.facility_total_hours
