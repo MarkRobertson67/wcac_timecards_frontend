@@ -6,8 +6,10 @@
 <br/>
 
 [![License](https://img.shields.io/badge/License-Proprietary-blue.svg)](./LICENSE.txt)
-[![GitHub release](https://img.shields.io/github/v/release/markrobertson67/wcac_timecards_frontend)](https://github.com/markrobertson67/[![version](https://img.shields.io/github/package-json/v/markrobertson67/wcac_timecards_frontend)](https://github.com/markrobertson67/wcac_timecards_frontend/blob/main/package.json)
+[![GitHub release](https://img.shields.io/github/v/release/markrobertson67/wcac_timecards_frontend)](https://github.com/markrobertson67/wcac_timecards_frontend/releases)
+[![version](https://img.shields.io/github/package-json/v/markrobertson67/wcac_timecards_frontend)](https://github.com/markrobertson67/wcac_timecards_frontend/blob/main/package.json)
 [![Netlify Status](https://api.netlify.com/api/v1/badges/d9b982a6-78ec-40a3-9e2e-f9857b4a1706/deploy-status)](https://app.netlify.com/sites/wcac-timecards/deploys)
+
 
 
 
