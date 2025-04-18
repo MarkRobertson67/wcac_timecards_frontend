@@ -2,34 +2,32 @@
 Copyright (c) 2025 Mark Robertson
 See LICENSE.txt file for details. */
 
-/* Ensure the page container can scroll vertically */
+/* ==== Base container: fixed height ==== */
 .reportpageContainer {
   max-width: 1200px;
+  height: calc(100vh - 200px);  /* Locks height across all devices */
   margin: 0 auto;
   padding: 20px;
   background-color: white;
   border-radius: 8px;
-  overflow-y: visible;
-  max-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Prevent page scroll */
 }
 
+/* ==== Table wrapper: handles all scrolling ==== */
 .reportTableContainer {
-  width: 100%;
-  max-height:min-content;
-  margin: 0 auto;
-  overflow-x: auto;
+  flex-grow: 1;
   overflow-y: auto;
-  display: block;
+  overflow-x: auto;
 }
 
-.reportpageContainer h2 {
-  margin-top: 0 !important;
-}
-
+/* ==== Table formatting ==== */
 .table {
   width: 100%;
   min-width: 1000px;
   margin: 0 auto;
+  border-collapse: collapse;
 }
 
 .table th,
@@ -47,25 +45,79 @@ See LICENSE.txt file for details. */
   background-color: #f2f2f2;
 }
 
+/* ==== Header === */
+.reportpageContainer h2 {
+  margin-top: 0;
+}
+
+/* ==== Mobile: still fix height + table scrolls ==== */
+@media (max-width: 768px) {
+  .reportpageContainer {
+    height: calc(100vh - 150px);
+    padding: 10px;
+  }
+
+  .reportTableContainer {
+    padding-bottom: 60px;
+  }
+
+  .table {
+    font-size: 0.75rem;
+  }
+
+  .table th,
+  .table td {
+    font-size: 0.65rem;
+    padding: 5px;
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  .button-group {
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .button-group button {
+    font-size: 0.85rem;
+    padding: 6px 10px;
+  }
+}
+
+/* ==== Extra small screen tweak ==== */
+@media (max-width: 375px) {
+  .table th,
+  .table td {
+    padding: 4px;
+    font-size: 0.6rem;
+  }
+
+  .reportTableContainer {
+    padding: 0 10px 60px 10px;
+  }
+}
+
+/* ==== Print ==== */
 @media print {
-  /* Ensure everything is visible when printing */
   body, html {
-    overflow-y: auto !important;
-    height: 100% !important;
+    overflow: visible !important;
+    height: auto !important;
   }
 
   .print-hide {
     display: none !important;
   }
 
+  .reportpageContainer,
+  .reportTableContainer {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
   .table {
     page-break-inside: avoid;
     break-inside: avoid;
-  }
-
-  .pageContainer, .reportpageContainer {
-    overflow: auto !important;
-    max-height: 90vh !important;
   }
 
   tr {
@@ -76,84 +128,4 @@ See LICENSE.txt file for details. */
   @page {
     margin: 1in;
   }
-}
-
-
-/* Mobile responsiveness */
-@media (max-width: 768px) {
-  .reportTableContainer {
-    padding: 0 10px;
-    padding-bottom: 220px;
-  }
-
-  .reportpageContainer {
-    padding-top: 8px !important;
-  }
-  
-  .reportpageContainer h2 {
-    margin-top: 0 !important;
-  }
-  
-  .table {
-    width: 100%;
-    font-size: 0.75rem;
-    word-wrap: break-word;
-  }
-
-  .table th, .table td {
-    font-size: 0.65rem !important;
-    padding: 5px;
-    word-wrap: break-word;
-    white-space: normal;
-  }
-
-  .button-group {
-    flex-direction: row;
-    justify-content: center;
-  }
-
-  .button-group button {
-    font-size: 0.85rem;
-    padding: 6px 10px;
-  }
-
-  .table td:first-child {
-    white-space: normal;
-    word-break: break-word;
-    max-width: 140px;
-  }
-
-}
-
-/* For even smaller screens */
-@media (max-width: 375px) {
-  .reportTableContainer {
-    max-width: 100%;
-    padding: 0 10px;
-    margin-top: 0px;
-    padding-bottom: 220px;
-    padding-right: 10px;
-  }
-
-  .reportpageContainer {
-    padding-top: 8px !important;
-  }
-  
-  .reportpageContainer h2 {
-    margin-top: 0 !important;
-  }
-  
-  
-  .table {
-    width: 100%;
-    table-layout: fixed;
-  }
-
-  .table th, .table td {
-    font-size: 0.65rem !important;
-    padding: 4px;
-    word-wrap: break-word;
-    white-space: normal;
-  }
-  
 }
