@@ -373,85 +373,12 @@ function TimeCardReports() {
     }
   };
 
-  const renderFormFields = () => {
-    const { reportType, startDate, endDate, selectedEmployeeName, employees } =
-      formState;
-
-    if (
-      ["totalHours", "detailedTimecards", "employeeSummary"].includes(
-        reportType
-      )
-    ) {
-      return (
-        <div className="row mb-3">
-          <div className="col-12 col-md mb-2">
-            <label htmlFor="selectedEmployeeName" className="form-label">
-              Employee:
-            </label>
-            <select
-              id="selectedEmployeeName"
-              className="form-select"
-              value={selectedEmployeeName || ""}
-              onChange={handleChange}
-              disabled={isLoading}
-              style={{
-                backgroundColor: isLoading ? "#e9ecef" : "",
-                cursor: isLoading ? "not-allowed" : "pointer",
-                opacity: isLoading ? 0.7 : 1,
-              }}
-            >
-              <option value="">Select Employee</option>
-              {reportType !== "detailedTimecards" && isAdmin && (
-                <option value="ALL">ALL</option>
-              )}
-              {employees.map((emp) => (
-                <option
-                  key={emp.id}
-                  value={`${emp.first_name} ${emp.last_name}`}
-                >
-                  {emp.first_name} {emp.last_name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="col-12 col-md mb-2">
-            <label htmlFor="startDate" className="form-label">
-              Start Date:
-            </label>
-            <input
-              id="startDate"
-              type="date"
-              className="form-control"
-              value={startDate}
-              onChange={handleChange}
-              disabled={isLoading}
-            />
-          </div>
-          <div className="col-12 col-md mb-2">
-            <label htmlFor="endDate" className="form-label">
-              End Date:
-            </label>
-            <input
-              id="endDate"
-              type="date"
-              className="form-control"
-              value={endDate}
-              onChange={handleChange}
-              disabled={isLoading}
-            />
-          </div>
-        </div>
-      );
-    }
-
-    return null;
-  };
 
   return (
     <div className={styles.tcrPage}>
-      <div className="container mt-4 pt-4">
+      <div className="container mt-4 pt-4" style={{ maxWidth: "500px" }}>
         <h2 className="text-center mb-4">Time Card Reports</h2>
-
+  
         {isLoading ? (
           <div className="text-center mt-4">
             <div className="spinner-border custom-spinner" role="status"></div>
@@ -469,18 +396,66 @@ function TimeCardReports() {
                 value={formState.reportType}
                 onChange={handleChange}
               >
-                <option value="totalHours">
-                  Total Hours Worked by Employee
-                </option>
-                <option value="detailedTimecards">
-                  Detailed Timecards by Employee
-                </option>
+                <option value="totalHours">Total Hours Worked by Employee</option>
+                <option value="detailedTimecards">Detailed Timecards by Employee</option>
                 <option value="employeeSummary">Employee Summary Report</option>
               </select>
             </div>
-
-            {renderFormFields()}
-
+  
+            {["totalHours", "detailedTimecards", "employeeSummary"].includes(formState.reportType) && (
+              <>
+                <div className="mb-3">
+                  <label htmlFor="selectedEmployeeName" className="form-label">Employee:</label>
+                  <select
+                    id="selectedEmployeeName"
+                    className="form-select"
+                    value={formState.selectedEmployeeName || ""}
+                    onChange={handleChange}
+                    disabled={isLoading}
+                    style={{
+                      backgroundColor: isLoading ? "#e9ecef" : "",
+                      cursor: isLoading ? "not-allowed" : "pointer",
+                      opacity: isLoading ? 0.7 : 1,
+                    }}
+                  >
+                    <option value="">Select Employee</option>
+                    {formState.reportType !== "detailedTimecards" && isAdmin && (
+                      <option value="ALL">ALL</option>
+                    )}
+                    {formState.employees.map((emp) => (
+                      <option key={emp.id} value={`${emp.first_name} ${emp.last_name}`}>
+                        {emp.first_name} {emp.last_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+  
+                <div className="mb-3">
+                  <label htmlFor="startDate" className="form-label">Start Date:</label>
+                  <input
+                    id="startDate"
+                    type="date"
+                    className="form-control"
+                    value={formState.startDate}
+                    onChange={handleChange}
+                    disabled={isLoading}
+                  />
+                </div>
+  
+                <div className="mb-3">
+                  <label htmlFor="endDate" className="form-label">End Date:</label>
+                  <input
+                    id="endDate"
+                    type="date"
+                    className="form-control"
+                    value={formState.endDate}
+                    onChange={handleChange}
+                    disabled={isLoading}
+                  />
+                </div>
+              </>
+            )}
+  
             <div
               style={{
                 display: "flex",
@@ -494,23 +469,16 @@ function TimeCardReports() {
                 className="btn btn-primary"
                 onClick={handleGenerateReport}
                 disabled={isLoading}
-                style={{
-                  padding: "6px 14px",
-                  width: "auto",
-                  minWidth: "fit-content",
-                }}
+                style={{ padding: "6px 14px", width: "auto" }}
               >
                 {isLoading ? "Loading..." : "Generate Report"}
               </button>
+  
               <button
                 className="btn btn-danger"
                 onClick={resetForm}
                 disabled={isLoading}
-                style={{
-                  padding: "6px 14px",
-                  width: "auto",
-                  minWidth: "fit-content",
-                }}
+                style={{ padding: "6px 14px", width: "auto" }}
               >
                 {isLoading ? "Loading..." : "Reset"}
               </button>
@@ -520,6 +488,7 @@ function TimeCardReports() {
       </div>
     </div>
   );
+  
 }
 
 export default TimeCardReports;
