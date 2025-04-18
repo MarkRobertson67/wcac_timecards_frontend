@@ -422,15 +422,16 @@ const ReportPage = () => {
                 <td className="time-cell">
                   <strong>
                     <div>{totals.facility.hours} h</div>
-                    <br />
                     <div>{totals.facility.minutes} min</div>
                   </strong>
                 </td>
-
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
                 <td className="time-cell">
                   <strong>
                     <div>{totals.driving.hours} h</div>
-                    <br />
                     <div>{totals.driving.minutes} min</div>
                   </strong>
                 </td>
