@@ -6,7 +6,7 @@
 <br/>
 
 [![License](https://img.shields.io/badge/License-Proprietary-blue.svg)](./LICENSE.txt)
-[![Version](https://img.shields.io/badge/Version-1.0.0-blue.svg)](package.json)
+[![GitHub release](https://img.shields.io/github/v/release/markrobertson67/wcac_timecards_frontend)](https://github.com/markrobertson67/wcac_timecards_frontend/releases)
 [![Netlify Status](https://api.netlify.com/api/v1/badges/d9b982a6-78ec-40a3-9e2e-f9857b4a1706/deploy-status)](https://app.netlify.com/sites/wcac-timecards/deploys)
 
 
