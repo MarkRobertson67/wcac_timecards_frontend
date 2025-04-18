@@ -418,17 +418,19 @@ const ReportPage = () => {
               <td colSpan="5" style={{ textAlign: "right" }}>
                 <strong>Total</strong>
               </td>
-              <td>
+              <td className="time-cell">
                 <strong>
-                  {totals.facility.hours} h {totals.facility.minutes} min
+                  <div>{totals.facility.hours} h</div>
+                  <br />
+                  <div>{totals.facility.minutes} min</div>
                 </strong>
               </td>
-              <td colSpan="4" style={{ textAlign: "right" }}>
-                <strong>Total</strong>
-              </td>
-              <td>
+
+              <td className="time-cell">
                 <strong>
-                  {totals.driving.hours} h {totals.driving.minutes} min
+                  <div>{totals.driving.hours} h</div>
+                  <br />
+                  <div>{totals.driving.minutes} min</div>
                 </strong>
               </td>
             </tr>
@@ -533,19 +535,34 @@ const ReportPage = () => {
                   <td>{`${record.first_name} ${record.last_name}`}</td>
                   <td>
                     {record.facility_total_hours &&
-                    typeof record.facility_total_hours === "object"
-                      ? `${record.facility_total_hours.hours || 0} h ${
-                          record.facility_total_hours.minutes || 0
-                        } min`
-                      : "0 H 0 Min"}
+                    typeof record.facility_total_hours === "object" ? (
+                      <>
+                        {record.facility_total_hours.hours || 0} h
+                        <br />
+                        {record.facility_total_hours.minutes || 0} min
+                      </>
+                    ) : (
+                      <>
+                        0 h
+                        <br />0 min
+                      </>
+                    )}
                   </td>
+
                   <td>
                     {record.driving_total_hours &&
-                    typeof record.driving_total_hours === "object"
-                      ? `${record.driving_total_hours.hours || 0} h ${
-                          record.driving_total_hours.minutes || 0
-                        } min`
-                      : "0 H 0 Min"}
+                    typeof record.driving_total_hours === "object" ? (
+                      <>
+                        {record.driving_total_hours.hours || 0} h
+                        <br />
+                        {record.driving_total_hours.minutes || 0} min
+                      </>
+                    ) : (
+                      <>
+                        0 h
+                        <br />0 min
+                      </>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -555,12 +572,13 @@ const ReportPage = () => {
                 </td>
                 <td>
                   <strong>
-                    {facilityTotalHours} h {facilityTotalMinutes} min
+                    {facilityTotalHours} h <br /> {facilityTotalMinutes} min
                   </strong>
                 </td>
                 <td>
                   <strong>
-                    {drivingTotalHours} h {drivingTotalMinutes} min
+                    {drivingTotalHours} h <br />
+                    {drivingTotalMinutes} min
                   </strong>
                 </td>
               </tr>

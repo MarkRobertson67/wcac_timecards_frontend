@@ -45,11 +45,12 @@ See LICENSE.txt file for details. */
   background-color: #f2f2f2;
 }
 
-/* ==== Header === */
+/* ==== Header ==== */
 .reportpageContainer h2 {
   margin-top: 0;
 }
 
+/* ==== Mobile: fix height + table scrolls ==== */
 /* ==== Mobile: still fix height + table scrolls ==== */
 @media (max-width: 768px) {
   .reportpageContainer {
@@ -62,6 +63,7 @@ See LICENSE.txt file for details. */
   }
 
   .table {
+    table-layout: auto;
     font-size: 0.75rem;
   }
 
@@ -71,6 +73,20 @@ See LICENSE.txt file for details. */
     padding: 5px;
     white-space: normal;
     word-break: break-word;
+  }
+
+  /* FIX: Keep ID column from wrapping */
+  .table th:nth-child(1),
+  .table td:nth-child(1) {
+    min-width: 50px;
+    white-space: nowrap;
+  }
+
+  /* FIX: Prevent name from wrapping weirdly */
+  .table th:nth-child(2),
+  .table td:nth-child(2) {
+    min-width: 130px;
+    white-space: nowrap;
   }
 
   .button-group {
@@ -87,16 +103,33 @@ See LICENSE.txt file for details. */
 
 /* ==== Extra small screen tweak ==== */
 @media (max-width: 375px) {
-  .table th,
-  .table td {
-    padding: 4px;
-    font-size: 0.6rem;
-  }
-
   .reportTableContainer {
     padding: 0 10px 60px 10px;
   }
+
+  .table th,
+  .table td {
+    font-size: 0.6rem;
+    padding: 4px;
+  }
+
+  .table td:first-child {
+    white-space: nowrap;
+    min-width: 50px;
+  }
+
+  .table td:nth-child(2) {
+    white-space: nowrap;
+    min-width: 120px;
+  }
+
+  .break-cell {
+    white-space: normal;
+    word-break: break-word;
+    text-align: center;
+  }
 }
+
 
 /* ==== Print ==== */
 @media print {
@@ -129,3 +162,4 @@ See LICENSE.txt file for details. */
     margin: 1in;
   }
 }
+
