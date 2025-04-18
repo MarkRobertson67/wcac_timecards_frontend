@@ -121,8 +121,8 @@ html, body {
 
   .container {
     padding: 10px;
-    padding-top: 30px; /* Ensures space below navbar */
-    padding-bottom: 350px;
+    padding-top: 25px; /* Ensures space below navbar */
+    padding-bottom: 355px;
   }
 }
 

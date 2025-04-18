@@ -5,7 +5,6 @@ See LICENSE.txt file for details. */
 
 /* ActiveTimeCard.module.css */
 
-
 /* Basic CSS reset */
 * {
   margin: 0;
@@ -17,11 +16,15 @@ See LICENSE.txt file for details. */
 .container {
   max-width: 1400px;
   margin: 0 auto;
-  padding-bottom: 120px; /* Space for footer */
+  padding-bottom: 120px;
   height: 89vh;
   overflow: hidden;
   display: flex;
   flex-direction: column; /* Stack header, table, and footer vertically */
+}
+
+.container h2 {
+  margin-top: 20px;
 }
 
 /* Table Wrapper: Enable scroll only for the table */
@@ -29,7 +32,7 @@ See LICENSE.txt file for details. */
   overflow-x: auto;
   overflow-y: auto;
   flex-grow: 1; /* Allow table to take up available space */
-  max-height:80vh
+  max-height: 80vh;
 }
 
 /* Ensure table fills the container width */
@@ -89,17 +92,48 @@ See LICENSE.txt file for details. */
   height: 3rem;
 }
 
+/* Button group styling */
+.buttonGroup {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 1rem;
+}
 
+.buttonGroup button {
+  padding: 6px 12px;
+  font-size: 0.875rem;
+}
+
+/* Responsive styles for mobile */
 @media (max-width: 768px) {
-  /* Ensure the activity column is wider on mobile */
-  .activityColumn, .table th.activityColumn, .table td.activityColumn {
-    min-width: 117px;
-    text-align: center !important; /* Align text in dropdown to the left */
+  .container h2 {
+    margin-top: 20px;
   }
 
-  /* Make sure the dropdown shows the full text */
+  .buttonGroup {
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .buttonGroup button {
+    flex: 1 1 45%;
+    max-width: 200px;
+    min-width: 120px;
+    padding: 6px 10px;
+    font-size: 0.875rem;
+  }
+
+  .activityColumn,
+  .table th.activityColumn,
+  .table td.activityColumn {
+    min-width: 117px;
+    text-align: center !important;
+  }
+
   .form-select {
-    font-size: 14px; /* Ensure consistent font size for the dropdown */
-    text-align: left; /* Align text in the dropdown to the left */
+    font-size: 14px;
+    text-align: left;
   }
 }
