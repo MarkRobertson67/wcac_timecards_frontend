@@ -8,11 +8,12 @@ See LICENSE.txt file for details. */
   height: calc(100vh - 200px);  /* Locks height across all devices */
   margin: 0 auto;
   padding: 20px;
+  padding-bottom: 50px;
   background-color: white;
   border-radius: 8px;
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* Prevent page scroll */
+  /* overflow: hidden; */
 }
 
 /* ==== Table wrapper: handles all scrolling ==== */
@@ -51,7 +52,6 @@ See LICENSE.txt file for details. */
 }
 
 /* ==== Mobile: fix height + table scrolls ==== */
-/* ==== Mobile: still fix height + table scrolls ==== */
 @media (max-width: 768px) {
   .reportpageContainer {
     height: calc(100vh - 150px);
