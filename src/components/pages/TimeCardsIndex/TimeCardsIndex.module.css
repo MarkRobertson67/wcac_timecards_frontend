@@ -3,116 +3,61 @@ Copyright (c) 2025 Mark Robertson
 See LICENSE.txt file for details. */
 
 
+/* Basic reset */
+html, body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Prevent scrolling on desktop */
 @media (min-width: 769px) {
   html, body {
     overflow: hidden;
   }
 }
 
-.container {
-  margin-top: 10px;
-  min-height: calc(100vh - 70px - 50px);
-  overflow-y: hidden;
-}
-
-/* Component-Specific Styles */
-.eventContent {
-  /* min-height: 100vh;
-  overflow-y: visible;  */
-  display: flex;
-  justify-content: center;
-  align-items: center; /* Ensure vertical centering */
-  height: 100%;
-  width: 100%;
-  color: black;
-  font-weight: bold;
-  text-align: center; /* Center text horizontally */
-  cursor: pointer; /* Make the whole event box clickable */
-}
-
-.eventContent span {
-  font-size: 1rem;
-}
-
-/* Media Queries */
-/* Adjust event font size specifically for mobile devices */
-@media (max-width: 768px) {
-  .eventContent span {
-    font-size: 0.5rem;
-  }
-
-  /* FullCalendar cell styling for mobile */
-  .fc-daygrid-day-frame {
-    height: 50px; /* Reduce height to avoid overlapping */
-  }
-
-  .fc .fc-daygrid-event {
-    white-space: nowrap;
-  }
-}
-
-
-/* Update event font size for smaller screens */
-.eventContent span {
-  font-size: 1rem;
-}
-
-@media (max-width: 600px) {
-  .eventContent span {
-    font-size: 0.5rem;
-    line-height: 1; /* Reduce line height for better spacing */
-  }
-
-  /* Adjust container padding for smaller screens */
-  .container {
-    padding: 5px;
-  }
-}
-
-/* Basic reset */
-body, html {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 /* Container styling */
 .container {
+  margin-top: 40px; /* Ensure space below navbar */
+  min-height: calc(100vh - 120px); /* Account for footer and spacing */
   width: 100%;
   padding: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding-bottom: 150px;
+  overflow-y: auto;
 }
 
 /* Centering title */
 .container h2 {
   text-align: center;
   margin-bottom: 20px;
+  font-size: 1.4rem;
 }
 
 /* FullCalendar styling */
 .fc {
-  height: 50vh; /* Make the calendar take up 50% of the screen height on mobile */
-    max-height: 50vh;
-    overflow-y: auto;
+  height: auto;
+  max-height: 50vh;
+  overflow-y: auto;
 }
 
 /* Adjusting the height of the calendar cells */
 .fc-daygrid-day-frame {
-  height: 70px; /* height of the cells */
+  height: 70px;
 }
 
 /* Adjusting the height of the calendar header */
 .fc-header-toolbar {
-  height: 40px; /* height of the header */
+  height: 40px;
 }
 
 /* Styling for header buttons */
 .fc-button {
   background-color: transparent;
-  border: none; /* Remove default border */
+  border: none;
   color: #000;
   font-weight: normal;
   outline: none;
@@ -132,15 +77,52 @@ body, html {
   outline: none;
 }
 
-/* Additional styles to override FullCalendar defaults */
 .fc-button:focus-visible {
   outline: none;
 }
 
-/* Media query for smaller screens */
+/* Component-Specific Styles */
+.eventContent {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  color: black;
+  font-weight: bold;
+  text-align: center;
+  cursor: pointer;
+}
+
+.eventContent span {
+  font-size: 1rem;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  .eventContent span {
+    font-size: 0.5rem;
+  }
+
+  .fc-daygrid-day-frame {
+    height: 50px;
+  }
+
+  .fc .fc-daygrid-event {
+    white-space: nowrap;
+  }
+}
+
 @media (max-width: 600px) {
+  .eventContent span {
+    font-size: 0.5rem;
+    line-height: 1;
+  }
+
   .container {
-    padding: 5px;
+    padding: 10px;
+    padding-top: 30px; /* Ensures space below navbar */
     padding-bottom: 350px;
   }
 }
+
