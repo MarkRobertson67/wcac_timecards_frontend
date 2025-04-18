@@ -9,8 +9,8 @@ See LICENSE.txt file for details. */
   padding: 20px;
   background-color: white;
   border-radius: 8px;
-  overflow-y: auto;
-  height: calc(100vh - 160px);
+  overflow-y: visible;
+  max-height: 100vh;
 }
 
 .reportTableContainer {
@@ -22,9 +22,12 @@ See LICENSE.txt file for details. */
   display: block;
 }
 
+.reportpageContainer h2 {
+  margin-top: 0 !important;
+}
+
 .table {
   width: 100%;
-  /* max-width: 1600px; */
   min-width: 1000px;
   margin: 0 auto;
 }
@@ -47,8 +50,8 @@ See LICENSE.txt file for details. */
 @media print {
   /* Ensure everything is visible when printing */
   body, html {
-    overflow: visible !important;
-    height: auto !important;
+    overflow-y: auto !important;
+    height: 100% !important;
   }
 
   .print-hide {
@@ -61,8 +64,8 @@ See LICENSE.txt file for details. */
   }
 
   .pageContainer, .reportpageContainer {
-    overflow: visible !important;
-    height: auto !important;
+    overflow: auto !important;
+    max-height: 90vh !important;
   }
 
   tr {
@@ -80,9 +83,17 @@ See LICENSE.txt file for details. */
 @media (max-width: 768px) {
   .reportTableContainer {
     padding: 0 10px;
-    padding-bottom: 50px;
+    padding-bottom: 220px;
   }
 
+  .reportpageContainer {
+    padding-top: 8px !important;
+  }
+  
+  .reportpageContainer h2 {
+    margin-top: 0 !important;
+  }
+  
   .table {
     width: 100%;
     font-size: 0.75rem;
@@ -119,10 +130,20 @@ See LICENSE.txt file for details. */
   .reportTableContainer {
     max-width: 100%;
     padding: 0 10px;
-    margin-top: 10px;
-    padding-bottom: 80px;
+    margin-top: 0px;
+    padding-bottom: 220px;
+    padding-right: 10px;
   }
 
+  .reportpageContainer {
+    padding-top: 8px !important;
+  }
+  
+  .reportpageContainer h2 {
+    margin-top: 0 !important;
+  }
+  
+  
   .table {
     width: 100%;
     table-layout: fixed;

@@ -3,8 +3,8 @@
    See LICENSE.txt file for details. */
 
    #root {
-    padding-top: 56px;   /* height of your navbar */
-    padding-bottom: 60px;/* height of your footer */
+    padding-top: 33px;   /* height of your navbar */
+    padding-bottom: 20px;/* height of your footer */
     box-sizing: border-box;
     height: 100%;        /* Allow the root container to take full height */
     overflow-y: auto;    
