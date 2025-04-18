@@ -33,7 +33,6 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
   // Check if the screen width is mobile (adjust as needed for your breakpoint)
   //const isMobile = width <= 768;
 
-
   useEffect(() => {
     const fetchEmployeeId = async () => {
       try {
@@ -964,45 +963,25 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
       <h2 className="text-center mb-4">Active Timecard</h2>
 
-      <div className="text-center mb-3">
+      <div className={styles.buttonGroup}>
         <button
-          className="btn btn-primary me-3"
+          className="btn btn-primary"
           onClick={handleSubmit}
           disabled={isSubmitting || isSubmitted || isLoading}
         >
-          {isSubmitting ? (
-            <>
-              <span
-                className="spinner-border spinner-border-sm"
-                role="status"
-                aria-hidden="true"
-              ></span>
-              Submitting...
-            </>
-          ) : isSubmitted ? (
-            "Submitted"
-          ) : (
-            "Turn in your Timecard"
-          )}
+          {isSubmitting
+            ? "Submitting..."
+            : isSubmitted
+            ? "Submitted"
+            : "Turn in your Timecard"}
         </button>
 
         <button
-          className="btn btn-danger me-3"
+          className="btn btn-danger"
           onClick={handleReset}
           disabled={isSubmitting || isLoading}
         >
-          {isLoading ? (
-            <>
-              <span
-                className="spinner-border spinner-border-sm"
-                role="status"
-                aria-hidden="true"
-              ></span>
-              Resetting...
-            </>
-          ) : (
-            "Reset"
-          )}
+          {isLoading ? "Resetting..." : "Reset"}
         </button>
 
         <button
@@ -1014,8 +993,8 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
       </div>
 
       {/* Key explanation with delete red dot */}
-      <div className="text-center mb-4">
-        <p style={{ textAlign: "center" }}>
+      <div className={`text-center ${styles.instructions}`}>
+        <p>
           click <span style={{ color: "red" }}>🔴</span> to delete time.
         </p>
       </div>
