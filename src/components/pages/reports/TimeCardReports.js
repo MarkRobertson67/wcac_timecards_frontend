@@ -503,7 +503,7 @@ function TimeCardReports() {
                 {isLoading ? "Loading..." : "Generate Report"}
               </button>
               <button
-                className="btn btn-secondary"
+                className="btn btn-danger"
                 onClick={resetForm}
                 disabled={isLoading}
                 style={{
