@@ -79,13 +79,8 @@ const ReportPage = () => {
     // }
 
     if (period === "monthly") {
-      console.log("Raw summaryPeriod for monthly:", summaryPeriod);
-    
-      const paddedDate =
-        typeof summaryPeriod === "string" && summaryPeriod.length === 7
-          ? `${summaryPeriod}-01`
-          : summaryPeriod;
-    
+      const raw = summaryPeriod?.toString?.() || "";
+      const paddedDate = raw.length === 7 ? `${raw}-01` : raw;
       const parsedDate = new Date(paddedDate);
       console.log("Parsed date for monthly:", parsedDate);
     
@@ -98,6 +93,7 @@ const ReportPage = () => {
       const year = parsedDate.getFullYear();
       return `${month} ${year}`;
     }
+    
     
     
     
