@@ -59,7 +59,6 @@ const ReportPage = () => {
 
   // Helper function to format period based on weekly, monthly, or yearly
   const formatPeriodRange = useCallback((summaryPeriod, period) => {
-    
     const startOfPeriod = new Date(summaryPeriod);
     if (isNaN(startOfPeriod)) {
       console.warn("⚠️ Invalid summaryPeriod:", summaryPeriod);
@@ -84,23 +83,32 @@ const ReportPage = () => {
         console.warn("Invalid date for monthly view:", summaryPeriod);
         return "Invalid Month";
       }
-    
+
       const year = startOfPeriod.getUTCFullYear();
       const month = startOfPeriod.getUTCMonth(); // 0-based index
       const monthNames = [
-        "January", "February", "March", "April", "May", "June",
-        "July", "August", "September", "October", "November", "December"
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
       ];
-    
+
       const monthName = monthNames[month];
       console.log(`Parsed date for monthly: ${startOfPeriod}`);
       console.log(`Parsed month index: ${month}, name: ${monthName}`);
-    
+      console.log(`Returning monthly label: ${monthName} ${year}`);
+
       return `${monthName} ${year}`;
     }
-    
-    
-    
+
     if (period === "yearly") {
       return `${startOfPeriod.getUTCFullYear()}`;
     }
@@ -995,7 +1003,6 @@ const ReportPage = () => {
             <table
               className={`table table-striped table-bordered text-center ${styles.table}`}
               style={{ tableLayout: "auto", width: "max-content" }}
-
             >
               <thead>
                 <tr>
@@ -1016,6 +1023,7 @@ const ReportPage = () => {
                 {/* Render from `records` */}
                 {records.map((record, index) => (
                   <tr key={`${employeeId}-${index}`}>
+                    
                     <td
                       style={{
                         whiteSpace: "pre-wrap",
@@ -1025,9 +1033,20 @@ const ReportPage = () => {
                         minWidth: "160px",
                       }}
                     >
-                      {period === "weekly"
-                        ? formatPeriodRange(record.summary_period, "weekly")
-                        : formatPeriodRange(record.summary_period, period)}
+                      {(() => {
+                        const raw = record.summary_period;
+                        if (!raw) return "Missing Period";
+                        const label =
+                          record.formatted_period ||
+                          formatPeriodRange(raw, period);
+                        if (
+                          label === "Invalid Month" ||
+                          label === "Invalid Date"
+                        ) {
+                          console.warn("⚠️ Found invalid label:", { raw });
+                        }
+                        return label;
+                      })()}
                     </td>
 
                     <td style={{ minWidth: "120px" }}>
