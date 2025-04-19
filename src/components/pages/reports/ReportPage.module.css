@@ -107,6 +107,12 @@ See LICENSE.txt file for details. */
     padding: 0 10px 60px 10px;
   }
 
+  .table {
+    table-layout: auto !important;
+    min-width: unset !important;
+    width: max-content;
+  }
+  
   .table th,
   .table td {
     font-size: 0.6rem;
@@ -115,12 +121,22 @@ See LICENSE.txt file for details. */
 
   .table td:first-child {
     white-space: nowrap;
-    min-width: 50px;
+    min-width: 150px;
   }
 
   .table td:nth-child(2) {
     white-space: nowrap;
-    min-width: 120px;
+    min-width: 0px;
+  }
+
+  .table td:first-child(3) {
+    white-space: nowrap;
+    min-width: 50px;
+  }
+
+  .table td:nth-child(4) {
+    white-space: nowrap;
+    min-width: 50px;
   }
 
   .break-cell {

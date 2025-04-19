@@ -59,20 +59,36 @@ const ReportPage = () => {
 
   // Helper function to format period based on weekly, monthly, or yearly
   const formatPeriodRange = useCallback((summaryPeriod, period) => {
+    
     const startOfPeriod = new Date(summaryPeriod);
+    if (isNaN(startOfPeriod)) {
+      console.warn("⚠️ Invalid summaryPeriod:", summaryPeriod);
+      return "Invalid Date";
+    }
 
     if (period === "weekly") {
       const endOfPeriod = new Date(startOfPeriod);
       endOfPeriod.setDate(startOfPeriod.getDate() + 6);
-      return `${formatDate(startOfPeriod)} - ${formatDate(endOfPeriod)}`;
+      return `${formatDate(startOfPeriod)} -\n ${formatDate(endOfPeriod)}`;
     }
+
+    // if (period === "monthly") {
+    //   return `${startOfPeriod.toLocaleString("default", {
+    //     month: "long",
+    //   })} ${startOfPeriod.getFullYear()}`;
+    // }
 
     if (period === "monthly") {
-      return `${startOfPeriod.toLocaleString("default", {
-        month: "long",
-      })} ${startOfPeriod.getFullYear()}`;
+      const parsedDate = new Date(summaryPeriod);
+      if (isNaN(parsedDate)) {
+        console.warn("Invalid date for monthly view:", summaryPeriod);
+        return "Invalid Month";
+      }
+      const month = parsedDate.toLocaleString("default", { month: "long" });
+      const year = parsedDate.getFullYear();
+      return `${month} ${year}`;
     }
-
+    
     if (period === "yearly") {
       return `${startOfPeriod.getUTCFullYear()}`;
     }
@@ -871,39 +887,92 @@ const ReportPage = () => {
             {titlePrefix} Employee Summary Report For <br /> {firstName}{" "}
             {lastName}
           </h2>
+
           <div className="text-center mb-4">
-            <button
-              className={`btn btn-sm mx-2 ${
-                period === "weekly" ? "btn-primary" : "btn-secondary"
-              }`}
-              onClick={() => handlePeriodChange("weekly")}
+            {/* Period Toggle Buttons */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                gap: "10px",
+                flexWrap: "wrap",
+                marginBottom: "1rem",
+              }}
             >
-              Weekly
-            </button>
-            <button
-              className={`btn btn-sm mx-2 ${
-                period === "monthly" ? "btn-primary" : "btn-secondary"
-              }`}
-              onClick={() => handlePeriodChange("monthly")}
+              <button
+                className={`btn btn-sm ${
+                  period === "weekly" ? "btn-primary" : "btn-secondary"
+                }`}
+                onClick={() => handlePeriodChange("weekly")}
+                style={{
+                  flex: "1 0 100px",
+                  maxWidth: "120px",
+                  padding: "6px 10px",
+                  fontSize: "0.85rem",
+                }}
+              >
+                Weekly
+              </button>
+              <button
+                className={`btn btn-sm ${
+                  period === "monthly" ? "btn-primary" : "btn-secondary"
+                }`}
+                onClick={() => handlePeriodChange("monthly")}
+                style={{
+                  flex: "1 0 100px",
+                  maxWidth: "120px",
+                  padding: "6px 10px",
+                  fontSize: "0.85rem",
+                }}
+              >
+                Monthly
+              </button>
+              <button
+                className={`btn btn-sm ${
+                  period === "yearly" ? "btn-primary" : "btn-secondary"
+                }`}
+                onClick={() => handlePeriodChange("yearly")}
+                style={{
+                  flex: "1 0 100px",
+                  maxWidth: "120px",
+                  padding: "6px 10px",
+                  fontSize: "0.85rem",
+                }}
+              >
+                Yearly
+              </button>
+            </div>
+
+            {/* Print / Back Buttons */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                gap: "10px",
+                flexWrap: "wrap",
+              }}
             >
-              Monthly
-            </button>
-            <button
-              className={`btn btn-sm mx-2 ${
-                period === "yearly" ? "btn-primary" : "btn-secondary"
-              }`}
-              onClick={() => handlePeriodChange("yearly")}
-            >
-              Yearly
-            </button>
-            <br />
-            <div className="mt-3">
-              <button className="btn btn-primary mx-2" onClick={handlePrint}>
+              <button
+                className="btn btn-primary"
+                onClick={handlePrint}
+                style={{
+                  flex: "1 0 100px",
+                  maxWidth: "120px",
+                  padding: "6px 10px",
+                  fontSize: "0.85rem",
+                }}
+              >
                 Print Report
               </button>
               <button
-                className="btn btn-dark mx-2"
+                className="btn btn-dark"
                 onClick={() => navigate(-1)}
+                style={{
+                  flex: "1 0 100px",
+                  maxWidth: "120px",
+                  padding: "6px 10px",
+                  fontSize: "0.85rem",
+                }}
               >
                 Back
               </button>
@@ -913,20 +982,22 @@ const ReportPage = () => {
           <div className={styles.reportTableContainer}>
             <table
               className={`table table-striped table-bordered text-center ${styles.table}`}
+              style={{ tableLayout: "auto", width: "max-content" }}
+
             >
               <thead>
                 <tr>
-                  <th>
+                  <th style={{ minWidth: "160px" }}>
                     {period === "weekly"
                       ? "Period (Date Range)"
                       : period === "monthly"
                       ? "Month"
                       : "Year"}
                   </th>
-                  <th>Facility Total Hours</th>
-                  <th>Driving Total Hours</th>
-                  <th>Days Worked</th>
-                  <th>Days Absent</th>
+                  <th style={{ minWidth: "220px" }}>Facility Total Hours</th>
+                  <th style={{ minWidth: "140px" }}>Driving Total Hours</th>
+                  <th style={{ minWidth: "100px" }}>Days Worked</th>
+                  <th style={{ minWidth: "100px" }}>Days Absent</th>
                 </tr>
               </thead>
               <tbody>
@@ -935,10 +1006,11 @@ const ReportPage = () => {
                   <tr key={`${employeeId}-${index}`}>
                     <td
                       style={{
-                        whiteSpace: "normal",
+                        whiteSpace: "pre-wrap",
                         wordBreak: "break-word",
-                        fontSize: "0.45rem", // smaller text
-                        maxWidth: "140px",
+                        fontSize: "0.75rem",
+                        maxWidth: "160px",
+                        minWidth: "160px",
                       }}
                     >
                       {period === "weekly"
@@ -946,18 +1018,20 @@ const ReportPage = () => {
                         : formatPeriodRange(record.summary_period, period)}
                     </td>
 
-                    <td>
+                    <td style={{ minWidth: "120px" }}>
                       {record.facility_total_hours
                         ? `${record.facility_total_hours.hours} h ${record.facility_total_hours.minutes} min`
                         : "0 hours 0 minutes"}
                     </td>
-                    <td>
+                    <td style={{ minWidth: "140px" }}>
                       {record.driving_total_hours
                         ? `${record.driving_total_hours.hours} h ${record.driving_total_hours.minutes} min`
                         : "0 hours 0 minutes"}
                     </td>
-                    <td>{record.days_worked}</td>
-                    <td>{record.absentee_days}</td>
+                    <td style={{ minWidth: "100px" }}>{record.days_worked}</td>
+                    <td style={{ minWidth: "100px" }}>
+                      {record.absentee_days}
+                    </td>
                   </tr>
                 ))}
                 {/* Overall Totals */}
