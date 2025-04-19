@@ -79,15 +79,27 @@ const ReportPage = () => {
     // }
 
     if (period === "monthly") {
-      const parsedDate = new Date(summaryPeriod);
+      console.log("Raw summaryPeriod for monthly:", summaryPeriod);
+    
+      const paddedDate =
+        typeof summaryPeriod === "string" && summaryPeriod.length === 7
+          ? `${summaryPeriod}-01`
+          : summaryPeriod;
+    
+      const parsedDate = new Date(paddedDate);
+      console.log("Parsed date for monthly:", parsedDate);
+    
       if (isNaN(parsedDate)) {
-        console.warn("Invalid date for monthly view:", summaryPeriod);
+        console.warn("❌ Invalid date for monthly view:", summaryPeriod);
         return "Invalid Month";
       }
-      const month = parsedDate.toLocaleString("default", { month: "long" });
+    
+      const month = parsedDate.toLocaleString("en-US", { month: "long" });
       const year = parsedDate.getFullYear();
       return `${month} ${year}`;
     }
+    
+    
     
     if (period === "yearly") {
       return `${startOfPeriod.getUTCFullYear()}`;
