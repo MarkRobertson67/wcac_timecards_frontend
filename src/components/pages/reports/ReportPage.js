@@ -57,64 +57,38 @@ const ReportPage = () => {
     };
   };
 
-  // Helper function to format period based on weekly, monthly, or yearly
   const formatPeriodRange = useCallback((summaryPeriod, period) => {
-    const startOfPeriod = new Date(summaryPeriod);
-    if (isNaN(startOfPeriod)) {
-      console.warn("⚠️ Invalid summaryPeriod:", summaryPeriod);
+    // Skip parsing if it's already a formatted label (e.g., "March 2025", "2024")
+    if (typeof summaryPeriod === "string" && !summaryPeriod.includes("T")) {
+      return summaryPeriod; // use as-is, it's already formatted
+    }
+  
+    const date = new Date(summaryPeriod);
+    if (isNaN(date)) {
+      console.warn("⚠️ Not a parseable ISO date string:", summaryPeriod);
       return "Invalid Date";
     }
-
+  
     if (period === "weekly") {
-      const endOfPeriod = new Date(startOfPeriod);
-      endOfPeriod.setDate(startOfPeriod.getDate() + 6);
-      return `${formatDate(startOfPeriod)} -\n ${formatDate(endOfPeriod)}`;
+      const endOfWeek = new Date(date);
+      endOfWeek.setDate(date.getDate() + 6);
+      return `${formatDate(date)} -\n ${formatDate(endOfWeek)}`;
     }
-
-    // if (period === "monthly") {
-    //   return `${startOfPeriod.toLocaleString("default", {
-    //     month: "long",
-    //   })} ${startOfPeriod.getFullYear()}`;
-    // }
-
+  
     if (period === "monthly") {
-      const startOfPeriod = new Date(summaryPeriod);
-      if (isNaN(startOfPeriod)) {
-        console.warn("Invalid date for monthly view:", summaryPeriod);
-        return "Invalid Month";
-      }
-
-      const year = startOfPeriod.getUTCFullYear();
-      const month = startOfPeriod.getUTCMonth(); // 0-based index
-      const monthNames = [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December",
-      ];
-
-      const monthName = monthNames[month];
-      console.log(`Parsed date for monthly: ${startOfPeriod}`);
-      console.log(`Parsed month index: ${month}, name: ${monthName}`);
-      console.log(`Returning monthly label: ${monthName} ${year}`);
-
-      return `${monthName} ${year}`;
+      const month = date.toLocaleString("default", { month: "long" });
+      const year = date.getFullYear();
+      return `${month} ${year}`;
     }
-
+  
     if (period === "yearly") {
-      return `${startOfPeriod.getUTCFullYear()}`;
+      return `${date.getFullYear()}`;
     }
-
-    return formatDate(startOfPeriod); // Fallback if no valid period is provided
+  
+    return formatDate(date); // fallback
   }, []);
+  
+  
 
   const aggregateDataByPeriod = useCallback(
     (data, period) => {
@@ -1023,7 +997,7 @@ const ReportPage = () => {
                 {/* Render from `records` */}
                 {records.map((record, index) => (
                   <tr key={`${employeeId}-${index}`}>
-                    
+
                     <td
                       style={{
                         whiteSpace: "pre-wrap",
