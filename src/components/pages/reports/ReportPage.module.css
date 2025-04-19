@@ -149,33 +149,40 @@ See LICENSE.txt file for details. */
 
 /* ==== Print ==== */
 @media print {
-  body, html {
+  html,
+  body {
     overflow: visible !important;
     height: auto !important;
   }
 
+  /* Hide elements not needed for printing */
   .print-hide {
     display: none !important;
   }
 
+  /* Force page break between sections */
+  .page-break {
+    page-break-after: always;
+  }
+
+  /* Ensure containers expand fully for printing */
   .reportpageContainer,
   .reportTableContainer {
     height: auto !important;
     overflow: visible !important;
   }
 
-  .table {
-    page-break-inside: avoid;
-    break-inside: avoid;
-  }
-
+  /* Prevent tables and rows from splitting across pages */
+  .table,
   tr {
     page-break-inside: avoid;
     break-inside: avoid;
   }
 
+  /* Set margins for printed pages */
   @page {
     margin: 1in;
   }
 }
+
 
