@@ -79,15 +79,26 @@ const ReportPage = () => {
     // }
 
     if (period === "monthly") {
-      const parsedDate = new Date(summaryPeriod); // Already normalized above
-      if (isNaN(parsedDate)) {
+      const startOfPeriod = new Date(summaryPeriod);
+      if (isNaN(startOfPeriod)) {
         console.warn("Invalid date for monthly view:", summaryPeriod);
         return "Invalid Month";
       }
-      const month = parsedDate.toLocaleString("en-US", { month: "long" });
-      const year = parsedDate.getFullYear();
-      return `${month} ${year}`;
+    
+      const year = startOfPeriod.getUTCFullYear();
+      const month = startOfPeriod.getUTCMonth(); // 0-based index
+      const monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+      ];
+    
+      const monthName = monthNames[month];
+      console.log(`Parsed date for monthly: ${startOfPeriod}`);
+      console.log(`Parsed month index: ${month}, name: ${monthName}`);
+    
+      return `${monthName} ${year}`;
     }
+    
     
     
     if (period === "yearly") {
@@ -189,58 +200,18 @@ const ReportPage = () => {
   };
 
   // Cache the initial data when the component mounts
-  // useEffect(() => {
-  //   if (initialReportData) {
-  //     console.log("Initial Report Data before formatting:", initialReportData);
-  //     setLoading(true);
-  //     const formattedData = initialReportData.map((data) => ({
-  //       ...data,
-  //       formatted_period: formatPeriodRange(data.summary_period, "weekly"), // Default to weekly
-  //     }));
-  //     console.log(
-  //       "Formatted period (weekly):",
-  //       formatPeriodRange("2024-11-25T00:00:00.000Z", "weekly")
-  //     );
-  //     setCachedData((prevCache) => ({
-  //       ...prevCache,
-  //       weekly: formattedData,
-  //       monthly: formattedData.map((d) => ({
-  //         ...d,
-  //         formatted_period: formatPeriodRange(d.summary_period, "monthly"),
-  //       })),
-  //       yearly: formattedData.map((d) => ({
-  //         ...d,
-  //         formatted_period: formatPeriodRange(d.summary_period, "yearly"),
-  //       })),
-  //     }));
-  //     setLoading(false);
-  //   }
-  // }, [initialReportData, formatPeriodRange]);
-
   useEffect(() => {
     if (initialReportData) {
       console.log("Initial Report Data before formatting:", initialReportData);
       setLoading(true);
-  
-      const formattedData = initialReportData.map((data) => {
-        let normalizedSummaryPeriod = data.summary_period;
-  
-        // Normalize format: if it's "YYYY-MM-DD", convert to full ISO format
-        if (
-          typeof normalizedSummaryPeriod === "string" &&
-          normalizedSummaryPeriod.length === 10
-        ) {
-          normalizedSummaryPeriod = `${normalizedSummaryPeriod}T00:00:00.000Z`;
-        }
-  
-        return {
-          ...data,
-          summary_period: normalizedSummaryPeriod, // store the normalized version
-          formatted_period: formatPeriodRange(normalizedSummaryPeriod, "weekly"),
-        };
-      });
-  
-      // Set all period versions
+      const formattedData = initialReportData.map((data) => ({
+        ...data,
+        formatted_period: formatPeriodRange(data.summary_period, "weekly"), // Default to weekly
+      }));
+      console.log(
+        "Formatted period (weekly):",
+        formatPeriodRange("2024-11-25T00:00:00.000Z", "weekly")
+      );
       setCachedData((prevCache) => ({
         ...prevCache,
         weekly: formattedData,
@@ -253,13 +224,9 @@ const ReportPage = () => {
           formatted_period: formatPeriodRange(d.summary_period, "yearly"),
         })),
       }));
-  
       setLoading(false);
     }
   }, [initialReportData, formatPeriodRange]);
-  
-
-
 
   const handlePrint = () => {
     window.print();
