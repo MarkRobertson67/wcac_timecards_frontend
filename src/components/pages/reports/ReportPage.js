@@ -460,7 +460,7 @@ const ReportPage = () => {
             </tbody>
           </table>
           <button
-            className="btn btn-sm btn-secondary mt-3"
+            className={`btn btn-sm btn-secondary mt-3 ${styles.backToTopButton}`}
             onClick={() => {
               const topEl = document.getElementById("reportTop");
               if (topEl) topEl.scrollIntoView({ behavior: "smooth" });
