@@ -16,6 +16,16 @@ See LICENSE.txt file for details. */
   /* overflow: hidden; */
 }
 
+/* anchor for “Back to Top” */
+#reportTop {
+  display: block;
+  height: 0;
+  visibility: hidden;
+  /* leave 50px gap under your fixed navbar */
+  scroll-margin-top: 50px;
+}
+
+
 /* ==== Table wrapper: handles all scrolling ==== */
 .reportTableContainer {
   flex-grow: 1;
@@ -105,6 +115,13 @@ See LICENSE.txt file for details. */
 @media (max-width: 375px) {
   .reportTableContainer {
     padding: 0 10px 60px 10px;
+    overflow-x: auto !important;
+  }
+
+  .reportTableContainer table th {
+    white-space: nowrap !important;        /* don’t wrap at all */
+    word-break: normal !important;        /* only break at spaces */
+    overflow-wrap: normal !important;     /* only wrap at normal break points */
   }
 
   .table {
