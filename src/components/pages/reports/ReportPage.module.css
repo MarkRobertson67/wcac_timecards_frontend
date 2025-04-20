@@ -162,6 +162,11 @@ See LICENSE.txt file for details. */
     word-break: break-word;
     text-align: center;
   }
+
+  .backToTopButton {
+    margin-bottom: 60px;
+  }
+  
 }
 
 
