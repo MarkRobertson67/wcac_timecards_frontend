@@ -2,61 +2,173 @@
 Copyright (c) 2025 Mark Robertson
 See LICENSE.txt file for details. */
 
-/* Styling for the AboutComponent page */
+/* General page style */
+body, html {
+  height: 100%; /* Ensure full height of the page */
+  margin: 0; /* Remove default margins */
+  padding: 0; /* Remove default padding */
+}
+
 .acPage {
-    min-height: calc(100vh - 70px - 50px);
-    background: linear-gradient(135deg, #d3d8dd, #3c4650); /* Gradient background */
-    padding: 20px;
-    font-family: 'Arial', sans-serif;
-    padding-bottom: 120px; /* Space for the footer */
-    box-sizing: border-box; /* Include padding in the element's total width and height */
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Center content horizontally */
+  min-height: 100%; /* Ensure content stretches to fill available space */
+  background: linear-gradient(135deg, #d3d8dd, #3c4650);
+  padding: 20px;
+  font-family: 'Roboto', sans-serif;
+  padding-bottom: 120px; /* Space for the footer */
+  box-sizing: border-box; /* Include padding in the element's total width and height */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center content horizontally */
+  overflow-y: auto; /* Enable vertical scrolling */
+}
+
+/* Title Styling - Reverted to original font */
+.title {
+  text-align: center;
+  font-size: 2.5rem;
+  font-family: 'Arial', sans-serif;
+  color: #5a647a;
+  margin-top: 40px;
+  font-weight: bold; /* Bolder font weight */
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1); 
+}
+
+/* Description Styling */
+.description {
+  text-align: center;
+  font-size: 1.1rem;
+  color: #444;
+  margin-top: 20px;
+  font-weight: 400;
+}
+
+.linkText {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.linkText a {
+  color: #ddcbcb;
+  text-decoration: underline;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.linkText a:hover {
+  color: #ffffff;
+  text-decoration: none; /* Remove underline on hover */
+}
+
+/* Layout for content sections */
+.section {
+  display: flex;
+  justify-content: space-between; /* Ensures text and image are on opposite sides */
+  width: 80%; /* Adjust width to make the cards smaller */
+  margin-top: 40px;
+  flex-wrap: wrap; /* Allows columns to stack on smaller screens */
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2), 0 6px 15px rgba(0, 0, 0, 0.1); /* Bold multi-layered shadow */
+  border-top: 2px solid #007bff; /* Thin blue line on top */
+  border-bottom: 2px solid #dc3545; /* Thin red line on the bottom */
+}
+
+.textContent {
+  width: 45%; /* Adjust width to control how much space text takes */
+  margin-right: 10px; /* Add some space between text and image */
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Vertically center the content */
+  align-items: center; /* Horizontally center the content */
+}
+
+
+.imageContent {
+  width: 45%;
+}
+
+.screenshot {
+  margin-top: 20px;
+  text-align: center;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3), 0 6px 15px rgba(0, 0, 0, 0.15); /* Bold shadow for images */
+  border-top: 2px solid #007bff; /* Thin blue line on top */
+  border-bottom: 2px solid #dc3545; /* Thin red line on the bottom */
+}
+
+.screenshotImage {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Prominent shadow for images */
+}
+
+.screenshotCaption {
+  margin-top: 8px;
+  font-style: italic;
+  color: #ddcbcb;
+}
+
+.noteSection {
+  margin-top: 30px;
+  font-size: 1.1rem;
+  color: #333;
+  text-align: center;
+  font-weight: bold;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .section {
+    flex-direction: column; /* Stack the columns on smaller screens */
+    align-items: center;
+    width: 90%; /* Make the section take up most of the screen width */
   }
-  
+
+  .textContent, .imageContent {
+    width: 100%; /* Allow content to take up the full screen on mobile */
+    margin-bottom: 20px;
+  }
+
   .title {
-    text-align: center;
-    font-size: 2rem;
-    font-weight: bold;
-    color: #333; /* Darker text color for better readability */
-    margin-top: 40px;
+    font-size: 1.8rem; /* Adjust title size for smaller screens */
   }
-  
+
   .description {
-    text-align: center;
-    font-size: 1rem;
-    color: #444;
-    margin-top: 20px;
+    font-size: 0.9rem; /* Adjust description font size */
   }
-  
-  .linkText {
-    text-align: center;
-    margin-top: 10px;
-  }
-  
+
   .linkText a {
-    color: #007bff; /* Blue color for the links */
-    text-decoration: underline;
-    font-weight: bold;
+    font-size: 0.9rem; /* Adjust link size */
   }
-  
-  .linkText a:hover {
-    color: #0056b3; /* Darker blue on hover */
-    text-decoration: none; /* Remove underline on hover */
-  }
-  
-  @media (max-width: 768px) {
-    .title {
-      font-size: 1.5rem; /* Adjust title size for smaller screens */
-    }
-  
-    .description {
-      font-size: 0.9rem; /* Adjust description font size */
-    }
-  
-    .linkText a {
-      font-size: 0.9rem; /* Adjust link size */
-    }
-  }
-  
+}
+
+/* Styling for the Contact Us and FAQ Links */
+.noteSection {
+  margin-top: 30px;
+  font-size: 1.1rem;
+  color: #333;
+  text-align: center;
+  font-weight: bold;
+}
+
+.linkText {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.contactUsLink,
+.faqLink {
+  color: #ddcbcb;
+  text-decoration: underline;
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin: 10px;
+}
+
+.contactUsLink:hover,
+.faqLink:hover {
+  color: #ffffff; 
+  text-decoration: none;
+}
