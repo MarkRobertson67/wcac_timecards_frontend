@@ -31,7 +31,6 @@ const ReportPage = () => {
     typeof window !== "undefined" && window.innerWidth < 376
   );
 
-
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
@@ -460,17 +459,17 @@ const ReportPage = () => {
               </tr>
             </tbody>
           </table>
+          <button
+            className="btn btn-sm btn-secondary mt-3"
+            onClick={() => {
+              const topEl = document.getElementById("reportTop");
+              if (topEl) topEl.scrollIntoView({ behavior: "smooth" });
+              else window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+          >
+            Back to Top
+          </button>
         </div>
-        <button
-          className="btn btn-sm btn-secondary mt-3"
-          onClick={() => {
-            const topEl = document.getElementById("reportTop");
-            if (topEl) topEl.scrollIntoView({ behavior: "smooth" });
-            else window.scrollTo({ top: 0, behavior: "smooth" });
-          }}
-        >
-          Back to Top
-        </button>
       </div>
     );
   };
@@ -504,7 +503,7 @@ const ReportPage = () => {
     drivingTotalMinutes = drivingTotalMinutes % 60;
 
     return (
-      <div id="reportTop"  className={`${styles.pageContainer} mt-4`}>
+      <div id="reportTop" className={`${styles.pageContainer} mt-4`}>
         <div>
           <h2 className="text-center">Total Hours Report</h2>
           <p className="text-center">
@@ -621,18 +620,17 @@ const ReportPage = () => {
               </tr>
             </tbody>
           </table>
+          <button
+            className="btn btn-sm btn-secondary mt-3"
+            onClick={() => {
+              const el = document.getElementById("reportTop");
+              if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+              else window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+          >
+            Back to Top
+          </button>
         </div>
-        <button
-  className="btn btn-sm btn-secondary mt-3"
-  onClick={() => {
-    const el = document.getElementById("reportTop");
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-    else window.scrollTo({ top: 0, behavior: "smooth" });
-  }}
->
-  Back to Top
-</button>
-
       </div>
     );
   };
@@ -852,16 +850,16 @@ const ReportPage = () => {
                   </tbody>
                 </table>
                 <button
-  className="btn btn-sm btn-secondary mt-3"
-  onClick={() => {
-    const el = document.getElementById("reportTop");
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-    else window.scrollTo({ top: 0, behavior: "smooth" });
-  }}
->
-  Back to Top
-</button>
-
+                  className="btn btn-sm btn-secondary mt-3"
+                  onClick={() => {
+                    const el = document.getElementById("reportTop");
+                    if (el)
+                      el.scrollIntoView({ behavior: "smooth", block: "start" });
+                    else window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                >
+                  Back to Top
+                </button>
               </div>
             );
           })}
@@ -919,6 +917,7 @@ const ReportPage = () => {
 
       return (
         <div className={`${styles.pageContainer} mt-4`}>
+          <div id="reportTop" />
           <h2 className="text-center mb-4">
             {titlePrefix} Employee Summary Report For <br /> {firstName}{" "}
             {lastName}
@@ -1127,6 +1126,16 @@ const ReportPage = () => {
                 </tr>
               </tbody>
             </table>
+            <button
+          className="btn btn-sm btn-secondary mt-3"
+          onClick={() => {
+            const topEl = document.getElementById("reportTop");
+            if (topEl) topEl.scrollIntoView({ behavior: "smooth" });
+            else window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
+        >
+          Back to Top
+        </button>
           </div>
         </div>
       );
