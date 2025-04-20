@@ -27,6 +27,20 @@ const ReportPage = () => {
   const [reportData, setReportData] = useState(initialReportData || []); //Use passed datathrough location.state
   const [loading, setLoading] = useState(false);
   const [cachedData, setCachedData] = useState({}); // Cache data for periods
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== "undefined" && window.innerWidth < 376
+  );
+
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener("resize", handleResize);
+    // run once on mount
+    handleResize();
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // Helper function to calculate the overall totals for detailed timecards
   const calculateTotalsForDetailedTimecards = () => {
@@ -72,7 +86,7 @@ const ReportPage = () => {
     if (period === "weekly") {
       const endOfWeek = new Date(date);
       endOfWeek.setDate(date.getDate() + 6);
-      return `${formatDate(date)} -\n ${formatDate(endOfWeek)}`;
+      return `${formatDate(date)} ${formatDate(endOfWeek)}`;
     }
 
     if (period === "monthly") {
@@ -294,7 +308,7 @@ const ReportPage = () => {
     console.log(employeeInfo);
 
     return (
-      <div className={`${styles.pageContainer}`}>
+      <div id="reportTop" className={`${styles.pageContainer}`}>
         <h2 className="text-center mb-3">Detailed Timecards Report</h2>
         <p className="text-center mb-3">
           {`Report for: ${formatDate(startDate)} - ${formatDate(endDate)}`}
@@ -447,6 +461,16 @@ const ReportPage = () => {
             </tbody>
           </table>
         </div>
+        <button
+          className="btn btn-sm btn-secondary mt-3"
+          onClick={() => {
+            const topEl = document.getElementById("reportTop");
+            if (topEl) topEl.scrollIntoView({ behavior: "smooth" });
+            else window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
+        >
+          Back to Top
+        </button>
       </div>
     );
   };
@@ -480,46 +504,48 @@ const ReportPage = () => {
     drivingTotalMinutes = drivingTotalMinutes % 60;
 
     return (
-      <div className={`${styles.reportpageContainer} mt-4`}>
-        <h2 className="text-center">Total Hours Report</h2>
-        <p className="text-center">
-          {`Report for: ${formatDate(startDate)} - ${formatDate(endDate)}`}
-        </p>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            gap: "10px",
-            flexWrap: "wrap",
-            marginBottom: "2rem",
-          }}
-          className="print-hide"
-        >
-          <button
-            className="btn btn-sm btn-primary"
-            onClick={handlePrint}
-            style={{ flex: "1 0 100px", maxWidth: "140px" }}
+      <div id="reportTop"  className={`${styles.pageContainer} mt-4`}>
+        <div>
+          <h2 className="text-center">Total Hours Report</h2>
+          <p className="text-center">
+            {`Report for: ${formatDate(startDate)} - ${formatDate(endDate)}`}
+          </p>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              gap: "10px",
+              flexWrap: "wrap",
+              marginBottom: "2rem",
+            }}
+            className="print-hide"
           >
-            Print Report
-          </button>
-
-          {reportType === "totalHours" && (
             <button
-              className="btn btn-sm btn-secondary"
-              onClick={handleSaveCSV}
+              className="btn btn-sm btn-primary"
+              onClick={handlePrint}
               style={{ flex: "1 0 100px", maxWidth: "140px" }}
             >
-              Save as CSV
+              Print Report
             </button>
-          )}
 
-          <button
-            className="btn btn-sm btn-dark"
-            onClick={() => navigate(-1)}
-            style={{ flex: "1 0 100px", maxWidth: "140px" }}
-          >
-            Back
-          </button>
+            {reportType === "totalHours" && (
+              <button
+                className="btn btn-sm btn-secondary"
+                onClick={handleSaveCSV}
+                style={{ flex: "1 0 100px", maxWidth: "140px" }}
+              >
+                Save as CSV
+              </button>
+            )}
+
+            <button
+              className="btn btn-sm btn-dark"
+              onClick={() => navigate(-1)}
+              style={{ flex: "1 0 100px", maxWidth: "140px" }}
+            >
+              Back
+            </button>
+          </div>
         </div>
 
         <div
@@ -596,6 +622,17 @@ const ReportPage = () => {
             </tbody>
           </table>
         </div>
+        <button
+  className="btn btn-sm btn-secondary mt-3"
+  onClick={() => {
+    const el = document.getElementById("reportTop");
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    else window.scrollTo({ top: 0, behavior: "smooth" });
+  }}
+>
+  Back to Top
+</button>
+
       </div>
     );
   };
@@ -617,6 +654,7 @@ const ReportPage = () => {
 
       return (
         <div id="reportPrint" className={`${styles.pageContainer} mt-4`}>
+          <div id="reportTop" />
           {/* ===== Screen/print shared container ===== */}
           <div className="title-page">
             <h2 className="text-center mb-4">
@@ -813,6 +851,17 @@ const ReportPage = () => {
                     </tr>
                   </tbody>
                 </table>
+                <button
+  className="btn btn-sm btn-secondary mt-3"
+  onClick={() => {
+    const el = document.getElementById("reportTop");
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    else window.scrollTo({ top: 0, behavior: "smooth" });
+  }}
+>
+  Back to Top
+</button>
+
               </div>
             );
           })}
@@ -969,7 +1018,10 @@ const ReportPage = () => {
           <div className={styles.reportTableContainer}>
             <table
               className={`table table-striped table-bordered text-center ${styles.table}`}
-              style={{ tableLayout: "auto", width: "max-content" }}
+              style={{
+                tableLayout: "auto",
+                width: isMobile ? "100%" : "max-content",
+              }}
             >
               <thead>
                 <tr>
@@ -987,50 +1039,68 @@ const ReportPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {/* Render from `records` */}
-                {records.map((record, index) => (
-                  <tr key={`${employeeId}-${index}`}>
-                    <td
-                      style={{
-                        whiteSpace: "pre-wrap",
-                        wordBreak: "break-word",
-                        fontSize: "0.75rem",
-                        maxWidth: "160px",
-                        minWidth: "160px",
-                      }}
-                    >
-                      {(() => {
-                        const raw = record.summary_period;
-                        if (!raw) return "Missing Period";
-                        const label =
-                          record.formatted_period ||
-                          formatPeriodRange(raw, period);
-                        if (
-                          label === "Invalid Month" ||
-                          label === "Invalid Date"
-                        ) {
-                          console.warn("⚠️ Found invalid label:", { raw });
-                        }
-                        return label;
-                      })()}
-                    </td>
+                {records.map((record, index) => {
+                  // 1) Compute label once
+                  const raw = record.summary_period;
+                  let label =
+                    record.formatted_period ||
+                    formatPeriodRange(raw, period) ||
+                    "Missing Period";
+                  if (label === "Invalid Month" || label === "Invalid Date") {
+                    console.warn("⚠️ Found invalid label:", { raw });
+                  }
 
-                    <td style={{ minWidth: "120px" }}>
-                      {record.facility_total_hours
-                        ? `${record.facility_total_hours.hours} h ${record.facility_total_hours.minutes} min`
-                        : "0 hours 0 minutes"}
-                    </td>
-                    <td style={{ minWidth: "140px" }}>
-                      {record.driving_total_hours
-                        ? `${record.driving_total_hours.hours} h ${record.driving_total_hours.minutes} min`
-                        : "0 hours 0 minutes"}
-                    </td>
-                    <td style={{ minWidth: "100px" }}>{record.days_worked}</td>
-                    <td style={{ minWidth: "100px" }}>
-                      {record.absentee_days}
-                    </td>
-                  </tr>
-                ))}
+                  const parts = label.split(" - ");
+
+                  return (
+                    <tr key={`${employeeId}-${index}`}>
+                      <td
+                        style={{
+                          whiteSpace: "normal", // allow wrapping/newlines
+                          wordBreak: "break-word",
+                          fontSize: "0.75rem",
+                          maxWidth: isMobile ? "none" : "160px",
+                          minWidth: isMobile ? "0" : "160px",
+                        }}
+                      >
+                        {parts.map((line, i) => (
+                          <div key={i}>{line}</div>
+                        ))}
+                      </td>
+
+                      <td style={{ minWidth: "120px", whiteSpace: "pre-wrap" }}>
+                        {record.facility_total_hours ? (
+                          <>
+                            {record.facility_total_hours.hours} h<br />
+                            {record.facility_total_hours.minutes} min
+                          </>
+                        ) : (
+                          <>
+                            0 h<br />0 min
+                          </>
+                        )}
+                      </td>
+                      <td style={{ minWidth: "140px" }}>
+                        {record.driving_total_hours ? (
+                          <>
+                            {record.driving_total_hours.hours} h<br />
+                            {record.driving_total_hours.minutes} min
+                          </>
+                        ) : (
+                          <>
+                            0 h<br />0 min
+                          </>
+                        )}
+                      </td>
+                      <td style={{ minWidth: "100px" }}>
+                        {record.days_worked}
+                      </td>
+                      <td style={{ minWidth: "100px" }}>
+                        {record.absentee_days}
+                      </td>
+                    </tr>
+                  );
+                })}
                 {/* Overall Totals */}
                 <tr>
                   <td style={{ textAlign: "right" }}>
@@ -1038,14 +1108,14 @@ const ReportPage = () => {
                   </td>
                   <td>
                     <strong>
-                      {overallTotalsForSingle.facility.hours} h{" "}
-                      {overallTotalsForSingle.facility.minutes} min
+                      <div>{overallTotalsForSingle.facility.hours} h</div>
+                      <div>{overallTotalsForSingle.facility.minutes} min</div>
                     </strong>
                   </td>
                   <td>
                     <strong>
-                      {overallTotalsForSingle.driving.hours} h{" "}
-                      {overallTotalsForSingle.driving.minutes} min
+                      <div>{overallTotalsForSingle.driving.hours} h</div>
+                      <div>{overallTotalsForSingle.driving.minutes} min</div>
                     </strong>
                   </td>
                   <td>
