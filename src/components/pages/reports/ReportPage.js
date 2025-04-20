@@ -7,7 +7,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { formatDate, formatTime } from "../utils/TimeAndDateUtils";
 import styles from "./ReportPage.module.css";
 
-// const API = process.env.REACT_APP_API_URL;
+
 const ReportPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -1127,7 +1127,8 @@ const ReportPage = () => {
               </tbody>
             </table>
             <button
-          className="btn btn-sm btn-secondary mt-3"
+          className={`btn btn-sm btn-secondary mt-3 ${styles.backToTopButton}`}
+
           onClick={() => {
             const topEl = document.getElementById("reportTop");
             if (topEl) topEl.scrollIntoView({ behavior: "smooth" });
