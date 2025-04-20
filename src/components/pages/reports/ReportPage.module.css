@@ -149,40 +149,70 @@ See LICENSE.txt file for details. */
 
 /* ==== Print ==== */
 @media print {
+
+
+  /* 1) Prevent any container from clipping later pages */
   html,
-  body {
-    overflow: visible !important;
-    height: auto !important;
-  }
-
-  /* Hide elements not needed for printing */
-  .print-hide {
-    display: none !important;
-  }
-
-  /* Force page break between sections */
-  .page-break {
-    page-break-after: always;
-  }
-
-  /* Ensure containers expand fully for printing */
+  body,
   .reportpageContainer,
   .reportTableContainer {
-    height: auto !important;
     overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
   }
 
-  /* Prevent tables and rows from splitting across pages */
-  .table,
-  tr {
-    page-break-inside: avoid;
-    break-inside: avoid;
+  /*Each block starts on a fresh page with built‑in top padding */
+  .reportTableContainer {
+    page-break-before: always !important;
+    padding-top: 1in;
+    padding-bottom: 1in;
+    margin-bottom: 25px;
+    box-sizing: border-box;
+  }
+  
+  /* No extra blank after the last block */
+  .reportTableContainer:last-of-type {
+    page-break-after: auto !important;
+    break-after: auto !important;
   }
 
-  /* Set margins for printed pages */
+  /* Repeat the entire THEAD on each page (so Name + Column Heads show) */
+  .reportTableContainer thead {
+    display: table-header-group !important;
+  }
+
+  /*Allow tables to split across pages, but never break a row in half */
+  .reportTableContainer table {
+    page-break-inside: auto !important;
+    break-inside: auto !important;
+  }
+  .reportTableContainer tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Standard 1″ page margins */
   @page {
-    margin: 1in;
+    margin: .25in;
+  }
+
+  /*Firefox only: disable flex so page-breaks work */
+  @-moz-document url-prefix() {
+    /* turn off flex so breaks can happen */
+    .reportpageContainer {
+      display: block !important;
+    }
+
+    .reportTableContainer {
+      display: block !important;
+
+      /* DROP the 'after' break, keep only 'before' */
+      page-break-after: auto !important;
+      page-break-before: always !important;
+    }
+    /* no extra break before first block */
+    .reportTableContainer:first-of-type {
+      page-break-before: auto !important;
+    }
   }
 }
-
-
