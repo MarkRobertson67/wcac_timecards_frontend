@@ -2,7 +2,7 @@
 // Copyright (c) 2025 Mark Robertson
 // See LICENSE.txt file for details.
 
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { formatDate, formatTime } from "../utils/TimeAndDateUtils";
 import styles from "./ReportPage.module.css";
@@ -30,7 +30,7 @@ const ReportPage = () => {
   const [isMobile, setIsMobile] = useState(
     typeof window !== "undefined" && window.innerWidth < 376
   );
-  const tableContainerRef = useRef(null);
+
 
   useEffect(() => {
     const handleResize = () => {
