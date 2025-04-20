@@ -779,7 +779,6 @@ const ReportPage = () => {
 
             return (
               <div
-                ref={tableContainerRef}
                 key={employee.employee_id}
                 className={`page-break ${styles.reportTableContainer} mb-4`}
               >
