@@ -42,7 +42,7 @@ function AboutComponent() {
         <div className={styles.imageContent}>
           <div className={styles.screenshot}>
             <img
-              src="/TimeCardScreenshot.png" // Path to image in public folder
+              src="/LogInScreenshot.png"
               alt="Account creation screenshot"
               className={styles.screenshotImage}
             />
@@ -73,7 +73,7 @@ function AboutComponent() {
         <div className={styles.imageContent}>
           <div className={styles.screenshot}>
             <img
-              src="/LogInScreenshot.png" // Path to image in public folder
+              src="/TimeCardScreenshot.png"
               alt="Timecard submission screenshot"
               className={styles.screenshotImage}
             />
