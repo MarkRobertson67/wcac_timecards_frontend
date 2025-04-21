@@ -61,3 +61,21 @@ See LICENSE.txt file for details. */
     margin-top: 10px; /* Mobile */
   }
 }
+
+.flashingText {
+  animation: flash 1s linear infinite;
+  font-size: 34px;
+  font-weight: bold;
+}
+
+@keyframes flash {
+  0% {
+    color: #007bff;
+  }
+  50% {
+    color: #ff0000;
+  }
+  100% {
+    color: #007bff;
+  }
+}
