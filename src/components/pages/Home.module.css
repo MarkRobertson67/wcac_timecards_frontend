@@ -2,50 +2,51 @@
 Copyright (c) 2025 Mark Robertson
 See LICENSE.txt file for details. */
 
+
 /* Home.module.css */
 
 .hPage {
-    overflow: auto;
-    min-height: 90vh;
-    background: linear-gradient(135deg, #d3d8dd, #3c4650);
-    padding: 20px;
-    font-family: 'Arial', sans-serif;
-    padding-bottom: 120px;
-    box-sizing: border-box;
-  }
-  
-.hPage .container {
-    margin-top: 20px;
-    padding: 20px;
-    background-color: #ffffff; /* Optional: adding white background to the form area */
-    border-radius: 8px; /* Optional: rounding the corners of the form area */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: adding shadow for better visibility */
-  }
-  
-  /* Button styles (adjust to your needs) */
-  .btn {
-    padding: 0.8rem 1.5rem;
-    border-radius: 5px;
-    font-size: 1rem;
-  }
+  overflow: auto;
+  min-height: 90vh;
+  background: linear-gradient(135deg, #d3d8dd, #3c4650);
+  padding: 20px;
+  font-family: "Arial", sans-serif;
+  padding-bottom: 120px;
+  box-sizing: border-box;
+}
 
-  /* Ensure the homepage container has relative positioning */
+.hPage .container {
+  margin-top: 20px;
+  padding: 20px;
+  background-color: #ffffff; /* Optional: adding white background to the form area */
+  border-radius: 8px; /* Optional: rounding the corners of the form area */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: adding shadow for better visibility */
+}
+
+/* Button styles (adjust to your needs) */
+.btn {
+  padding: 0.8rem 1.5rem;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+/* Ensure the homepage container has relative positioning */
 .homepage {
   position: relative;
   /* Other styling */
 }
-  
-/* Container for the bus - position it absolutely */
 
-  
 /* The bus image itself */
 .busAnimation {
   position: absolute;
-  margin-top: 80px;
-  width: 150px; /* Adjust size as needed */
   animation: driveAcross 10s linear infinite;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 155px; /* Position the bus at the bottom for desktop */
+  width: 350px; /* Default size for desktop */
+  max-width: 100%; /* Ensures bus doesn't get larger than the container */
 }
-  
+
 /* Keyframes for the bus moving from left to right */
 @keyframes driveAcross {
   from {
@@ -56,12 +57,7 @@ See LICENSE.txt file for details. */
   }
 }
 
-@media (max-width: 768px) {
-  .busAnimation {
-    margin-top: 10px; /* Mobile */
-  }
-}
-
+/* Flashing text style */
 .flashingText {
   animation: flash 1s linear infinite;
   font-size: 34px;
@@ -78,4 +74,20 @@ See LICENSE.txt file for details. */
   100% {
     color: #007bff;
   }
+}
+
+/* Mobile (screens smaller than 768px) */
+@media (max-width: 768px) {
+  .busAnimation {
+    width: 68px; /* Smaller bus size on mobile */
+    top: 63px; /* Position bus at the top */
+    bottom: auto; /* Remove bottom positioning */
+  }
+
+  /* Flashing text style */
+.flashingText {
+  animation: flash 1s linear infinite;
+  font-size: 20px;
+  font-weight: bold;
+}
 }

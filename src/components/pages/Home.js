@@ -350,12 +350,11 @@ function Home() {
         )}
 
         {/* Bus Image at the bottom */}
-        <div style={{ position: "relative", zIndex: 10 }}>
+        <div>
           <img
             src={bus}
             alt="Bus"
             className={styles.busAnimation}
-            style={{ width: "200px" }}
           />
         </div>
       </div>
