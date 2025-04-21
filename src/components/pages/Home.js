@@ -36,6 +36,7 @@ function Home() {
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isWaitingForEmailVerification, setIsWaitingForEmailVerification] = useState(false);
+  const [isSignupSelected, setIsSignupSelected] = useState(false);
 
   const navigate = useNavigate();
 
@@ -232,17 +233,20 @@ function Home() {
         {isWaitingForEmailVerification && (
           <div className="text-center">
             <div className="spinner-border text-primary" role="status"></div>
-            <p className="mt-3">
-              Waiting for email verification.
+            <p className="mt-3">Waiting for email verification.</p>
+            <p className="mt-2">
+              An email has been sent to your inbox with a verification link.
+              Please open the email and click on the verification link to
+              confirm your account.
             </p>
             <p className="mt-2">
-              An email has been sent to your inbox with a verification link. Please open the email and click on the verification link to confirm your account.
-            </p>
-            <p className="mt-2">
-              Once you verify your email, this page will automatically update, and you can proceed to complete your profile.
+              Once you verify your email, this page will automatically update,
+              and you can proceed to complete your profile.
             </p>
             <p className="mt-2 text-muted">
-              If you didn't receive the email, please check your spam or junk folder. You can also click the button below to resend the verification email.
+              If you didn't receive the email, please check your spam or junk
+              folder. You can also click the button below to resend the
+              verification email.
             </p>
             <button className="btn btn-link" onClick={handleResendVerification}>
               Didn't get an email? Resend Verification Email
@@ -252,7 +256,7 @@ function Home() {
             )}
           </div>
         )}
-  
+
         {currentUser && !isWaitingForEmailVerification && (
           <div className="text-center">
             <h1>Hello {firstName || "User"}! You are currently logged in</h1>
@@ -266,10 +270,12 @@ function Home() {
             )}
           </div>
         )}
-  
+
         {!currentUser && !isWaitingForEmailVerification && (
           <>
-            <h1 className="text-center mb-4">Please Login to access your account</h1>
+            <h1 className="text-center mb-4">
+              Please Login to access your account
+            </h1>
             <form
               onSubmit={handleSubmit}
               className="card p-3 mx-auto"
@@ -324,22 +330,37 @@ function Home() {
             <div className="text-center mt-3">
               <button
                 className="btn btn-secondary"
-                onClick={() => setIsLogin(!isLogin)}
+                onClick={() => {
+                  setIsLogin(!isLogin);
+                  setIsSignupSelected(!isSignupSelected);
+                }}
               >
                 {isLogin ? "Switch to Sign Up" : "Switch to Login"}
               </button>
             </div>
+
+            {/* Flashing Text Link */}
+            <div className="text-center mt-3">
+              <p className={`${isSignupSelected ? styles.flashingText : ""}`}>
+                Before you create an account, please review the{" "}
+                <a href="/tutorials">tutorials</a>.
+              </p>
+            </div>
           </>
         )}
-  
+
         {/* Bus Image at the bottom */}
         <div style={{ position: "relative", zIndex: 10 }}>
-        <img src={bus} alt="Bus" className={styles.busAnimation} style={{ width: "200px" }}/>
-      </div>
+          <img
+            src={bus}
+            alt="Bus"
+            className={styles.busAnimation}
+            style={{ width: "200px" }}
+          />
+        </div>
       </div>
     </div>
   );
-  
 }
 
 export default Home;
