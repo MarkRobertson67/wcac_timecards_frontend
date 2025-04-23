@@ -5,7 +5,7 @@
 import React, { useState } from "react";
 import { auth } from "../../../firebase/firebaseConfig";
 
-function ProfileModal({ onClose }) {
+function ProfileModal({ onSave,  onCancel }) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
@@ -16,50 +16,39 @@ function ProfileModal({ onClose }) {
   const handleSave = async () => {
     if (!firstName || !lastName || !phone || !position) {
       alert("Please complete all fields");
-      console.log("Validation failed.");
       return;
     }
 
     const user = auth.currentUser;
     if (!user) {
       alert("User is not logged in");
-      console.log("No user found.");
       return;
     }
 
     const employeeData = {
-      firebase_uid: user?.uid,
-      email: user?.email,
+      firebase_uid: user.uid,
+      email: user.email,
       first_name: firstName,
       last_name: lastName,
-      phone: phone,
-      position: position,
+      phone,
+      position,
     };
-
-    console.log("Employee Data:", employeeData);
 
     try {
       const response = await fetch(`${API}/employees`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(employeeData),
       });
-
-      if (!response.ok) {
-        throw new Error("Failed to save employee profile");
-      }
-
-      const result = await response.json();
-      console.log("Profile saved:", result);
-      //alert("Profile saved successfully!");
-      onClose(); // Close modal
+      if (!response.ok) throw new Error("Failed to save employee profile");
+      await response.json();
+      onSave();   // notify parent that save succeeded
     } catch (error) {
-      console.error("Error saving employee profile:", error.message);
+      console.error("Error saving employee profile:", error);
       alert("Error saving profile");
     }
   };
+
 
   const formatPhoneNumber = (value) => {
     const cleaned = value.replace(/\D/g, "");
@@ -91,7 +80,7 @@ function ProfileModal({ onClose }) {
               type="button"
               className="btn-close"
               aria-label="Close"
-              onClick={onClose}
+              onClick={onCancel}
             ></button>
           </div>
           <div className="modal-body">
@@ -149,7 +138,7 @@ function ProfileModal({ onClose }) {
             <button
               type="button"
               className="btn btn-secondary"
-              onClick={onClose}
+              onClick={onCancel}
             >
               Cancel
             </button>
