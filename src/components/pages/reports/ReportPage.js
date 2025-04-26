@@ -323,7 +323,7 @@ const ReportPage = () => {
             justifyContent: "center",
             gap: "10px",
             flexWrap: "wrap",
-            paddingBottom: "40px",
+            paddingBottom: "20px",
             paddingRight: "20px",
           }}
           className="print-hide mb-4"
