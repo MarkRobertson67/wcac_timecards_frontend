@@ -22,7 +22,7 @@ See LICENSE.txt file for details. */
   height: 0;
   visibility: hidden;
   /* leave 50px gap under your fixed navbar */
-  scroll-margin-top: 50px;
+  scroll-margin-top: 30px;
 }
 
 
@@ -31,6 +31,7 @@ See LICENSE.txt file for details. */
   flex-grow: 1;
   overflow-y: auto;
   overflow-x: auto;
+  padding-bottom: 150px;
 }
 
 /* ==== Table formatting ==== */
