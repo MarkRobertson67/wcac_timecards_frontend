@@ -221,9 +221,12 @@ const ReportPage = () => {
     }
   }, [initialReportData, formatPeriodRange]);
 
+
   const handlePrint = () => {
     window.print();
   };
+
+   
 
   // If loading, display a loading spinner/message
   if (loading) {
@@ -307,17 +310,24 @@ const ReportPage = () => {
     console.log(employeeInfo);
 
     return (
-      <div id="reportTop" className={`${styles.pageContainer}`}>
+      <div id="reportPrint" className={styles.pageContainer}>
+        <div id="reportTop" />
+    
+        {/* — TABLE — */}
+        <div className={`${styles.reportTableContainer} reportTableContainer`}>
+        <div className="print-only titleContainer">
         <h2 className="text-center mb-3">Detailed Timecards Report</h2>
         <p className="text-center mb-3">
           {`Report for: ${formatDate(startDate)} - ${formatDate(endDate)}`}
           <br />
           <strong>Employee ID:</strong> {employeeId || "N/A"}
           <br />
-          <strong>Employee Name:</strong> {firstName || "N/A"}{" "}
-          {lastName || "N/A"}
+          <strong>Employee Name:</strong> {firstName || "N/A"} {lastName || "N/A"}
         </p>
+      </div>
+        {/* — SCREEN-ONLY BUTTONS — */}
         <div
+          className="print-hide mb-4"
           style={{
             display: "flex",
             justifyContent: "center",
@@ -326,31 +336,22 @@ const ReportPage = () => {
             paddingBottom: "20px",
             paddingRight: "20px",
           }}
-          className="print-hide mb-4"
         >
           <button
             className="btn btn-primary"
             onClick={handlePrint}
-            style={{
-              flex: "1 0 120px", // min width 120px, will shrink/grow
-              maxWidth: "150px", // optional max
-            }}
+            style={{ flex: "1 0 120px", maxWidth: "150px" }}
           >
             Print Report
           </button>
           <button
             className="btn btn-dark"
             onClick={() => navigate(-1)}
-            style={{
-              flex: "1 0 120px",
-              maxWidth: "150px",
-            }}
+            style={{ flex: "1 0 120px", maxWidth: "150px" }}
           >
             Back
           </button>
         </div>
-
-        <div className={styles.reportTableContainer}>
           <table
             className={`table table-striped table-bordered text-center ${styles.table}`}
           >
@@ -378,8 +379,7 @@ const ReportPage = () => {
               {reportData.map((record) => (
                 <tr key={record.timecard_id}>
                   <td>{formatDate(record.work_date)}</td>
-
-                  {/* Facility Activity Columns */}
+                  {/* Facility Activity */}
                   <td>
                     {record.facility_start_time
                       ? formatTime(record.facility_start_time)
@@ -405,8 +405,7 @@ const ReportPage = () => {
                       ? `${record.facility_total_hours.hours} h ${record.facility_total_hours.minutes} min`
                       : "0 Hours 0 Minutes"}
                   </td>
-
-                  {/* Driving Activity Columns */}
+                  {/* Driving Activity */}
                   <td>
                     {record.driving_start_time
                       ? formatTime(record.driving_start_time)
@@ -434,8 +433,7 @@ const ReportPage = () => {
                   </td>
                 </tr>
               ))}
-              {/* Overall Totals Row */}
-              {/* Totals row */}
+              {/* Overall Totals */}
               <tr>
                 <td colSpan="5" style={{ textAlign: "right" }}>
                   <strong>Total</strong>
@@ -446,10 +444,7 @@ const ReportPage = () => {
                     <div>{totals.facility.minutes} min</div>
                   </strong>
                 </td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td></td><td></td><td></td><td></td>
                 <td className="time-cell">
                   <strong>
                     <div>{totals.driving.hours} h</div>
@@ -459,11 +454,13 @@ const ReportPage = () => {
               </tr>
             </tbody>
           </table>
+    
+          {/* — BACK TO TOP — */}
           <button
             className={`btn btn-sm btn-secondary mt-3 ${styles.backToTopButton}`}
             onClick={() => {
-              const topEl = document.getElementById("reportTop");
-              if (topEl) topEl.scrollIntoView({ behavior: "smooth" });
+              const el = document.getElementById("reportTop");
+              if (el) el.scrollIntoView({ behavior: "smooth" });
               else window.scrollTo({ top: 0, behavior: "smooth" });
             }}
           >
@@ -472,6 +469,7 @@ const ReportPage = () => {
         </div>
       </div>
     );
+    
   };
 
   const renderTotalHours = () => {
@@ -503,12 +501,19 @@ const ReportPage = () => {
     drivingTotalMinutes = drivingTotalMinutes % 60;
 
     return (
-      <div id="reportTop" className={`${styles.pageContainer} mt-4`}>
-        <div>
+      <div id="reportPrint" className={`${styles.pageContainer} mt-4`}>
+        <div id="reportTop" />
+        <div
+          className={styles.reportTableContainer}
+          // style={{ marginTop: "30px" }}
+        >
+                  <div>
+        <div id="titleBlock" className={styles.titleContainer}>
           <h2 className="text-center">Total Hours Report</h2>
           <p className="text-center">
             {`Report for: ${formatDate(startDate)} - ${formatDate(endDate)}`}
           </p>
+          </div>
           <div
             style={{
               display: "flex",
@@ -546,11 +551,6 @@ const ReportPage = () => {
             </button>
           </div>
         </div>
-
-        <div
-          className={styles.reportTableContainer}
-          // style={{ marginTop: "30px" }}
-        >
           <table className="table table-striped table-bordered text-center">
             <thead>
               <tr>
@@ -653,7 +653,7 @@ const ReportPage = () => {
       return (
         <div id="reportPrint" className={`${styles.pageContainer} mt-4`}>
           <div id="reportTop" />
-          {/* ===== Screen/print shared container ===== */}
+
           <div className="title-page">
             <h2 className="text-center mb-4">
               {titlePrefix} Employee Summary Report For ALL
