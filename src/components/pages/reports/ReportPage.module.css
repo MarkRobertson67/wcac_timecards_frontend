@@ -5,7 +5,7 @@ See LICENSE.txt file for details. */
 /* ==== Base container: fixed height ==== */
 .reportpageContainer {
   max-width: 1200px;
-  height: calc(100vh - 200px);  /* Locks height across all devices */
+  height: calc(100vh - 200px); /* Locks height across all devices */
   margin: 0 auto;
   padding: 20px;
   padding-bottom: 50px;
@@ -21,17 +21,16 @@ See LICENSE.txt file for details. */
   display: block;
   height: 0;
   visibility: hidden;
-  /* leave 50px gap under your fixed navbar */
+  /* leave 30px gap under your fixed navbar */
   scroll-margin-top: 30px;
 }
-
 
 /* ==== Table wrapper: handles all scrolling ==== */
 .reportTableContainer {
   flex-grow: 1;
   overflow-y: auto;
   overflow-x: auto;
-  padding-bottom: 150px;
+  padding-bottom: 120px;
 }
 
 /* ==== Table formatting ==== */
@@ -114,16 +113,15 @@ See LICENSE.txt file for details. */
 
 /* ==== Extra small screen tweak ==== */
 @media (max-width: 375px) {
-  
   .reportTableContainer {
     padding: 0 10px 60px 10px;
     overflow-x: auto !important;
   }
 
   .reportTableContainer table th {
-    white-space: nowrap !important;        /* don’t wrap at all */
-    word-break: normal !important;        /* only break at spaces */
-    overflow-wrap: normal !important;     /* only wrap at normal break points */
+    white-space: nowrap !important; /* don’t wrap at all */
+    word-break: normal !important; /* only break at spaces */
+    overflow-wrap: normal !important; /* only wrap at normal break points */
   }
 
   .table {
@@ -131,7 +129,7 @@ See LICENSE.txt file for details. */
     min-width: unset !important;
     width: max-content;
   }
-  
+
   .table th,
   .table td {
     font-size: 0.6rem;
@@ -167,58 +165,36 @@ See LICENSE.txt file for details. */
   .backToTopButton {
     margin-bottom: 60px;
   }
-  
 }
 
+/* hide .print-only on screen */
+.print-only {
+  display: none !important;
+}
 
 /* ==== Print ==== */
 @media print {
-
-
-  /* 1) Prevent any container from clipping later pages */
-  html,
-  body,
-  .reportpageContainer,
-  .reportTableContainer {
-    overflow: visible !important;
-    height: auto !important;
-    max-height: none !important;
+  /* hide every element on the page */
+  body * {
+    visibility: hidden !important;
   }
-
-  /*Each block starts on a fresh page with built‑in top padding */
+  /* make your table wrapper (and its children) visible */
+  .reportTableContainer,
+  .reportTableContainer * {
+    visibility: visible !important;
+  }
+  /* pin it to the top of the page and full width */
   .reportTableContainer {
-    page-break-before: always !important;
-    padding-top: 1in;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    /* if you need breathing room: */
+    padding-top: 0.5in;
     padding-bottom: 1in;
-    margin-bottom: 25px;
     box-sizing: border-box;
   }
-  
-  /* No extra blank after the last block */
-  .reportTableContainer:last-of-type {
-    page-break-after: auto !important;
-    break-after: auto !important;
-  }
 
-  /* Repeat the entire THEAD on each page (so Name + Column Heads show) */
-  .reportTableContainer thead {
-    display: table-header-group !important;
-  }
-
-  /*Allow tables to split across pages, but never break a row in half */
-  .reportTableContainer table {
-    page-break-inside: auto !important;
-    break-inside: auto !important;
-  }
-  .reportTableContainer tr {
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-  }
-
-  /* Standard 1″ page margins */
-  @page {
-    margin: .25in;
-  }
 
   /*Firefox only: disable flex so page-breaks work */
   @-moz-document url-prefix() {
