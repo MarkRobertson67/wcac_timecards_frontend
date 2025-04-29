@@ -350,12 +350,12 @@ const ReportPage = () => {
                 <th>Lunch Start</th>
                 <th>Lunch End</th>
                 <th>End Time</th>
-                <th style={{ width: "140px" }}>Total Hours</th>
+                <th style={{ width: "120px" }}>Total Hours</th>
                 <th>Start Time</th>
                 <th>Lunch Start</th>
                 <th>Lunch End</th>
                 <th>End Time</th>
-                <th style={{ width: "140px" }}>Total Hours</th>
+                <th style={{ width: "120px" }}>Total Hours</th>
               </tr>
             </thead>
             <tbody>
@@ -386,7 +386,7 @@ const ReportPage = () => {
                   <td>
                     {record.facility_total_hours
                       ? `${record.facility_total_hours.hours} h ${record.facility_total_hours.minutes} min`
-                      : "0 Hours 0 Minutes"}
+                      : "0 hours 0 minutes"}
                   </td>
                   {/* Driving Activity */}
                   <td>
@@ -412,7 +412,7 @@ const ReportPage = () => {
                   <td>
                     {record.driving_total_hours
                       ? `${record.driving_total_hours.hours} h ${record.driving_total_hours.minutes} min`
-                      : "0 Hours 0 Minutes"}
+                      : "0 hours 0 hinutes"}
                   </td>
                 </tr>
               ))}
@@ -423,8 +423,8 @@ const ReportPage = () => {
                 </td>
                 <td className="time-cell">
                   <strong>
-                    <div>{totals.facility.hours} h</div>
-                    <div>{totals.facility.minutes} min</div>
+                    <div>{totals.facility.hours} hours</div>
+                    <div>{totals.facility.minutes} minutes</div>
                   </strong>
                 </td>
                 <td></td>
@@ -433,8 +433,8 @@ const ReportPage = () => {
                 <td></td>
                 <td className="time-cell">
                   <strong>
-                    <div>{totals.driving.hours} h</div>
-                    <div>{totals.driving.minutes} min</div>
+                    <div>{totals.driving.hours} hours</div>
+                    <div>{totals.driving.minutes} minutes</div>
                   </strong>
                 </td>
               </tr>
@@ -488,10 +488,7 @@ const ReportPage = () => {
     return (
       <div id="reportPrint" className={`${styles.pageContainer} mt-4`}>
         <div id="reportTop" />
-        <div
-          className={styles.reportTableContainer}
-          // style={{ marginTop: "30px" }}
-        >
+        <div className={styles.reportTableContainer}>
           <div>
             <div id="titleBlock" className={styles.titleContainer}>
               <h2 className="text-center">Total Hours Report</h2>
@@ -552,56 +549,47 @@ const ReportPage = () => {
               </tr>
             </thead>
             <tbody>
-              {reportData.map((record) => (
-                <tr key={record.employee_id}>
-                  <td>{record.employee_id}</td>
-                  <td>{`${record.first_name} ${record.last_name}`}</td>
-                  <td>
-                    {record.facility_total_hours &&
-                    typeof record.facility_total_hours === "object" ? (
-                      <>
-                        {record.facility_total_hours.hours || 0} h
-                        <br />
-                        {record.facility_total_hours.minutes || 0} min
-                      </>
-                    ) : (
-                      <>
-                        0 h
-                        <br />0 min
-                      </>
-                    )}
-                  </td>
+              {reportData.map((record) => {
+                const fac = record.facility_total_hours ?? {
+                  hours: 0,
+                  minutes: 0,
+                };
+                const drv = record.driving_total_hours ?? {
+                  hours: 0,
+                  minutes: 0,
+                };
+                return (
+                  <tr key={record.employee_id}>
+                    <td>{record.employee_id}</td>
+                    <td>{`${record.first_name} ${record.last_name}`}</td>
 
-                  <td>
-                    {record.driving_total_hours &&
-                    typeof record.driving_total_hours === "object" ? (
-                      <>
-                        {record.driving_total_hours.hours || 0} h
-                        <br />
-                        {record.driving_total_hours.minutes || 0} min
-                      </>
-                    ) : (
-                      <>
-                        0 h
-                        <br />0 min
-                      </>
-                    )}
-                  </td>
-                </tr>
-              ))}
+                    <td className="time-cell">
+                      {fac.hours} Hours <br className="mobile-break" />
+                      {fac.minutes} Minutes
+                    </td>
+
+                    <td className="time-cell">
+                      {drv.hours} Hours <br className="mobile-break" />
+                      {drv.minutes} Minutes
+                    </td>
+                  </tr>
+                );
+              })}
+
               <tr>
                 <td colSpan="2" style={{ textAlign: "right" }}>
                   <strong>Total</strong>
                 </td>
                 <td>
                   <strong>
-                    {facilityTotalHours} h <br /> {facilityTotalMinutes} min
+                    {facilityTotalHours} Hours <br className="mobile-break" />
+                    {facilityTotalMinutes} Minutes
                   </strong>
                 </td>
                 <td>
                   <strong>
-                    {drivingTotalHours} h <br />
-                    {drivingTotalMinutes} min
+                    {drivingTotalHours} Hours <br className="mobile-break" />
+                    {drivingTotalMinutes} Minutes
                   </strong>
                 </td>
               </tr>
@@ -775,7 +763,11 @@ const ReportPage = () => {
               employeeTotals.driving.minutes %= 60;
 
               return (
-                <div key={employee.employee_id} className={`page-break mb-4`}>
+                <div
+                  key={employee.employee_id}
+                  className={`page-break-inside: avoid;  
+           page-break-after: automb-4`}
+                >
                   <h3 style={{ textAlign: "left" }}>
                     {employee.first_name} {employee.last_name}
                   </h3>
@@ -814,15 +806,28 @@ const ReportPage = () => {
                                 )}
                           </td>
                           <td>
-                            {record.facility_total_hours
-                              ? `${record.facility_total_hours.hours} h ${record.facility_total_hours.minutes} min`
-                              : "0 hours 0 minutes"}
+                            {record.facility_total_hours ? (
+                              <>
+                                {record.facility_total_hours.hours} h{" "}
+                                <br className="mobile-break" />
+                                {record.facility_total_hours.minutes} min
+                              </>
+                            ) : (
+                              <>0 hours 0 minutes</>
+                            )}
                           </td>
                           <td>
-                            {record.driving_total_hours
-                              ? `${record.driving_total_hours.hours} h ${record.driving_total_hours.minutes} min`
-                              : "0 hours 0 minutes"}
+                            {record.driving_total_hours ? (
+                              <>
+                                {record.driving_total_hours.hours} h{" "}
+                                <br className="mobile-break" />
+                                {record.driving_total_hours.minutes} min
+                              </>
+                            ) : (
+                              <>0 hours 0 minutes</>
+                            )}
                           </td>
+
                           <td>{record.days_worked}</td>
                           <td>{record.absentee_days}</td>
                         </tr>
@@ -835,12 +840,14 @@ const ReportPage = () => {
                         <td>
                           <strong>
                             {employeeTotals.facility.hours} h{"  "}
+                            <br className="mobile-break" />
                             {employeeTotals.facility.minutes} min
                           </strong>
                         </td>
                         <td>
                           <strong>
                             {employeeTotals.driving.hours} h{"  "}
+                            <br className="mobile-break" />
                             {employeeTotals.driving.minutes} min
                           </strong>
                         </td>
@@ -853,6 +860,7 @@ const ReportPage = () => {
                       </tr>
                     </tbody>
                   </table>
+                  <br />
                 </div>
               );
             })}
@@ -1041,10 +1049,31 @@ const ReportPage = () => {
                       ? "Month"
                       : "Year"}
                   </th>
-                  <th style={{ textAlign: "left" }}>Facility Total Hours</th>
-                  <th style={{ textAlign: "left" }}>Driving Total Hours</th>
-                  <th style={{ textAlign: "left" }}>Days Worked</th>
-                  <th style={{ textAlign: "left" }}>Days Absent</th>
+
+                  <th style={{ textAlign: "left" }}>
+                    Facility {"  "}
+                    <br className="mobile-break" />
+                    Total {"  "}
+                    <br className="mobile-break" />
+                    Hours
+                  </th>
+                  <th style={{ textAlign: "left" }}>
+                    Driving {"  "}
+                    <br className="mobile-break" />
+                    Total {"  "}
+                    <br className="mobile-break" />
+                    Hours
+                  </th>
+                  <th style={{ textAlign: "left" }}>
+                    Days {"  "}
+                    <br className="mobile-break" />
+                    Worked
+                  </th>
+                  <th style={{ textAlign: "left" }}>
+                    Days {"  "}
+                    <br className="mobile-break" />
+                    Absent
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -1063,46 +1092,43 @@ const ReportPage = () => {
 
                   return (
                     <tr key={`${employeeId}-${index}`}>
-                      <td
-                      // style={{
-                      //   whiteSpace: "normal", // allow wrapping/newlines
-                      //   wordBreak: "break-word",
-                      //   fontSize: "0.75rem",
-                      //   maxWidth: isMobile ? "none" : "160px",
-                      //   minWidth: isMobile ? "0" : "160px",
-                      // }}
-                      >
+                      <td>
                         {parts.map((line, i) => (
                           <div key={i}>{line}</div>
                         ))}
                       </td>
 
-                      <td style={{ minWidth: "120px", whiteSpace: "pre-wrap" }}>
+                      <td>
                         {record.facility_total_hours ? (
                           <>
-                            {record.facility_total_hours.hours} h{"  "}
+                            {record.facility_total_hours.hours} h
+                            <br className="mobile-break" />
                             {record.facility_total_hours.minutes} min
                           </>
                         ) : (
-                          <>0 h{"  "}0 min</>
+                          <>
+                            0 h
+                            <br className="mobile-break" />0 min
+                          </>
                         )}
                       </td>
-                      <td style={{ minWidth: "140px" }}>
+                      <td>
                         {record.driving_total_hours ? (
                           <>
-                            {record.driving_total_hours.hours} h{"  "}
+                            {record.driving_total_hours.hours} h
+                            <br className="mobile-break" />
                             {record.driving_total_hours.minutes} min
                           </>
                         ) : (
-                          <>0 h{"  "}0 min</>
+                          <>
+                            0 h
+                            <br className="mobile-break" />0 min
+                          </>
                         )}
                       </td>
-                      <td style={{ minWidth: "100px" }}>
-                        {record.days_worked}
-                      </td>
-                      <td style={{ minWidth: "100px" }}>
-                        {record.absentee_days}
-                      </td>
+
+                      <td>{record.days_worked}</td>
+                      <td>{record.absentee_days}</td>
                     </tr>
                   );
                 })}
@@ -1113,16 +1139,19 @@ const ReportPage = () => {
                   </td>
                   <td>
                     <strong>
-                      <div>{overallTotalsForSingle.facility.hours} h</div>
-                      <div>{overallTotalsForSingle.facility.minutes} min</div>
+                      {overallTotalsForSingle.facility.hours} h{" "}
+                      <br className="mobile-break" />
+                      {overallTotalsForSingle.facility.minutes} min
                     </strong>
                   </td>
                   <td>
                     <strong>
-                      <div>{overallTotalsForSingle.driving.hours} h</div>
-                      <div>{overallTotalsForSingle.driving.minutes} min</div>
+                      {overallTotalsForSingle.driving.hours} h{" "}
+                      <br className="mobile-break" />
+                      {overallTotalsForSingle.driving.minutes} min
                     </strong>
                   </td>
+
                   <td>
                     <strong>{overallTotalsForSingle.daysWorked}</strong>
                   </td>
