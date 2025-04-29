@@ -21,7 +21,7 @@ See LICENSE.txt file for details. */
   display: block;
   height: 0;
   visibility: hidden;
-  /* leave 30px gap under your fixed navbar */
+  /* leave 30px gap under fixed navbar */
   scroll-margin-top: 30px;
 }
 
@@ -69,7 +69,7 @@ See LICENSE.txt file for details. */
   }
 
   .reportTableContainer {
-    padding-bottom: 40px;
+    padding-bottom: 100px;
   }
 
   .table {
@@ -99,6 +99,11 @@ See LICENSE.txt file for details. */
     white-space: nowrap;
   }
 
+  .table td:first-child {
+    white-space: nowrap;
+    min-width: 150px;
+  }
+
   .button-group {
     flex-direction: row;
     justify-content: center;
@@ -109,12 +114,14 @@ See LICENSE.txt file for details. */
     font-size: 0.85rem;
     padding: 6px 10px;
   }
+
 }
 
+
 /* ==== Extra small screen tweak ==== */
-@media (max-width: 375px) {
+@media (max-width: 350px) {
   .reportTableContainer {
-    padding: 0 10px 60px 10px;
+    padding: 0 10px 100px 10px;
     overflow-x: auto !important;
   }
 
@@ -172,12 +179,15 @@ See LICENSE.txt file for details. */
   display: none !important;
 }
 
+
+
 /* ==== Print ==== */
 @media print {
   /* hide every element on the page */
   body * {
     visibility: hidden !important;
   }
+
   /* make your table wrapper (and its children) visible */
   .reportTableContainer,
   .reportTableContainer * {
@@ -189,30 +199,32 @@ See LICENSE.txt file for details. */
     top: 0;
     left: 0;
     width: 100%;
-    /* if you need breathing room: */
-    padding-top: 0.5in;
-    padding-bottom: 1in;
-    box-sizing: border-box;
+
+    padding: 0.5in 0.3in 0.75in 0.3in !important; 
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+  .page-break h3 {
+    page-break-after: avoid !important;
+  }
+}
+
+/*Firefox only: disable flex so page-breaks work */
+@-moz-document url-prefix() {
+  /* turn off flex so breaks can happen */
+  .reportpageContainer {
+    display: block !important;
   }
 
+  .reportTableContainer {
+    display: block !important;
 
-  /*Firefox only: disable flex so page-breaks work */
-  @-moz-document url-prefix() {
-    /* turn off flex so breaks can happen */
-    .reportpageContainer {
-      display: block !important;
-    }
-
-    .reportTableContainer {
-      display: block !important;
-
-      /* DROP the 'after' break, keep only 'before' */
-      page-break-after: auto !important;
-      page-break-before: always !important;
-    }
-    /* no extra break before first block */
-    .reportTableContainer:first-of-type {
-      page-break-before: auto !important;
-    }
+    /* DROP the 'after' break, keep only 'before' */
+    page-break-after: auto !important;
+    page-break-before: always !important;
+  }
+  /* no extra break before first block */
+  .reportTableContainer:first-of-type {
+    page-break-before: auto !important;
   }
 }

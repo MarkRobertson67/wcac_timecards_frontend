@@ -32,6 +32,18 @@
   color: #61dafb;
 }
 
+/* ALWAYS hide the <br> by default: */
+.mobile-break {
+  display: none !important;
+}
+
+/* ONLY show on narrow viewports: */
+@media (max-width: 768px) {
+  .mobile-break {
+    display: block !important;
+  }
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
