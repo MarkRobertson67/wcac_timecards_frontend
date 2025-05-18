@@ -170,7 +170,7 @@ function TimeCardsIndex() {
       className={styles.container}
       style={{
         width: "100%",
-        maxHeight: isMobile ? "calc(100vh - 150px)" : "100%",
+        maxHeight: isMobile ? "calc(100vh - 150px)" : "80%",
         overflowY: isMobile ? "auto" : "hidden",
         paddingBottom: isMobile ? "100px" : "0px",
       }}
@@ -186,6 +186,7 @@ function TimeCardsIndex() {
           <div className="mt-2">Loading timecard data...</div>
         </div>
       ) : (
+        <div className={styles.calendarWrapper}>
         <FullCalendar
           timeZone="UTC"
           plugins={[dayGridPlugin, interactionPlugin]}
@@ -219,6 +220,7 @@ function TimeCardsIndex() {
             paddingBottom: isMobile ? "80px" : "0px", // Add extra space on mobile
           }}
         />
+        </div>
       )}
       <div style={{ display: "flex", justifyContent: "center", gap: "20px" }}>
         <span>Key:</span>
