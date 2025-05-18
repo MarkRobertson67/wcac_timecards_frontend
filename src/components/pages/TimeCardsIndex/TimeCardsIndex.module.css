@@ -3,126 +3,133 @@ Copyright (c) 2025 Mark Robertson
 See LICENSE.txt file for details. */
 
 
-/* Basic reset */
-html, body {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* TimeCardsIndex.module.css */
 
-/* Prevent scrolling on desktop */
-@media (min-width: 769px) {
-  html, body {
-    overflow: hidden;
+/* ===========================================================
+   Global Reset + Always Allow Vertical Scroll
+   =========================================================== */
+   html, body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    overflow-y: auto;
   }
-}
-
-/* Container styling */
-.container {
-  margin-top: 40px; /* Ensure space below navbar */
-  min-height: calc(100vh - 120px); /* Account for footer and spacing */
-  width: 100%;
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-bottom: 150px;
-  overflow-y: auto;
-}
-
-/* Centering title */
-.container h2 {
-  text-align: center;
-  margin-bottom: 20px;
-  font-size: 1.4rem;
-}
-
-/* FullCalendar styling */
-.fc {
-  height: auto;
-  max-height: 50vh;
-  overflow-y: auto;
-}
-
-/* Adjusting the height of the calendar cells */
-.fc-daygrid-day-frame {
-  height: 70px;
-}
-
-/* Adjusting the height of the calendar header */
-.fc-header-toolbar {
-  height: 40px;
-}
-
-/* Styling for header buttons */
-.fc-button {
-  background-color: transparent;
-  border: none;
-  color: #000;
-  font-weight: normal;
-  outline: none;
-}
-
-/* Styling for button in different states */
-.fc-button:hover {
-  background-color: #f0f0f0;
-  color: #000;
-  font-weight: bold;
-}
-
-.fc-button:active, .fc-button:focus {
-  background-color: transparent;
-  color: #000;
-  border: none;
-  outline: none;
-}
-
-.fc-button:focus-visible {
-  outline: none;
-}
-
-/* Component-Specific Styles */
-.eventContent {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  width: 100%;
-  color: black;
-  font-weight: bold;
-  text-align: center;
-  cursor: pointer;
-}
-
-.eventContent span {
-  font-size: 1rem;
-}
-
-/* Media Queries */
-@media (max-width: 768px) {
-  .eventContent span {
-    font-size: 0.5rem;
-  }
-
-  .fc-daygrid-day-frame {
-    height: 50px;
-  }
-
-  .fc .fc-daygrid-event {
-    white-space: nowrap;
-  }
-}
-
-@media (max-width: 600px) {
-  .eventContent span {
-    font-size: 0.5rem;
-    line-height: 1;
-  }
-
+  
+  /* ===========================================================
+     Outer Container: Title + Calendar + Key
+     =========================================================== */
   .container {
+    margin-top: 40px;                         /* space below navbar */
     padding: 10px;
-    padding-top: 20px;
-    padding-bottom: 355px;
+    padding-bottom: 150px;                    /* room for footer */
+    width: 100%;
+    max-height: calc(100vh - 150px);          /* leave ~100px for header/footer */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-y: auto;
   }
-}
-
+  
+  /* Page Title */
+  .container h2 {
+    flex: 0 0 auto;
+    text-align: center;
+    margin-bottom: 1rem;
+    font-size: 1.4rem;
+  }
+  
+  /* ===========================================================
+     Calendar Wrapper: Center & Narrow the Calendar
+     =========================================================== */
+  .calendarWrapper {
+    width: 100%;
+    max-width: 1200px;   /* calendar never wider than 800px */
+    margin: 0 auto;     /* center horizontally */
+    flex: 1 1 auto;     /* fill remaining vertical space */
+    overflow-y: auto;
+    padding-bottom: 100px;
+  }
+  
+  /* ===========================================================
+     FullCalendar Tweaks
+     =========================================================== */
+  /* center the header toolbar */
+  .fc-header-toolbar {
+    height: 40px;
+  }
+  
+  /* style header buttons */
+  .fc-button {
+    background: transparent;
+    border: none;
+    color: #000;
+    outline: none;
+  }
+  .fc-button:hover {
+    background: #f0f0f0;
+    font-weight: bold;
+  }
+  
+  /* each day cell becomes a flex container */
+  .fc-daygrid-day-frame {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 70px;      /* adjust as desired */
+  }
+  
+  /* event container inside each day-cell */
+  .fc-daygrid-day-frame .fc-daygrid-day-events {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
+  
+  /* harness around each event to center it */
+  .fc-daygrid-event-harness {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+  
+  /* your eventContent styling */
+  .eventContent {
+    width: 100%;
+    text-align: center;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  /* ===========================================================
+     Mobile Queries (unchanged)
+     =========================================================== */
+  @media (max-width: 768px) {
+    .eventContent span {
+      font-size: 0.5rem;
+    }
+  
+    .fc-daygrid-day-frame {
+      height: 50px;
+    }
+  
+    .fc .fc-daygrid-event {
+      white-space: nowrap;
+    }
+  }
+  
+  @media (max-width: 600px) {
+    .eventContent span {
+      font-size: 0.5rem;
+      line-height: 1;
+    }
+  
+    .container {
+      padding: 10px;
+      padding-top: 20px;
+      padding-bottom: 355px;
+    }
+  }
+  
