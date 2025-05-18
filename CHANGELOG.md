@@ -2,6 +2,9 @@
 // Copyright (c) 2025 Mark Robertson
 // See LICENSE.txt file for details.
 
+## Version 1.0.8 (2025-05-18)
+- Fixed CSS for Home and Index Pages
+
 ## Version 1.0.7 (2025-04-29)
 - Fixed CSS for mobile and Fixed Print
 
