@@ -76,6 +76,14 @@ See LICENSE.txt file for details. */
   }
 }
 
+/* Laptops & small desktops */
+@media (max-width: 1440px) {
+  .busAnimation {
+    width: 240px; 
+    bottom: 115px;
+  }
+}
+
 /* Mobile (screens smaller than 768px) */
 @media (max-width: 768px) {
   .busAnimation {
